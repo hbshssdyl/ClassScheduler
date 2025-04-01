@@ -12,9 +12,10 @@ Controller::Controller(QObject* parent)
 void Controller::initialize()
 {
     mAllOperateMode.clear();
-    mAllOperateMode.emplace_back(OperateMode::Deduplication);
-    mAllOperateMode.emplace_back(OperateMode::Enhancement);
-    mAllOperateMode.emplace_back(OperateMode::Compression);
+    mAllOperateMode.emplace_back(OperateMode::SearchTeacherInfo);
+    mAllOperateMode.emplace_back(OperateMode::ScheduleClass);
+    mAllOperateMode.emplace_back(OperateMode::CalcOneToOneMoney);
+    mAllOperateMode.emplace_back(OperateMode::CalcClassMoney);
     onOperateModeSelected(OperateMode::WelcomePage);
 }
 
@@ -26,12 +27,14 @@ std::string Controller::toOperateModeString(OperateMode mode)
         return "None";
     case OperateMode::WelcomePage:
         return "WelcomePage";
-    case OperateMode::Deduplication:
-        return "Deduplication";
-    case OperateMode::Enhancement:
-        return "Enhancement";
-    case OperateMode::Compression:
-        return "Compression";
+    case OperateMode::SearchTeacherInfo:
+        return "SearchTeacherInfo";
+    case OperateMode::ScheduleClass:
+        return "ScheduleClass";
+    case OperateMode::CalcOneToOneMoney:
+        return "CalcOneToOneMoney";
+    case OperateMode::CalcClassMoney:
+        return "CalcClassMoney";
     default:
         return "default";
     }
@@ -60,41 +63,41 @@ void Controller::onOperateModeSelected(OperateMode mode)
     }
 }
 
-void Controller::handleDeduplicationMode(string dirPath)
+void Controller::handleSearchTeacherInfoMode()
 {
-    std::string finalDirPath = dirPath.substr(8); // remove "file:///" in the dirPath
-    auto files = CUtils::TraversingFilesRecursive(finalDirPath);
+    // std::string finalDirPath = dirPath.substr(8); // remove "file:///" in the dirPath
+    // auto files = CUtils::TraversingFilesRecursive(finalDirPath);
 
-    //mRepeatedImagesGroup = OUtils::getRepeatedImages(files);
+    // //mRepeatedImagesGroup = OUtils::getRepeatedImages(files);
 
-    QVariantList groupRepeatedImages;
-    CUtils::updateRepeatedImages(groupRepeatedImages, mRepeatedImagesGroup);
+    // QVariantList groupRepeatedImages;
+    // CUtils::updateRepeatedImages(groupRepeatedImages, mRepeatedImagesGroup);
 
-    if (mGroupRepeatedImages != groupRepeatedImages)
-    {
-        mGroupRepeatedImages = std::move(groupRepeatedImages);
-        emit repeatedImagesChanged();
-    }
+    // if (mGroupRepeatedImages != groupRepeatedImages)
+    // {
+    //     mGroupRepeatedImages = std::move(groupRepeatedImages);
+    //     emit repeatedImagesChanged();
+    // }
 }
 
 void Controller::onForderPathReceived(QString dirPath)
 {
-    if(mOperateMode == OperateMode::Deduplication)
-        handleDeduplicationMode(dirPath.toStdString());
+    // if(mOperateMode == OperateMode::Deduplication)
+    //     handleDeduplicationMode(dirPath.toStdString());
 }
 
 void Controller::onDeleteRepeatedImagesAction()
 {
-    for (auto& group : mRepeatedImagesGroup)
-    {
-        for (auto& image : group.images)
-        {
-            if (image.isReadyToDelete)
-            {
-                //OUtils::removeImage(image.path);
-            }
-        }
-    }
+    // for (auto& group : mRepeatedImagesGroup)
+    // {
+    //     for (auto& image : group.images)
+    //     {
+    //         if (image.isReadyToDelete)
+    //         {
+    //             //OUtils::removeImage(image.path);
+    //         }
+    //     }
+    // }
 }
 
 

@@ -24,9 +24,10 @@ public:
     {
         None,
         WelcomePage,
-        Deduplication,
-        Enhancement,
-        Compression
+        SearchTeacherInfo,
+        ScheduleClass,
+        CalcOneToOneMoney,
+        CalcClassMoney
     };
     Q_ENUM(OperateMode)
     using OperateModes = std::vector<OperateMode>;
@@ -48,7 +49,7 @@ signals:
 private:
     std::string toOperateModeString(OperateMode mode);
     void refreshOperateMode(OperateMode mode);
-    void handleDeduplicationMode(string dirPath);
+    void handleSearchTeacherInfoMode();
 
 private:
     OperateMode mOperateMode { OperateMode::None };

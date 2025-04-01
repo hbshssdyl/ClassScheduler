@@ -14,13 +14,15 @@ QString toOperateModeString(Controller::OperateMode mode)
     case Controller::OperateMode::None:
         return "None";
     case Controller::OperateMode::WelcomePage:
-        return "WelcomePage";
-    case Controller::OperateMode::Deduplication:
-        return "Deduplication";
-    case Controller::OperateMode::Enhancement:
-        return "Enhancement";
-    case Controller::OperateMode::Compression:
-        return "Compression";
+        return "欢迎使用";
+    case Controller::OperateMode::SearchTeacherInfo:
+        return "查询教师信息";
+    case Controller::OperateMode::ScheduleClass:
+        return "排课";
+    case Controller::OperateMode::CalcOneToOneMoney:
+        return "计算一对一费用";
+    case Controller::OperateMode::CalcClassMoney:
+        return "计算班课费用";
     default:
         return "default";
     }

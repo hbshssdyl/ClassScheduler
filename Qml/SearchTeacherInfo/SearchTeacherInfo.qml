@@ -30,10 +30,8 @@ Rectangle {
         delegate: SearchTeacherInfoDelegate{
             id: actionItem
 
-            width: 100
+            width: root.width
             height: 50
-
-
         }
     }
 }

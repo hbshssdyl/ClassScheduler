@@ -9,8 +9,6 @@ Rectangle{
 
     property var selectedOperateMode
 
-    signal buttonClicked(var mode)
-
     color: modelData.isSelected ? ColorUtils.getActionItemBackgroundSelectedColor() : ColorUtils.getActionItemBackgroundUnselectedColor()
     radius: 5
 
@@ -19,47 +17,32 @@ Rectangle{
         width: 1
     }
 
-    Text{
-        id: actionName
-
-        anchors.centerIn: parent
-        text: modelData.actionName
-        font {
-            bold: false
-            pixelSize: 12
-        }
-    }
-
-    MouseArea{
-        id: mouseArea
+    RowLayout {
+        id: rowLayout
 
         anchors.fill: parent
-        hoverEnabled: true
-        onHoveredChanged:{
-            if(modelData.isSelected)
-                return;
+        spacing: 0
 
-            if(containsMouse)
-                root.color = ColorUtils.getActionItemBackgroundHoverdColor()
-            else
-                root.color = ColorUtils.getActionItemBackgroundUnselectedColor()
-        }
+        Rectangle{
+            id: teacherNameItem
+            color: "transparent"
 
-        onPressed: {
-            if(modelData.isSelected)
-                return;
-
-            root.color = ColorUtils.getActionItemBackgroundSelectedColor()
-        }
-        onReleased: {
-            if(modelData.isSelected)
-                return;
-
-            if(mouseArea.containsMouse){
-                root.buttonClicked(modelData.OperateMode);
+            Layout.alignment: Qt.AlignCenter
+            border {
+                color: ColorUtils.getActionItemBorderColor()
+                width: 1
             }
-            else
-                root.color = ColorUtils.getActionItemBackgroundUnselectedColor()
+
+            Text{
+                id: teacherName
+
+                anchors.centerIn: parent
+                text: "名字"
+                font {
+                    bold: false
+                    pixelSize: 12
+                }
+            }
         }
     }
 }

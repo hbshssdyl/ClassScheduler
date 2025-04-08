@@ -24,7 +24,7 @@ Rectangle{
         spacing: 0
 
         Rectangle{
-            id: teacherNameItem
+            id: courseTypeItem
             color: "transparent"
 
             Layout.alignment: Qt.AlignCenter
@@ -36,7 +36,7 @@ Rectangle{
             }
 
             Text{
-                id: teacherName
+                id: courseType
 
                 anchors.centerIn: parent
                 text: "名字"
@@ -46,8 +46,9 @@ Rectangle{
                 }
             }
         }
+
         Rectangle{
-            id: teacherAgeItem
+            id: courseNameItem
             color: "transparent"
 
             Layout.alignment: Qt.AlignCenter
@@ -59,40 +60,38 @@ Rectangle{
             }
 
             Text{
-                id: teacherAge
+                id: courseName
 
                 anchors.centerIn: parent
-                text: "50"
+                text: "名字"
                 font {
                     bold: false
                     pixelSize: 12
                 }
             }
         }
+
         Rectangle{
-            id: teacherClassItem
+            id: coursePricesItem
+
             color: "transparent"
 
             Layout.alignment: Qt.AlignCenter
             Layout.fillWidth: true
-            //Layout.preferredHeight: root.height
+            Layout.preferredHeight: root.height
             border {
                 color: ColorUtils.getActionItemBorderColor()
                 width: 1
             }
 
-            ListView {
-                id: teacherClassItemView
+            Text{
+                id: coursePrices
 
-                //model: controller.actionItemsList
-                anchors.fill: parent
-                spacing: 12
-
-                delegate: TeacherCourseItemDelegate{
-                    id: actionItem
-
-                    width: root.width
-                    height: 50
+                anchors.centerIn: parent
+                text: "50"
+                font {
+                    bold: false
+                    pixelSize: 12
                 }
             }
         }

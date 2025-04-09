@@ -5,7 +5,7 @@
 
 using namespace std;
 
-namespace PictureManager
+namespace ClassScheduler
 {
     struct ImageInfo
     {
@@ -24,4 +24,4 @@ namespace PictureManager
         int maxWidth;
         int maxHeight;
     };
-} // namespace PictureManager
+} // namespace ClassScheduler

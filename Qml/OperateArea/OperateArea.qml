@@ -32,7 +32,7 @@ Rectangle {
             Layout.fillWidth: true
             Layout.fillHeight: true
             onLoaded: {
-                item.controller = root.controller;
+                item.rootController = root.controller;
             }
         }
     }

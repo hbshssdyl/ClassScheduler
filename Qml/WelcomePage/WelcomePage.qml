@@ -7,7 +7,7 @@ Rectangle {
     id: root
 
     property var operateMode
-    property var controller
+    property var rootController
 
     color: "transparent"
 

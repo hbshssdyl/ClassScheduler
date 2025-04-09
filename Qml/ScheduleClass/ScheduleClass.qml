@@ -3,13 +3,12 @@ import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.12
 import Qt.labs.folderlistmodel 2.5
 import QtQuick.Dialogs 1.3
-import PictureManager 1.0
 
 Rectangle {
     id: root
 
     property var operateMode
-    property var controller
+    property var rootController
 
     color: "#FFFFFF"
     radius: 5

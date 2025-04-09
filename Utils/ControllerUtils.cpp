@@ -5,8 +5,10 @@
 
 namespace fs = std::filesystem;
 
-namespace PictureManager
+namespace ClassScheduler
 {
+
+//For controller.cpp
 QString toOperateModeString(Controller::OperateMode mode)
 {
     switch (mode)
@@ -39,45 +41,63 @@ void CUtils::updateActionItemsList(QVariantList& data, const Controller::Operate
     }
 }
 
-void CUtils::updateRepeatedImages(QVariantList& data, const vector<RepeatedImages>& repeatedImagesGroup)
+//For SearchTeacherInfoController.cpp
+/*
+     * teacherName 老师名字
+     * teacherCourseList 老师当前的课程
+     */
+
+//teacherCourseList
+/*
+     * suject 科目
+     * date 日期
+     * time 时间（24小时制）
+     * week 周几
+     * school 学校
+     * grade 年级
+     * courseTime 课时
+     * studentFee 家长单价 金额/小时
+     * teacherFee 老师单价 金额/小时
+     */
+void CUtils::updateTeacherInfoList(QVariantList& data)
 {
-    for(auto repeatedImages : repeatedImagesGroup)
-    {
-        QVariantList images;
-        for(auto& img : repeatedImages.images)
-        {
-            QVariantMap image;
-            image.insert("name", QString::fromStdString(img.name));
-            image.insert("path", QString::fromStdString("file:///" + img.path));
-            image.insert("width", img.width);
-            image.insert("height", img.height);
-            image.insert("isReadyToDelete", img.isReadyToDelete);
-            images.append(image);
-        }
-        data.append(QVariantMap{ { "images", images },
-                                 { "maxWidth", repeatedImages.maxWidth },
-                                 { "maxHeight", repeatedImages.maxHeight }});
-    }
+    QVariantList teacherCourseList;
+    QVariantMap teacherCourse1 = QVariantMap{ { "suject", "科目1" },
+                                          { "date", "日期1" },
+                                          { "time", "时间1（24小时制）" },
+                                          { "week", "周几1" },
+                                          { "school", "学校1" },
+                                          { "grade", "年级1" },
+                                          { "courseTime", "课时1" },
+                                          { "studentFee", "家长单价1" },
+                                          { "teacherFee", "老师单价1" }};
+    QVariantMap teacherCourse2 = QVariantMap{ { "suject", "科目2" },
+                                             { "date", "日期2" },
+                                             { "time", "时间2（24小时制）" },
+                                             { "week", "周几2" },
+                                             { "school", "学校2" },
+                                             { "grade", "年级2" },
+                                             { "courseTime", "课时2" },
+                                             { "studentFee", "家长单价2" },
+                                             { "teacherFee", "老师单价2" }};
+    QVariantMap teacherCourse3 = QVariantMap{ { "suject", "科目3" },
+                                             { "date", "日期3" },
+                                             { "time", "时间3（24小时制）" },
+                                             { "week", "周几3" },
+                                             { "school", "学校3" },
+                                             { "grade", "年级3" },
+                                             { "courseTime", "课时3" },
+                                             { "studentFee", "家长单价3" },
+                                             { "teacherFee", "老师单价3" }};
+    teacherCourseList.append(teacherCourse1);
+    teacherCourseList.append(teacherCourse2);
+    teacherCourseList.append(teacherCourse3);
+    data.append(QVariantMap{ { "teacherName", "老师1" },
+                            { "teacherCourseList", teacherCourseList }});
+    data.append(QVariantMap{ { "teacherName", "老师2" },
+                            { "teacherCourseList", teacherCourseList }});
+    data.append(QVariantMap{ { "teacherName", "老师3" },
+                            { "teacherCourseList", teacherCourseList }});
 }
 
-std::vector<std::string> CUtils::TraversingFilesRecursive(std::string dirName)
-{
-    std::vector<std::string> files = {};
-    fs::path url(dirName);
-    if (!fs::exists(url))
-    {
-        return files;
-    }
-
-    fs::recursive_directory_iterator begin(url);
-    for (fs::recursive_directory_iterator end; begin != end; ++begin)
-    {
-        if (!fs::is_directory(begin->path()))
-        {
-            files.emplace_back(begin->path().generic_u8string());
-            // 中文文件名乱码问题暂未解决
-        }
-    }
-    return files;
-}
 } // namespace PictureManager

@@ -8,7 +8,9 @@ Rectangle {
     id: root
 
     property var operateMode
-    property var controller
+    property var rootController
+    property var controller: rootController.getSearchTeacherInfoController()
+    property int minDelegateHeight: 50
 
     color: "#FFFFFF"
     radius: 5
@@ -18,20 +20,28 @@ Rectangle {
         width: 1
     }
 
-    ListView {
-        id: listView
+    ScrollView {
+        id: scrollView
 
-        model: controller.actionItemsList
         anchors.fill: parent
-        //orientation: ListView.Horizontal
-        //layoutDirection: Qt.LeftToRight
-        spacing: 12
+        clip: true
 
-        delegate: SearchTeacherInfoDelegate{
-            id: actionItem
+        ListView {
+            id: listView
 
-            width: root.width
-            height: 50
+            model: controller.teacherInfoList
+            anchors.fill: parent
+            spacing: 12
+
+            delegate: SearchTeacherInfoDelegate{
+                id: delegateItem
+
+                width: root.width
+                height: delegateHeight
+                minDelegateHeight: root.minDelegateHeight
+            }
         }
     }
+
+
 }

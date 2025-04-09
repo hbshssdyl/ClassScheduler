@@ -2,6 +2,9 @@
 
 #include "Controller.h"
 #include "Utils/ControllerUtils.h"
+#include "SearchTeacherInfoController.h"
+
+using namespace ClassScheduler;
 
 Controller::Controller(QObject* parent)
 {
@@ -63,41 +66,17 @@ void Controller::onOperateModeSelected(OperateMode mode)
     }
 }
 
-void Controller::handleSearchTeacherInfoMode()
+SearchTeacherInfoController* Controller::getSearchTeacherInfoController()
 {
-    // std::string finalDirPath = dirPath.substr(8); // remove "file:///" in the dirPath
-    // auto files = CUtils::TraversingFilesRecursive(finalDirPath);
-
-    // //mRepeatedImagesGroup = OUtils::getRepeatedImages(files);
-
-    // QVariantList groupRepeatedImages;
-    // CUtils::updateRepeatedImages(groupRepeatedImages, mRepeatedImagesGroup);
-
-    // if (mGroupRepeatedImages != groupRepeatedImages)
-    // {
-    //     mGroupRepeatedImages = std::move(groupRepeatedImages);
-    //     emit repeatedImagesChanged();
-    // }
-}
-
-void Controller::onForderPathReceived(QString dirPath)
-{
-    // if(mOperateMode == OperateMode::Deduplication)
-    //     handleDeduplicationMode(dirPath.toStdString());
-}
-
-void Controller::onDeleteRepeatedImagesAction()
-{
-    // for (auto& group : mRepeatedImagesGroup)
-    // {
-    //     for (auto& image : group.images)
-    //     {
-    //         if (image.isReadyToDelete)
-    //         {
-    //             //OUtils::removeImage(image.path);
-    //         }
-    //     }
-    // }
+    if (!mSearchTeacherInfoController)
+    {
+        cout<<"mytest1"<<endl;
+        mSearchTeacherInfoController = new SearchTeacherInfoController(this);
+        cout<<"mytest2"<<endl;
+        mSearchTeacherInfoController->initialize();
+        cout<<"mytest3"<<endl;
+    }
+    return mSearchTeacherInfoController;
 }
 
 

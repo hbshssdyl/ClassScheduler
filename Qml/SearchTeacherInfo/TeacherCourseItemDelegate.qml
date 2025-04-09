@@ -7,13 +7,14 @@ import "../JSUtils/ColorUtils.js" as ColorUtils
 Rectangle{
     id: root
 
-    property var selectedOperateMode
+    property int minDelegateHeight
+    property int textItemWidth: 100
 
     color: "transparent"
     radius: 5
 
     border {
-        color: ColorUtils.getActionItemBorderColor()
+        color: "red"
         width: 1
     }
 
@@ -24,22 +25,23 @@ Rectangle{
         spacing: 0
 
         Rectangle{
-            id: courseTypeItem
+            id: sujectItem
+
             color: "transparent"
 
-            Layout.alignment: Qt.AlignCenter
-            Layout.fillWidth: true
-            Layout.preferredHeight: root.height
+            Layout.alignment: Qt.AlignLeft
+            Layout.preferredWidth: root.textItemWidth
+            Layout.preferredHeight: root.minDelegateHeight
             border {
-                color: ColorUtils.getActionItemBorderColor()
+                color: "yellow"
                 width: 1
             }
 
             Text{
-                id: courseType
+                id: suject
 
                 anchors.centerIn: parent
-                text: "名字"
+                text: modelData.suject
                 font {
                     bold: false
                     pixelSize: 12
@@ -48,22 +50,23 @@ Rectangle{
         }
 
         Rectangle{
-            id: courseNameItem
+            id: dateItem
+
             color: "transparent"
 
-            Layout.alignment: Qt.AlignCenter
-            Layout.fillWidth: true
-            Layout.preferredHeight: root.height
+            Layout.alignment: Qt.AlignLeft
+            Layout.preferredWidth: root.textItemWidth
+            Layout.preferredHeight: root.minDelegateHeight
             border {
-                color: ColorUtils.getActionItemBorderColor()
+                color: "blue"
                 width: 1
             }
 
             Text{
-                id: courseName
+                id: date
 
                 anchors.centerIn: parent
-                text: "名字"
+                text: modelData.date
                 font {
                     bold: false
                     pixelSize: 12
@@ -72,28 +75,185 @@ Rectangle{
         }
 
         Rectangle{
-            id: coursePricesItem
+            id: timeItem
 
             color: "transparent"
 
-            Layout.alignment: Qt.AlignCenter
-            Layout.fillWidth: true
-            Layout.preferredHeight: root.height
+            Layout.alignment: Qt.AlignLeft
+            Layout.preferredWidth: root.textItemWidth
+            Layout.preferredHeight: root.minDelegateHeight
             border {
                 color: ColorUtils.getActionItemBorderColor()
                 width: 1
             }
 
             Text{
-                id: coursePrices
+                id: time
 
                 anchors.centerIn: parent
-                text: "50"
+                text: modelData.time
                 font {
                     bold: false
                     pixelSize: 12
                 }
             }
         }
+
+        Rectangle{
+            id: weekItem
+
+            color: "transparent"
+
+            Layout.alignment: Qt.AlignLeft
+            Layout.preferredWidth: root.textItemWidth
+            Layout.preferredHeight: root.minDelegateHeight
+            border {
+                color: ColorUtils.getActionItemBorderColor()
+                width: 1
+            }
+
+            Text{
+                id: week
+
+                anchors.centerIn: parent
+                text: modelData.week
+                font {
+                    bold: false
+                    pixelSize: 12
+                }
+            }
+        }
+
+        Rectangle{
+            id: schoolItem
+
+            color: "transparent"
+
+            Layout.alignment: Qt.AlignLeft
+            Layout.preferredWidth: root.textItemWidth
+            Layout.preferredHeight: root.minDelegateHeight
+            border {
+                color: ColorUtils.getActionItemBorderColor()
+                width: 1
+            }
+
+            Text{
+                id: school
+
+                anchors.centerIn: parent
+                text: modelData.school
+                font {
+                    bold: false
+                    pixelSize: 12
+                }
+            }
+        }
+
+        Rectangle{
+            id: gradeItem
+
+            color: "transparent"
+
+            Layout.alignment: Qt.AlignLeft
+            Layout.preferredWidth: root.textItemWidth
+            Layout.preferredHeight: root.minDelegateHeight
+            border {
+                color: ColorUtils.getActionItemBorderColor()
+                width: 1
+            }
+
+            Text{
+                id: grade
+
+                anchors.centerIn: parent
+                text: modelData.grade
+                font {
+                    bold: false
+                    pixelSize: 12
+                }
+            }
+        }
+
+        Rectangle{
+            id: courseTimeItem
+
+            color: "transparent"
+
+            Layout.alignment: Qt.AlignLeft
+            Layout.preferredWidth: root.textItemWidth
+            Layout.preferredHeight: root.minDelegateHeight
+            border {
+                color: ColorUtils.getActionItemBorderColor()
+                width: 1
+            }
+
+            Text{
+                id: courseTime
+
+                anchors.centerIn: parent
+                text: modelData.courseTime
+                font {
+                    bold: false
+                    pixelSize: 12
+                }
+            }
+        }
+
+        Rectangle{
+            id: studentFeeItem
+
+            color: "transparent"
+
+            Layout.alignment: Qt.AlignLeft
+            Layout.preferredWidth: root.textItemWidth
+            Layout.preferredHeight: root.minDelegateHeight
+            border {
+                color: ColorUtils.getActionItemBorderColor()
+                width: 1
+            }
+
+            Text{
+                id: studentFee
+
+                anchors.centerIn: parent
+                text: modelData.studentFee
+                font {
+                    bold: false
+                    pixelSize: 12
+                }
+            }
+        }
+
+        Rectangle{
+            id: teacherFeeItem
+
+            color: "transparent"
+
+            Layout.alignment: Qt.AlignLeft
+            Layout.preferredWidth: root.textItemWidth
+            Layout.preferredHeight: root.minDelegateHeight
+            border {
+                color: ColorUtils.getActionItemBorderColor()
+                width: 1
+            }
+
+            Text{
+                id: teacherFee
+
+                anchors.centerIn: parent
+                text: modelData.teacherFee
+                font {
+                    bold: false
+                    pixelSize: 12
+                }
+            }
+        }
+
+        Item {
+            id: spaceItem
+
+            Layout.fillWidth: true
+        }
+
     }
 }

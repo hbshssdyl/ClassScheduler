@@ -7,10 +7,7 @@
 #include <QString>
 #include <QVariant>
 
-#include "Utils/DataUtils.h"
-
 using namespace std;
-using namespace PictureManager;
 
 class SearchTeacherInfoController : public QObject {
     Q_OBJECT
@@ -25,8 +22,13 @@ public:
     /*
      * suject 科目
      * date 日期
+     * time 时间（24小时制）
      * week 周几
      * school 学校
+     * grade 年级
+     * courseTime 课时
+     * studentFee 家长单价 金额/小时
+     * teacherFee 老师单价 金额/小时
      */
     enum class OperateMode
     {
@@ -42,30 +44,16 @@ public:
 
 public:
     explicit SearchTeacherInfoController(QObject* parent = nullptr);
-    void initialize();
-
-public slots:
-    void onOperateModeSelected(OperateMode mode);
-    void onForderPathReceived(QString dirPath);
-    void onDeleteRepeatedImagesAction();
+    Q_INVOKABLE void initialize();
 
 signals:
-    void operateModeChanged();
-    void actionItemsListChanged();
-    void repeatedImagesChanged();
+    void teacherInfoListChanged();
 
 private:
-    std::string toOperateModeString(OperateMode mode);
-    void refreshOperateMode(OperateMode mode);
-    void handleSearchTeacherInfoMode();
+    void refreshSearchTeacherInfo();
 
 private:
-    OperateMode mOperateMode { OperateMode::None };
-    QString mLoadedView { "" };
-    QVariantList mActionItemsList;
-    OperateModes mAllOperateMode;
-    QVariantList mGroupRepeatedImages;
-    vector<RepeatedImages> mRepeatedImagesGroup;
+    QVariantList mTeacherInfoList;
 
 };
 

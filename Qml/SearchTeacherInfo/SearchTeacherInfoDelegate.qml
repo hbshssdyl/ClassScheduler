@@ -7,7 +7,8 @@ import "../JSUtils/ColorUtils.js" as ColorUtils
 Rectangle{
     id: root
 
-    property var selectedOperateMode
+    property int minDelegateHeight
+    property int delegateHeight: minDelegateHeight * teacherClassItemView.count
 
     color: "transparent"
     radius: 5
@@ -27,8 +28,8 @@ Rectangle{
             id: teacherNameItem
             color: "transparent"
 
-            Layout.alignment: Qt.AlignCenter
-            Layout.fillWidth: true
+            Layout.alignment: Qt.AlignLeft
+            Layout.preferredWidth: 60
             Layout.preferredHeight: root.height
             border {
                 color: ColorUtils.getActionItemBorderColor()
@@ -39,43 +40,21 @@ Rectangle{
                 id: teacherName
 
                 anchors.centerIn: parent
-                text: "名字"
+                text: modelData.teacherName
                 font {
                     bold: false
                     pixelSize: 12
                 }
             }
         }
-        Rectangle{
-            id: teacherAgeItem
-            color: "transparent"
 
-            Layout.alignment: Qt.AlignCenter
-            Layout.fillWidth: true
-            Layout.preferredHeight: root.height
-            border {
-                color: ColorUtils.getActionItemBorderColor()
-                width: 1
-            }
-
-            Text{
-                id: teacherAge
-
-                anchors.centerIn: parent
-                text: "50"
-                font {
-                    bold: false
-                    pixelSize: 12
-                }
-            }
-        }
         Rectangle{
             id: teacherClassItem
             color: "transparent"
 
-            Layout.alignment: Qt.AlignCenter
+            Layout.alignment: Qt.AlignLeft
             Layout.fillWidth: true
-            //Layout.preferredHeight: root.height
+            Layout.preferredHeight: root.height
             border {
                 color: ColorUtils.getActionItemBorderColor()
                 width: 1
@@ -84,17 +63,18 @@ Rectangle{
             ListView {
                 id: teacherClassItemView
 
-                //model: controller.actionItemsList
+                model: modelData.teacherCourseList
                 anchors.fill: parent
-                spacing: 12
 
                 delegate: TeacherCourseItemDelegate{
-                    id: actionItem
+                    id: delegateItem
 
-                    width: root.width
-                    height: 50
+                    width: teacherClassItem.width
+                    minDelegateHeight: root.minDelegateHeight
+                    height: minDelegateHeight
                 }
             }
         }
+
     }
 }

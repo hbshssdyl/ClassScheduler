@@ -3,23 +3,31 @@
 #include "SearchTeacherInfoController.h"
 #include "Utils/ControllerUtils.h"
 
+using namespace ClassScheduler;
+
 SearchTeacherInfoController::SearchTeacherInfoController(QObject* parent)
 {
-    refreshOperateMode(OperateMode::WelcomePage);
-    initialize();
+    cout<<"mytest"<<endl;
+    //initialize();
 }
 
 void SearchTeacherInfoController::initialize()
 {
-    mAllOperateMode.clear();
-    mAllOperateMode.emplace_back(OperateMode::SearchTeacherInfo);
-    mAllOperateMode.emplace_back(OperateMode::ScheduleClass);
-    mAllOperateMode.emplace_back(OperateMode::CalcOneToOneMoney);
-    mAllOperateMode.emplace_back(OperateMode::CalcClassMoney);
-    onOperateModeSelected(OperateMode::WelcomePage);
+    refreshSearchTeacherInfo();
 }
 
+void SearchTeacherInfoController::refreshSearchTeacherInfo()
+{
+    QVariantList newTeacherInfoList;
+    CUtils::updateTeacherInfoList(newTeacherInfoList);
 
+    if (mTeacherInfoList != newTeacherInfoList)
+    {
+        mTeacherInfoList = std::move(newTeacherInfoList);
+        emit teacherInfoListChanged();
+    }
+    cout<<"mytest7"<<endl;
+}
 
 
 

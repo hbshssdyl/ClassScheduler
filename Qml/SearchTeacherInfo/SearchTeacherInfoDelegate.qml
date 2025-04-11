@@ -69,7 +69,7 @@ Rectangle{
                 delegate: TeacherCourseItemDelegate{
                     id: delegateItem
 
-                    width: teacherClassItem.width
+                    width: textItemWidth * teacherClassItemView.count
                     minDelegateHeight: root.minDelegateHeight
                     height: minDelegateHeight
                 }

@@ -1,14 +1,28 @@
 #pragma once
 
+#include <QCoreApplication>
 #include "SearchTeacherInfoController.h"
 #include "Utils/ControllerUtils.h"
+
+
+#include "xlsxdocument.h"
+#include "xlsxchartsheet.h"
+#include "xlsxcellrange.h"
+#include "xlsxchart.h"
+#include "xlsxrichstring.h"
+
+#include "xlsxworkbook.h"
+using namespace QXlsx;
 
 using namespace ClassScheduler;
 
 SearchTeacherInfoController::SearchTeacherInfoController(QObject* parent)
 {
-    cout<<"mytest"<<endl;
-    //initialize();
+    Document doc("test.xlsx");
+    doc.selectSheet("Sheet2"); // select a sheet. current sheet is 'added sheet'.
+    int row = 1; int col = 1;
+    QString var = doc.read( row, col ).toString();
+    cout << var.toStdString() << endl;
 }
 
 void SearchTeacherInfoController::initialize()

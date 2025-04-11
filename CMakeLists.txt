@@ -59,3 +59,17 @@ install(TARGETS appClassScheduler
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
+
+# QXlsx
+add_subdirectory(QXlsx)
+target_link_libraries(appClassScheduler PRIVATE QXlsx::QXlsx)
+
+
+
+
+
+
+
+
+
+

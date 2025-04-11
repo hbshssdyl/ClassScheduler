@@ -14,7 +14,7 @@ Rectangle{
     radius: 5
 
     border {
-        color: "red"
+        color: ColorUtils.getActionItemBorderColor()
         width: 1
     }
 
@@ -33,7 +33,7 @@ Rectangle{
             Layout.preferredWidth: root.textItemWidth
             Layout.preferredHeight: root.minDelegateHeight
             border {
-                color: "yellow"
+                color: ColorUtils.getActionItemBorderColor()
                 width: 1
             }
 
@@ -58,7 +58,7 @@ Rectangle{
             Layout.preferredWidth: root.textItemWidth
             Layout.preferredHeight: root.minDelegateHeight
             border {
-                color: "blue"
+                color: ColorUtils.getActionItemBorderColor()
                 width: 1
             }
 

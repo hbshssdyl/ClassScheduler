@@ -59,10 +59,10 @@ void CUtils::updateActionItemsList(QVariantList& data, const Controller::Operate
      * studentFee 家长单价 金额/小时
      * teacherFee 老师单价 金额/小时
      */
-void CUtils::updateTeacherInfoList(QVariantList& data)
+void CUtils::updateTeacherInfoList(QVariantList& data, vector<teacherInfo> teacherInfos)
 {
     QVariantList teacherCourseList;
-    QVariantMap teacherCourse1 = QVariantMap{ { "suject", "科目1" },
+    QVariantMap teacherCourse1 = QVariantMap{ { "suject", "test" },
                                           { "date", "日期1" },
                                           { "time", "时间1（24小时制）" },
                                           { "week", "周几1" },

@@ -1,8 +1,8 @@
 #pragma once
 
+#include <iostream>
 #include "Controller.h"
 #include "Utils/ControllerUtils.h"
-#include "SearchTeacherInfoController.h"
 
 using namespace ClassScheduler;
 
@@ -70,11 +70,8 @@ SearchTeacherInfoController* Controller::getSearchTeacherInfoController()
 {
     if (!mSearchTeacherInfoController)
     {
-        cout<<"mytest1"<<endl;
         mSearchTeacherInfoController = new SearchTeacherInfoController(this);
-        cout<<"mytest2"<<endl;
         mSearchTeacherInfoController->initialize();
-        cout<<"mytest3"<<endl;
     }
     return mSearchTeacherInfoController;
 }

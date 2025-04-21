@@ -1,11 +1,11 @@
 #pragma once
 
 #include <QObject>
-#include <iostream>
 #include <cstdio>
 #include <vector>
 #include <QString>
 #include <QVariant>
+#include <QPointer>
 
 #include "SearchTeacherInfoController.h"
 
@@ -53,7 +53,7 @@ private:
     QString mLoadedView { "" };
     QVariantList mActionItemsList;
     OperateModes mAllOperateMode;
-    SearchTeacherInfoController* mSearchTeacherInfoController;
+    QPointer<SearchTeacherInfoController> mSearchTeacherInfoController;
 
 };
 

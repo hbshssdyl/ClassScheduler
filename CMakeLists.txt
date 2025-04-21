@@ -64,6 +64,10 @@ install(TARGETS appClassScheduler
 add_subdirectory(QXlsx)
 target_link_libraries(appClassScheduler PRIVATE QXlsx::QXlsx)
 
+# # OpenXLSX
+# add_subdirectory(OpenXLSX)
+# target_link_libraries(appClassScheduler PRIVATE OpenXLSX::OpenXLSX)
+
 
 
 

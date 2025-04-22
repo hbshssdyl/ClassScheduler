@@ -46,7 +46,7 @@ signals:
 private:
     std::string toOperateModeString(OperateMode mode);
     void refreshOperateMode(OperateMode mode);
-    void handleSearchTeacherInfoMode();
+    void getTeacherInfosByExcelFile(QString filePath);
 
 private:
     OperateMode mOperateMode { OperateMode::None };

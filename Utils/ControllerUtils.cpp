@@ -1,8 +1,16 @@
 #pragma once
 
+#include "DataUtils.h"
 #include "ControllerUtils.h"
 #include "Controller/Controller.h"
+#include "xlsxdocument.h"
+// #include "xlsxchartsheet.h"
+// #include "xlsxcellrange.h"
+// #include "xlsxchart.h"
+// #include "xlsxrichstring.h"
+#include "xlsxworkbook.h"
 
+using namespace QXlsx;
 namespace fs = std::filesystem;
 
 namespace ClassScheduler
@@ -31,6 +39,61 @@ QString toOperateModeString(Controller::OperateMode mode)
 
 }
 
+bool hasValidHeaders(Document& doc)
+{
+    int row = 1, col = 1;
+    map<std::string, bool> headers;
+    while(col)
+    {
+        QVariant var = doc.read(row, col);
+        auto str = var.toString().toStdString();
+        if(str.empty())
+        {
+            break;
+        }
+        headers[str] = true;
+        col++;
+    }
+    for(auto header : validExcelHeader)
+    {
+        if(!headers[header])
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool saveData(teacherInfo& info, std::string& headerStr, std::string& str)
+{
+    if(headerStr.empty() || str.empty())
+    {
+        return false;
+    }
+    cout << str << endl;
+    if(headerStr == "日期") info.date = str;
+    else if(headerStr == "姓名") info.studentName = str;
+    else if(headerStr == "学校") info.school = str;
+    else if(headerStr == "电话") info.studentPhoneNubmer = std::stoll(str);
+    else if(headerStr == "年级") info.grade = str;
+    else if(headerStr == "学科") info.suject = str;
+    else if(headerStr == "时间") info.time = str;
+    else if(headerStr == "老师") info.teacherNickName = str;
+    else if(headerStr == "网课or面授") info.type = str;
+    else if(headerStr == "金额/小时") info.studentFee = std::stoi(str);
+    else if(headerStr == "老师姓名") info.teacherName = str;
+    else if(headerStr == "老师工资") info.teacherFee = std::stoi(str);
+    return true;
+}
+
+bool isValidTeacherInfo(teacherInfo& info)
+{
+    if(info.studentName.empty()) return false;
+    if(info.teacherNickName.empty()) return false;
+    if(info.time.empty()) return false;
+    return true;
+}
+
 void CUtils::updateActionItemsList(QVariantList& data, const Controller::OperateMode& selectedMode, const Controller::OperateModes& actionItems)
 {
     for(auto activeItem : actionItems)
@@ -39,6 +102,51 @@ void CUtils::updateActionItemsList(QVariantList& data, const Controller::Operate
                                 { "OperateMode", static_cast<int>(activeItem) },
                                 { "isSelected", activeItem == selectedMode }});
     }
+}
+
+void CUtils::getTeacherInfosFromExcelFile(vector<teacherInfo>& teacherInfos, QString filePath)
+{
+    Document doc(filePath);
+    if (!doc.load())
+        return;
+
+    if(!hasValidHeaders(doc))
+    {
+        return;
+    }
+
+    int row = 2; int col = 1;
+    while(row)
+    {
+        col = 1;
+        teacherInfo info;
+        while(col)
+        {
+            QVariant header = doc.read(1, col);
+            auto headerStr = header.toString().toStdString();
+            QVariant var = doc.read(row, col);
+            auto str = var.toString().toStdString();
+
+            if(!saveData(info, headerStr, str))
+            {
+                break;
+            }
+
+            col++;
+        }
+        if(!isValidTeacherInfo(info))
+        {
+            break;
+        }
+        teacherInfos.emplace_back(info);
+        row++;
+    }
+
+
+
+
+
+
 }
 
 //For SearchTeacherInfoController.cpp

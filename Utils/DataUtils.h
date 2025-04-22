@@ -9,11 +9,15 @@ namespace ClassScheduler
 {
     struct teacherInfo
     {
-        int date;
+        std::string teacherName;
+        std::string teacherNickName;
+
+        //teacherCourseList
+        std::string date;
         std::string studentName;
         std::string weekend;
         std::string school;
-        int studentPhoneNubmer;
+        long long studentPhoneNubmer;
         std::string grade;
         std::string suject;
         std::string time;

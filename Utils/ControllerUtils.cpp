@@ -74,15 +74,15 @@ bool saveData(teacherInfo& info, std::string& headerStr, std::string& str)
     if(headerStr == "日期") info.date = str;
     else if(headerStr == "姓名") info.studentName = str;
     else if(headerStr == "学校") info.school = str;
-    else if(headerStr == "电话") info.studentPhoneNubmer = std::stoll(str);
+    else if(headerStr == "电话") info.studentPhoneNubmer = str;
     else if(headerStr == "年级") info.grade = str;
     else if(headerStr == "学科") info.suject = str;
     else if(headerStr == "时间") info.time = str;
     else if(headerStr == "老师") info.teacherNickName = str;
     else if(headerStr == "网课or面授") info.type = str;
-    else if(headerStr == "金额/小时") info.studentFee = std::stoi(str);
+    else if(headerStr == "金额/小时") info.studentFee = str;
     else if(headerStr == "老师姓名") info.teacherName = str;
-    else if(headerStr == "老师工资") info.teacherFee = std::stoi(str);
+    else if(headerStr == "老师工资") info.teacherFee = str;
     return true;
 }
 

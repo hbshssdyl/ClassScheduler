@@ -53,18 +53,18 @@ void createDBConnection()
                           "id                 INTEGER PRIMARY KEY AUTOINCREMENT,"
                           "teacherName        CHAR(50)            NOT NULL,"
                           "teacherNickName    CHAR(50)            NOT NULL,"
-                          "date               INTEGER,"
+                          "date               CHAR(50),"
                           "studentName        CHAR(50),"
                           "weekend            CHAR(50),"
                           "school             CHAR(50),"
-                          "studentPhoneNubmer INTEGER,"
+                          "studentPhoneNubmer CHAR(50),"
                           "grade              CHAR(50),"
                           "suject             CHAR(50)            NOT NULL,"
                           "time               CHAR(50)            NOT NULL,"
                           "type               CHAR(50),"
-                          "courseTime         INTEGER             NOT NULL,"
-                          "studentFee         INTEGER,"
-                          "teacherFee         INTEGER"
+                          "courseTime         CHAR(50)            NOT NULL,"
+                          "studentFee         CHAR(50),"
+                          "teacherFee         CHAR(50)"
                           ")");
     if (!ret) {
         qDebug() << "Failed to create table: " << query.lastError().text();
@@ -72,11 +72,32 @@ void createDBConnection()
     }
 }
 
-void insertData(QString teacherName, QString suject, QString time, int courseTime)
+void insertData(teacherInfo info)
 {
+    // insertData(teacherInfo.teacherName,
+    //            teacherInfo.teacherNickName,
+    //            teacherInfo.date,
+    //            teacherInfo.studentName,
+    //            teacherInfo.weekend,
+    //            teacherInfo.school,
+    //            teacherInfo.studentPhoneNubmer,
+    //            teacherInfo.grade,
+    //            teacherInfo.suject,
+    //            teacherInfo.time,
+    //            teacherInfo.type,
+    //            teacherInfo.courseTime,
+    //            teacherInfo.studentFee,
+    //            teacherInfo.teacherFee);
     QSqlQuery query;
-    QString sql = QString("INSERT INTO teacherInfos (teacherName, suject, time, courseTime) "
-                          "VALUES (%1, '数学', '13:00-17:00', 2)").arg(teacherName);
+    QString sql = QString("INSERT INTO teacherInfos (teacherName, teacherNickName, date,"
+                                                    "weekend, school, studentPhoneNubmer,"
+                                                    "grade, suject, time, type,"
+                                                    "courseTime, studentFee, teacherFee) "
+                          "VALUES (%1, %2, %3, %4, %5, %6, %7, %8, %9, %10, %11, %12, %13)")
+                          .arg(info.teacherName).arg(info.teacherNickName).arg(info.date)
+                          .arg(info.weekend).arg(info.school).arg(info.studentPhoneNubmer)
+                          .arg(info.grade).arg(info.suject).arg(info.time).arg(info.type)
+                          .arg(info.courseTime).arg(info.studentFee).arg(info.teacherFee);
     bool ret = query.exec(sql);
     if (!ret) {
         qDebug() << "Failed to insert data: " << query.lastError().text();
@@ -98,20 +119,12 @@ void queryData()
 
 void Controller::getTeacherInfosByExcelFile(QString filePath)
 {
-    vector<teacherInfo> teacherInfos;
-    CUtils::getTeacherInfosFromExcelFile(teacherInfos, filePath);
+    vector<teacherInfo> infos;
+    CUtils::getTeacherInfosFromExcelFile(infos, filePath);
     createDBConnection();
-    for(auto teacherInfo : teacherInfos)
+    for(auto info : infos)
     {
-        insertData(teacherInfo.teacherName,
-                   teacherInfo.teacherName,
-teacherInfo.teacherName,
-teacherInfo.teacherName,
-teacherInfo.teacherName,
-teacherInfo.teacherName,
-teacherInfo.teacherName,
-teacherInfo.teacherName,
-teacherInfo.teacherName,
+        insertData(info);
     }
 }
 

@@ -11,8 +11,9 @@ SearchTeacherInfoController::SearchTeacherInfoController(QObject* parent)
 {
 }
 
-void SearchTeacherInfoController::initialize()
+void SearchTeacherInfoController::initialize(vector<teacherInfo> teacherInfos)
 {
+    mTeacherInfos = teacherInfos;
     refreshSearchTeacherInfo();
 }
 

@@ -1289,7 +1289,7 @@ bool Styles::readCellXfs(QXmlStreamReader &reader)
         qWarning() << reader.errorString();
 
     if (hasCount && (count != m_xf_formatsList.size()))
-        qWarning("error read CellXfs");
+        qWarning() << "error read CellXfs" << count << " " << m_xf_formatsList.size();
 
     return true;
 }

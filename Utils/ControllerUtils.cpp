@@ -12,6 +12,7 @@
 
 using namespace QXlsx;
 namespace fs = std::filesystem;
+using CellPtr = std::shared_ptr<Cell>;
 
 namespace ClassScheduler
 {
@@ -45,8 +46,14 @@ bool hasValidHeaders(Document& doc)
     map<std::string, bool> headers;
     while(col)
     {
-        QVariant var = doc.read(row, col);
+        CellPtr cell = doc.cellAt(row, col);
+        if(!cell)
+        {
+            break;
+        }
+        QVariant var = cell->value();
         auto str = var.toString().toStdString();
+        //cout << str << endl;
         if(str.empty())
         {
             break;
@@ -58,20 +65,21 @@ bool hasValidHeaders(Document& doc)
     {
         if(!headers[header])
         {
+            cout << "无该信息: " << header << endl;
             return false;
         }
     }
     return true;
 }
 
-bool saveData(teacherInfo& info, std::string& headerStr, std::string& str)
+void saveData(teacherInfo& info, std::string& headerStr, std::string& str)
 {
-    if(headerStr.empty() || str.empty())
+    if(str.empty())
     {
-        return false;
+        str = nullString;
     }
-    cout << str << endl;
     if(headerStr == "日期") info.date = str;
+    else if(headerStr == "星期") info.weekend = str;
     else if(headerStr == "姓名") info.studentName = str;
     else if(headerStr == "学校") info.school = str;
     else if(headerStr == "电话") info.studentPhoneNubmer = str;
@@ -79,19 +87,33 @@ bool saveData(teacherInfo& info, std::string& headerStr, std::string& str)
     else if(headerStr == "学科") info.suject = str;
     else if(headerStr == "时间") info.time = str;
     else if(headerStr == "老师") info.teacherNickName = str;
-    else if(headerStr == "网课or面授") info.type = str;
+    else if(headerStr == "网课or面授") info.learningType = str;
+    else if(headerStr == "课时") info.courseTime = str;
     else if(headerStr == "金额/小时") info.studentFee = str;
+    else if(headerStr == "课酬总计") info.studentTotalFee = str;
     else if(headerStr == "老师姓名") info.teacherName = str;
     else if(headerStr == "老师工资") info.teacherFee = str;
-    return true;
+    else if(headerStr == "已收金额") info.gotMoney = str;
+    else if(headerStr == "付费方式") info.payType = str;
+    else if(headerStr == "收费日期") info.payDate = str;
 }
 
-bool isValidTeacherInfo(teacherInfo& info)
+bool isUsefulHeader(std::string header)
 {
-    if(info.studentName.empty()) return false;
-    if(info.teacherNickName.empty()) return false;
-    if(info.time.empty()) return false;
-    return true;
+    for(auto str : validExcelHeader)
+    {
+        if(header == str) return true;
+    }
+    return false;
+}
+
+QVariant readCellValue(std::string headerStr, CellPtr cell)
+{
+    if(headerStr == "星期")
+    {
+        return cell->value();
+    }
+    return cell->readValue();
 }
 
 void CUtils::updateActionItemsList(QVariantList& data, const Controller::OperateMode& selectedMode, const Controller::OperateModes& actionItems)
@@ -122,51 +144,47 @@ void CUtils::getTeacherInfosFromExcelFile(vector<teacherInfo>& teacherInfos, QSt
         teacherInfo info;
         while(col)
         {
-            QVariant header = doc.read(1, col);
-            auto headerStr = header.toString().toStdString();
-            QVariant var = doc.read(row, col);
-            auto str = var.toString().toStdString();
-
-            if(!saveData(info, headerStr, str))
+            CellPtr headerCell = doc.cellAt(1, col);
+            if(!headerCell)
             {
                 break;
             }
+            QVariant header = headerCell->readValue();
 
+            auto headerStr = header.toString().toStdString();
+            //cout << row << " " << col << " " << headerStr << " ";
+            if(headerStr.empty())
+            {
+                break;
+            }
+            if(!isUsefulHeader(headerStr))
+            {
+                col++;
+                continue;
+            }
+
+            CellPtr cell = doc.cellAt(row, col);
+            if(!cell)
+            {
+                col++;
+                continue;
+            }
+            QVariant var = readCellValue(headerStr, cell);
+            auto str = var.toString().toStdString();
+            //cout << str << endl;
+            saveData(info, headerStr, str);
             col++;
         }
-        if(!isValidTeacherInfo(info))
+        if(!info.isValidInfo())
         {
             break;
         }
         teacherInfos.emplace_back(info);
         row++;
     }
-
-
-
-
-
-
 }
 
 //For SearchTeacherInfoController.cpp
-/*
-     * teacherName 老师名字
-     * teacherCourseList 老师当前的课程
-     */
-
-//teacherCourseList
-/*
-     * suject 科目
-     * date 日期
-     * time 时间（24小时制）
-     * week 周几
-     * school 学校
-     * grade 年级
-     * courseTime 课时
-     * studentFee 家长单价 金额/小时
-     * teacherFee 老师单价 金额/小时
-     */
 void CUtils::updateTeacherInfoList(QVariantList& data, vector<teacherInfo> teacherInfos)
 {
     QVariantList teacherCourseList;

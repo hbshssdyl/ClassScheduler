@@ -43,8 +43,8 @@ int main(int argc, char *argv[])
         Qt::QueuedConnection);
     engine.loadFromModule("ClassScheduler", "Main");
 
-    auto controller = engine.rootObjects().at(0)->findChild<Controller *>("controller");
-    controller->initialize();
+    // auto controller = engine.rootObjects().at(0)->findChild<Controller *>("controller");
+    // controller->initialize();
 
     return app.exec();
 }

@@ -6,6 +6,7 @@
 #include <QString>
 #include <QVariant>
 #include <QPointer>
+#include <condition_variable>
 
 #include "SearchTeacherInfoController.h"
 
@@ -46,6 +47,7 @@ signals:
 private:
     std::string toOperateModeString(OperateMode mode);
     void refreshOperateMode(OperateMode mode);
+    void waitTeacherInfosInited();
     void getTeacherInfosByExcelFile(QString filePath);
 
 private:
@@ -54,6 +56,8 @@ private:
     QVariantList mActionItemsList;
     OperateModes mAllOperateMode;
     QPointer<SearchTeacherInfoController> mSearchTeacherInfoController;
+    vector<teacherInfo> mTeacherInfos;
+    std::condition_variable mTeacherInfosCondition;
 
 };
 

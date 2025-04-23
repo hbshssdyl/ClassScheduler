@@ -4,6 +4,7 @@
 #include "Controller.h"
 #include "Utils/ControllerUtils.h"
 #include <QtSql>
+#include <thread>
 
 using namespace ClassScheduler;
 
@@ -21,7 +22,7 @@ void Controller::initialize()
     mAllOperateMode.emplace_back(OperateMode::CalcOneToOneMoney);
     mAllOperateMode.emplace_back(OperateMode::CalcClassMoney);
     onOperateModeSelected(OperateMode::WelcomePage);
-    getTeacherInfosByExcelFile("FinalTest.xlsx");
+    getTeacherInfosByExcelFile("test.xlsx");
 }
 
 void createDBConnection()
@@ -32,39 +33,27 @@ void createDBConnection()
         qDebug() << "Failed to connect database.";
         return;
     }
-    // std::string teacherName;
-
-    // //teacherCourseList
-    // int date;
-    // std::string studentName;
-    // std::string weekend;
-    // std::string school;
-    // int studentPhoneNubmer;
-    // std::string grade;
-    // std::string suject;
-    // std::string time;
-    // std::string type;
-    // int courseTime;
-    // int studentFee;
-    // int teacherFee;
-    // 创建 teacherInfos 表
     QSqlQuery query;
     bool ret = query.exec("CREATE TABLE IF NOT EXISTS teacherInfos("
                           "id                 INTEGER PRIMARY KEY AUTOINCREMENT,"
-                          "teacherName        CHAR(50)            NOT NULL,"
-                          "teacherNickName    CHAR(50)            NOT NULL,"
                           "date               CHAR(50),"
-                          "studentName        CHAR(50),"
-                          "weekend            CHAR(50),"
+                          "weekend            CHAR(50)            NOT NULL,"
+                          "studentName        CHAR(50)            NOT NULL,"
                           "school             CHAR(50),"
                           "studentPhoneNubmer CHAR(50),"
                           "grade              CHAR(50),"
-                          "suject             CHAR(50)            NOT NULL,"
+                          "suject             CHAR(50),"
                           "time               CHAR(50)            NOT NULL,"
-                          "type               CHAR(50),"
-                          "courseTime         CHAR(50)            NOT NULL,"
-                          "studentFee         CHAR(50),"
-                          "teacherFee         CHAR(50)"
+                          "teacherNickName    CHAR(50)            NOT NULL,"
+                          "learningType       CHAR(50)            NOT NULL,"
+                          "courseTime         CHAR(50),"
+                          "studentFee         CHAR(50)            NOT NULL,"
+                          "studentTotalFee    CHAR(50),"
+                          "teacherName        CHAR(50),"
+                          "teacherFee         CHAR(50),"
+                          "gotMoney           CHAR(50),"
+                          "payType            CHAR(50),"
+                          "payDate            CHAR(50)"
                           ")");
     if (!ret) {
         qDebug() << "Failed to create table: " << query.lastError().text();
@@ -74,30 +63,14 @@ void createDBConnection()
 
 void insertData(teacherInfo info)
 {
-    // insertData(teacherInfo.teacherName,
-    //            teacherInfo.teacherNickName,
-    //            teacherInfo.date,
-    //            teacherInfo.studentName,
-    //            teacherInfo.weekend,
-    //            teacherInfo.school,
-    //            teacherInfo.studentPhoneNubmer,
-    //            teacherInfo.grade,
-    //            teacherInfo.suject,
-    //            teacherInfo.time,
-    //            teacherInfo.type,
-    //            teacherInfo.courseTime,
-    //            teacherInfo.studentFee,
-    //            teacherInfo.teacherFee);
     QSqlQuery query;
-    QString sql = QString("INSERT INTO teacherInfos (teacherName, teacherNickName, date,"
-                                                    "weekend, school, studentPhoneNubmer,"
-                                                    "grade, suject, time, type,"
-                                                    "courseTime, studentFee, teacherFee) "
-                          "VALUES (%1, %2, %3, %4, %5, %6, %7, %8, %9, %10, %11, %12, %13)")
-                          .arg(info.teacherName).arg(info.teacherNickName).arg(info.date)
-                          .arg(info.weekend).arg(info.school).arg(info.studentPhoneNubmer)
-                          .arg(info.grade).arg(info.suject).arg(info.time).arg(info.type)
-                          .arg(info.courseTime).arg(info.studentFee).arg(info.teacherFee);
+    QString sql = QString("INSERT INTO teacherInfos (date, weekend, studentName, school, studentPhoneNubmer, grade,"
+                                                    "suject, time, teacherNickName, learningType, courseTime, studentFee,"
+                                                    "studentTotalFee, teacherName, teacherFee, gotMoney, payType, payDate)"
+                          "VALUES ('%1', '%2', '%3', '%4', '%5', '%6', '%7', '%8', '%9', '%10', '%11', '%12', '%13', '%14', '%15', '%16', '%17', '%18')")
+                          .arg(info.date).arg(info.weekend).arg(info.studentName).arg(info.school).arg(info.studentPhoneNubmer).arg(info.grade)
+                          .arg(info.suject).arg(info.time).arg(info.teacherNickName).arg(info.learningType).arg(info.courseTime).arg(info.studentFee)
+                          .arg(info.studentTotalFee).arg(info.teacherName).arg(info.teacherFee).arg(info.gotMoney).arg(info.payType).arg(info.payDate);
     bool ret = query.exec(sql);
     if (!ret) {
         qDebug() << "Failed to insert data: " << query.lastError().text();
@@ -113,19 +86,23 @@ void queryData()
         QString suject = query.value("suject").toString();
         QString time = query.value("time").toString();
         int courseTime = query.value("courseTime").toInt();
-        cout << "Id:" << id << " teacherName:" << teacherName.toStdString() << " suject:" << suject.toStdString() << " time:" << time.toStdString() << " courseTime:" << courseTime << endl;
     }
 }
 
 void Controller::getTeacherInfosByExcelFile(QString filePath)
 {
-    vector<teacherInfo> infos;
-    CUtils::getTeacherInfosFromExcelFile(infos, filePath);
-    createDBConnection();
-    for(auto info : infos)
-    {
-        insertData(info);
-    }
+    auto f = [this, filePath] {
+        CUtils::getTeacherInfosFromExcelFile(mTeacherInfos, filePath);
+        createDBConnection();
+        for(auto info : mTeacherInfos)
+        {
+            insertData(info);
+        }
+        mTeacherInfosCondition.notify_all();
+    };
+
+    std::thread t1(f);
+    t1.detach();
 }
 
 std::string Controller::toOperateModeString(OperateMode mode)
@@ -172,12 +149,35 @@ void Controller::onOperateModeSelected(OperateMode mode)
     }
 }
 
+void Controller::waitTeacherInfosInited()
+{
+    std::mutex teacherInfosMutex;
+    std::unique_lock<std::mutex> u_lk(teacherInfosMutex);
+    int timeout = 5;
+
+    if (mTeacherInfos.size() > 0)
+    {
+        return;
+    }
+
+    std::cv_status ret = mTeacherInfosCondition.wait_for(u_lk, std::chrono::seconds(timeout));
+    if (ret == std::cv_status::timeout)
+    {
+        cout << "Maybe there is something wrong with the mTeacherInfos" << endl;
+    }
+    else if (ret == std::cv_status::no_timeout)
+    {
+        cout << "mTeacherInfos Initialized" << endl;
+    }
+}
+
 SearchTeacherInfoController* Controller::getSearchTeacherInfoController()
 {
     if (!mSearchTeacherInfoController)
     {
         mSearchTeacherInfoController = new SearchTeacherInfoController(this);
-        mSearchTeacherInfoController->initialize();
+        waitTeacherInfosInited();
+        mSearchTeacherInfoController->initialize(mTeacherInfos);
     }
     return mSearchTeacherInfoController;
 }

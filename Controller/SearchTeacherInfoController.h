@@ -49,7 +49,7 @@ public:
 
 public:
     explicit SearchTeacherInfoController(QObject* parent = nullptr);
-    Q_INVOKABLE void initialize();
+    Q_INVOKABLE void initialize(vector<teacherInfo> teacherInfos);
 
 signals:
     void teacherInfoListChanged();

@@ -8,6 +8,7 @@
 #include <QPointer>
 #include <condition_variable>
 
+#include "Managers/DBManager.h"
 #include "SearchTeacherInfoController.h"
 
 using namespace std;
@@ -45,18 +46,20 @@ signals:
     void actionItemsListChanged();
 
 private:
-    std::string toOperateModeString(OperateMode mode);
+    QString toOperateModeString(OperateMode mode);
     void refreshOperateMode(OperateMode mode);
     void waitTeacherInfosInited();
     void getTeacherInfosByExcelFile(QString filePath);
 
 private:
     OperateMode mOperateMode { OperateMode::None };
+    DBManagerPtr mDBManager;
     QString mLoadedView { "" };
     QVariantList mActionItemsList;
     OperateModes mAllOperateMode;
     QPointer<SearchTeacherInfoController> mSearchTeacherInfoController;
-    vector<teacherInfo> mTeacherInfos;
+
+    std::mutex mTeacherInfosMutex;
     std::condition_variable mTeacherInfosCondition;
 
 };

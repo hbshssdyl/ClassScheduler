@@ -1,6 +1,8 @@
 #pragma once
 
 #include "Utils/DataUtils.h"
+#include "Managers/DBmanager.h"
+
 #include <QObject>
 #include <cstdio>
 #include <vector>
@@ -48,18 +50,22 @@ public:
     using OperateModes = std::vector<OperateMode>;
 
 public:
-    explicit SearchTeacherInfoController(QObject* parent = nullptr);
-    Q_INVOKABLE void initialize(vector<teacherInfo> teacherInfos);
+    explicit SearchTeacherInfoController(DBManagerPtr dbManager, QObject* parent = nullptr);
+    Q_INVOKABLE void initialize();
 
 signals:
     void teacherInfoListChanged();
 
 private:
     void refreshSearchTeacherInfo();
+    void readTeacherInfosFromDB();
+    void getTeacherInfosFromExcelFile(QString filePath);
+    void readyForTeacherInfos();
 
 private:
     QVariantList mTeacherInfoList;
-    vector<teacherInfo> mTeacherInfos;
+    TeacherInfos mTeacherInfosFromDB;
+    DBManagerPtr mDBManager;
 
 };
 

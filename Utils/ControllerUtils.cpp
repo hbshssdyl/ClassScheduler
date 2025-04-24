@@ -43,7 +43,7 @@ QString toOperateModeString(Controller::OperateMode mode)
 bool hasValidHeaders(Document& doc)
 {
     int row = 1, col = 1;
-    map<std::string, bool> headers;
+    map<QString, bool> headers;
     while(col)
     {
         CellPtr cell = doc.cellAt(row, col);
@@ -52,9 +52,9 @@ bool hasValidHeaders(Document& doc)
             break;
         }
         QVariant var = cell->value();
-        auto str = var.toString().toStdString();
+        auto str = var.toString();
         //cout << str << endl;
-        if(str.empty())
+        if(str.isEmpty())
         {
             break;
         }
@@ -72,9 +72,9 @@ bool hasValidHeaders(Document& doc)
     return true;
 }
 
-void saveData(teacherInfo& info, std::string& headerStr, std::string& str)
+void saveData(TeacherInfo& info, QString& headerStr, QString& str)
 {
-    if(str.empty())
+    if(str.isEmpty())
     {
         str = nullString;
     }
@@ -98,7 +98,7 @@ void saveData(teacherInfo& info, std::string& headerStr, std::string& str)
     else if(headerStr == "收费日期") info.payDate = str;
 }
 
-bool isUsefulHeader(std::string header)
+bool isUsefulHeader(QString header)
 {
     for(auto str : validExcelHeader)
     {
@@ -107,7 +107,7 @@ bool isUsefulHeader(std::string header)
     return false;
 }
 
-QVariant readCellValue(std::string headerStr, CellPtr cell)
+QVariant readCellValue(QString headerStr, CellPtr cell)
 {
     if(headerStr == "星期")
     {
@@ -126,22 +126,23 @@ void CUtils::updateActionItemsList(QVariantList& data, const Controller::Operate
     }
 }
 
-void CUtils::getTeacherInfosFromExcelFile(vector<teacherInfo>& teacherInfos, QString filePath)
+TeacherInfos CUtils::getTeacherInfosFromExcelFile(QString filePath)
 {
+    TeacherInfos infos;
     Document doc(filePath);
     if (!doc.load())
-        return;
+        return infos;
 
     if(!hasValidHeaders(doc))
     {
-        return;
+        return infos;
     }
 
     int row = 2; int col = 1;
     while(row)
     {
         col = 1;
-        teacherInfo info;
+        TeacherInfo info;
         while(col)
         {
             CellPtr headerCell = doc.cellAt(1, col);
@@ -151,9 +152,9 @@ void CUtils::getTeacherInfosFromExcelFile(vector<teacherInfo>& teacherInfos, QSt
             }
             QVariant header = headerCell->readValue();
 
-            auto headerStr = header.toString().toStdString();
+            auto headerStr = header.toString();
             //cout << row << " " << col << " " << headerStr << " ";
-            if(headerStr.empty())
+            if(headerStr.isEmpty())
             {
                 break;
             }
@@ -170,7 +171,7 @@ void CUtils::getTeacherInfosFromExcelFile(vector<teacherInfo>& teacherInfos, QSt
                 continue;
             }
             QVariant var = readCellValue(headerStr, cell);
-            auto str = var.toString().toStdString();
+            auto str = var.toString();
             //cout << str << endl;
             saveData(info, headerStr, str);
             col++;
@@ -179,13 +180,14 @@ void CUtils::getTeacherInfosFromExcelFile(vector<teacherInfo>& teacherInfos, QSt
         {
             break;
         }
-        teacherInfos.emplace_back(info);
+        infos.emplace_back(info);
         row++;
     }
+    return infos;
 }
 
 //For SearchTeacherInfoController.cpp
-void CUtils::updateTeacherInfoList(QVariantList& data, vector<teacherInfo> teacherInfos)
+void CUtils::updateTeacherInfoList(QVariantList& data, TeacherInfos& teacherInfos)
 {
     QVariantList teacherCourseList;
     QVariantMap teacherCourse1 = QVariantMap{ { "suject", "test" },

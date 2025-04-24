@@ -2,36 +2,37 @@
 
 #include <String>
 #include <vector>
+#include <QString>
 
 using namespace std;
 
 namespace ClassScheduler
 {
-    static std::string nullString = "无该信息";
+    static QString nullString = "无该信息";
     static vector validExcelHeader{"日期", "星期", "姓名", "学校", "电话", "年级", "学科", "时间", "老师", "网课or面授", "课时", "金额/小时", "课酬总计", "老师姓名", "老师工资", "已收金额", "付费方式", "收费日期"};
-    struct teacherInfo
+    struct TeacherInfo
     {
-        std::string teacherName;
-        std::string teacherNickName;
+        QString teacherName;
+        QString teacherNickName;
 
         //teacherCourseList
-        std::string date;
-        std::string weekend;
-        std::string studentName;
+        QString date;
+        QString weekend;
+        QString studentName;
 
-        std::string school;
-        std::string studentPhoneNubmer;
-        std::string grade;
-        std::string suject;
-        std::string time;
-        std::string learningType;
-        std::string courseTime;
-        std::string studentFee;
-        std::string studentTotalFee;
-        std::string teacherFee;
-        std::string gotMoney;
-        std::string payType;
-        std::string payDate;
+        QString school;
+        QString studentPhoneNubmer;
+        QString grade;
+        QString suject;
+        QString time;
+        QString learningType;
+        QString courseTime;
+        QString studentFee;
+        QString studentTotalFee;
+        QString teacherFee;
+        QString gotMoney;
+        QString payType;
+        QString payDate;
 
         bool isValidInfo()
         {
@@ -60,5 +61,5 @@ namespace ClassScheduler
         }
     };
 
-
+    using TeacherInfos = vector<TeacherInfo>;
 } // namespace ClassScheduler

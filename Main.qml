@@ -31,6 +31,7 @@ Window {
             id: actionItems
 
             controller: controller
+            visible: controller.showActions
             Layout.alignment: Qt.AlignTop
             Layout.preferredHeight: 50
             Layout.fillWidth: true

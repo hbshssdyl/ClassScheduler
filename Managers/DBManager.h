@@ -1,6 +1,8 @@
 #ifndef DBMANAGER_H
 #define DBMANAGER_H
 #include "Utils/DataUtils.h"
+
+#include <QtSql>
 #include <memory>
 
 using namespace ClassScheduler;
@@ -17,6 +19,10 @@ public:
     bool createTeacherInfosTable();
     bool insertDataToTeacherInfosTable(TeacherInfos& infos);
     void queryDataFromTeacherInfosTable(TeacherInfos& infos);
+    bool isTableExist(QString tableName);
+
+private:
+    QSqlDatabase mDB;
 
 };
 

@@ -16,28 +16,29 @@ qt_add_executable(appClassScheduler
 qt_add_qml_module(appClassScheduler
     URI ClassScheduler
     VERSION 1.0
-    QML_FILES
-        Main.qml
-        SOURCES Controller/Controller.h
-        SOURCES Controller/Controller.cpp
-        SOURCES Utils/ControllerUtils.h
-        SOURCES Utils/ControllerUtils.cpp
-        SOURCES Utils/DataUtils.h
-        QML_FILES Qml/WelcomePage/WelcomePage.qml
-        QML_FILES Qml/SearchTeacherInfo/SearchTeacherInfo.qml
-        QML_FILES Qml/ScheduleClass/ScheduleClass.qml
-        QML_FILES Qml/CalcOneToOneMoney/CalcOneToOneMoney.qml
-        QML_FILES Qml/CalcClassMoney/CalcClassMoney.qml
-        QML_FILES Qml/ActionItems/ActionItems.qml
-        QML_FILES Qml/ActionItems/ActionItemDelegate.qml
-        QML_FILES Qml/OperateArea/OperateArea.qml
-        QML_FILES Qml/BasicComponent/MButton.qml
-        QML_FILES Qml/JSUtils/ColorUtils.js
-        QML_FILES Qml/SearchTeacherInfo/SearchTeacherInfoDelegate.qml
-        QML_FILES Qml/SearchTeacherInfo/TeacherCourseItemDelegate.qml
-        SOURCES Controller/SearchTeacherInfoController.cpp
-        SOURCES Controller/SearchTeacherInfoController.h
-        SOURCES Managers/DBManager.h Managers/DBManager.cpp
+
+    QML_FILES Main.qml
+    QML_FILES Qml/WelcomePage/WelcomePage.qml
+    QML_FILES Qml/SearchTeacherInfo/SearchTeacherInfo.qml
+    QML_FILES Qml/ScheduleClass/ScheduleClass.qml
+    QML_FILES Qml/CalcOneToOneMoney/CalcOneToOneMoney.qml
+    QML_FILES Qml/CalcClassMoney/CalcClassMoney.qml
+    QML_FILES Qml/ActionItems/ActionItems.qml
+    QML_FILES Qml/ActionItems/ActionItemDelegate.qml
+    QML_FILES Qml/OperateArea/OperateArea.qml
+    QML_FILES Qml/BasicComponent/MButton.qml
+    QML_FILES Qml/JSUtils/ColorUtils.js
+    QML_FILES Qml/SearchTeacherInfo/SearchTeacherInfoDelegate.qml
+    QML_FILES Qml/LoginView/LoginView.qml
+
+    SOURCES Controller/Controller.h
+    SOURCES Controller/Controller.cpp
+    SOURCES Utils/ControllerUtils.h
+    SOURCES Utils/ControllerUtils.cpp
+    SOURCES Utils/DataUtils.h
+    SOURCES Controller/SearchTeacherInfoController.cpp
+    SOURCES Controller/SearchTeacherInfoController.h
+    SOURCES Managers/DBManager.h Managers/DBManager.cpp
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.

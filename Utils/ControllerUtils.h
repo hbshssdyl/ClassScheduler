@@ -17,6 +17,7 @@ namespace ClassScheduler
     public:
         static void updateActionItemsList(QVariantList& data, const Controller::OperateMode& selectedMode, const Controller::OperateModes& actionItems);
         static void updateTeacherInfoList(QVariantList& data, TeacherInfos& teacherInfos);
+        static void updateTeacherHeaderList(QVariantList& data);
         static TeacherInfos getTeacherInfosFromExcelFile(QString filePath);
     };
 

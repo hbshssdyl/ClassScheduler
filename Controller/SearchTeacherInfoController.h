@@ -16,26 +16,7 @@ class SearchTeacherInfoController : public QObject {
     Q_OBJECT
 public:
     Q_PROPERTY(QVariantList teacherInfoList MEMBER mTeacherInfoList NOTIFY teacherInfoListChanged)
-    /*
-     * teacherName 老师名字（昵称）
-     * teacherCourseList 老师当前的课程
-     */
-
-    //teacherCourseList
-    /*
-     * date 日期
-     * studentName 学生姓名
-     * weekend 周几
-     * school 学校
-     * studentPhoneNubmer 学生电话
-     * grade 年级
-     * suject 学科
-     * time 时间（24小时制）
-     * type 面授/网课
-     * courseTime 课时
-     * studentFee 学生单价 金额/小时
-     * teacherFee 老师单价 金额/小时
-     */
+    Q_PROPERTY(QVariantList teacherHeaderList MEMBER mTeacherHeaderList NOTIFY teacherInfoHeaderChanged)
 
     enum class OperateMode
     {
@@ -55,17 +36,22 @@ public:
 
 signals:
     void teacherInfoListChanged();
+    void teacherInfoHeaderChanged();
 
 private:
     void refreshSearchTeacherInfo();
     void readTeacherInfosFromDB();
-    void getTeacherInfosFromExcelFile(QString filePath);
+    void initTeacherInfosFromExcelFile(QString filePath);
     void readyForTeacherInfos();
+    void dataInit();
+    void initTeahcerHeader();
 
 private:
     QVariantList mTeacherInfoList;
+    QVariantList mTeacherHeaderList;
     TeacherInfos mTeacherInfosFromDB;
     DBManagerPtr mDBManager;
+    bool mIsDBDataExist = false;
 
 };
 

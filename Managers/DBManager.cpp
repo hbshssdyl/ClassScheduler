@@ -1,5 +1,4 @@
 #include "DBManager.h"
-#include <QtSql>
 #include <iostream>
 
 using namespace ClassScheduler;
@@ -8,9 +7,9 @@ DBManager::DBManager() {}
 
 bool DBManager::createDBConnection()
 {
-    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
-    db.setDatabaseName("ClassScheduler.db");
-    if (!db.open()) {
+    mDB = QSqlDatabase::addDatabase("QSQLITE");
+    mDB.setDatabaseName("ClassScheduler.db");
+    if (!mDB.open()) {
         cout << "Failed to connect database." << endl;
         return false;
     }
@@ -69,10 +68,16 @@ bool DBManager::insertDataToTeacherInfosTable(TeacherInfos& infos)
     return true;
 }
 
+bool DBManager::isTableExist(QString tableName)
+{
+    QSqlQuery query(mDB);
+    query.exec(QString("select * from sqlite_master where type='table' and name='%1'").arg(tableName));
+    return query.next();;
+}
+
 void DBManager::queryDataFromTeacherInfosTable(TeacherInfos& infos)
 {
     QSqlQuery query("SELECT * FROM teacherInfos");
-    cout << "mytest1" << endl;
     int cnt = 1;
     while (query.next()) {
         TeacherInfo info;
@@ -99,7 +104,5 @@ void DBManager::queryDataFromTeacherInfosTable(TeacherInfos& infos)
         info.payDate = query.value("payDate").toString();
 
         infos.emplace_back(info);
-        cout << cnt++ << info.teacherName.toStdString() << endl;
     }
-    cout << "mytest3" << endl;
 }

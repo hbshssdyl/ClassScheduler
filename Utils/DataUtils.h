@@ -12,23 +12,22 @@ namespace ClassScheduler
     static vector validExcelHeader{"日期", "星期", "姓名", "学校", "电话", "年级", "学科", "时间", "老师", "网课or面授", "课时", "金额/小时", "课酬总计", "老师姓名", "老师工资", "已收金额", "付费方式", "收费日期"};
     struct TeacherInfo
     {
-        QString teacherName;
-        QString teacherNickName;
-
-        //teacherCourseList
         QString date;
         QString weekend;
         QString studentName;
-
         QString school;
         QString studentPhoneNubmer;
         QString grade;
+
         QString suject;
         QString time;
+        QString teacherNickName;
         QString learningType;
         QString courseTime;
         QString studentFee;
+
         QString studentTotalFee;
+        QString teacherName;
         QString teacherFee;
         QString gotMoney;
         QString payType;

@@ -17,12 +17,14 @@ class Controller : public QObject {
     Q_OBJECT
 public:
     Q_PROPERTY(OperateMode operateMode MEMBER mOperateMode NOTIFY operateModeChanged)
+    Q_PROPERTY(bool showActions MEMBER mShowActions NOTIFY operateModeChanged)
     Q_PROPERTY(QString loadedView MEMBER mLoadedView NOTIFY operateModeChanged)
     Q_PROPERTY(QVariantList actionItemsList MEMBER mActionItemsList NOTIFY actionItemsListChanged)
 
     enum class OperateMode
     {
         None,
+        LoginView,
         WelcomePage,
         SearchTeacherInfo,
         ScheduleClass,
@@ -50,11 +52,13 @@ private:
     void refreshOperateMode(OperateMode mode);
     void waitTeacherInfosInited();
     void getTeacherInfosByExcelFile(QString filePath);
+    void initDB();
 
 private:
     OperateMode mOperateMode { OperateMode::None };
     DBManagerPtr mDBManager;
     QString mLoadedView { "" };
+    bool mShowActions;
     QVariantList mActionItemsList;
     OperateModes mAllOperateMode;
     QPointer<SearchTeacherInfoController> mSearchTeacherInfoController;

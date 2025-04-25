@@ -9,6 +9,7 @@
 #include "Managers/DBManager.h"
 
 using namespace ClassScheduler;
+const QString TEACHER_INFOS_TABLE_NAME = "teacherInfos";
 
 SearchTeacherInfoController::SearchTeacherInfoController(DBManagerPtr dbManager, QObject* parent)
     : mDBManager(dbManager)
@@ -18,11 +19,25 @@ SearchTeacherInfoController::SearchTeacherInfoController(DBManagerPtr dbManager,
 
 void SearchTeacherInfoController::initialize()
 {
-    //getTeacherInfosFromExcelFile("test.xlsx");
+    dataInit();
     refreshSearchTeacherInfo();
 }
 
-void SearchTeacherInfoController::getTeacherInfosFromExcelFile(QString filePath)
+void SearchTeacherInfoController::dataInit()
+{
+    if(mDBManager->isTableExist(TEACHER_INFOS_TABLE_NAME))
+    {
+        cout << "DB is exist" << endl;
+        mIsDBDataExist = true;
+    }
+    else
+    {
+        cout << "init Teacher Infos From Excel File" << endl;
+        initTeacherInfosFromExcelFile("test.xlsx");
+    }
+}
+
+void SearchTeacherInfoController::initTeacherInfosFromExcelFile(QString filePath)
 {
     if(!mDBManager)
     {
@@ -52,13 +67,15 @@ void SearchTeacherInfoController::getTeacherInfosFromExcelFile(QString filePath)
 
 void SearchTeacherInfoController::refreshSearchTeacherInfo()
 {
-    if(!mDBManager->createDBConnection())
+    if(!mIsDBDataExist)
     {
-        cout << "Fail to open DB" << endl;
         return;
     }
+
+    initTeahcerHeader();
     readTeacherInfosFromDB();
-    if(!mTeacherInfosFromDB.size() == 0)
+
+    if(mTeacherInfosFromDB.size() == 0)
     {
         cout << "Fail to get teacher infos from DB" << endl;
         return;
@@ -71,6 +88,18 @@ void SearchTeacherInfoController::refreshSearchTeacherInfo()
     {
         mTeacherInfoList = std::move(newTeacherInfoList);
         emit teacherInfoListChanged();
+    }
+}
+
+void SearchTeacherInfoController::initTeahcerHeader()
+{
+    QVariantList newTeacherrHeaderList;
+    CUtils::updateTeacherHeaderList(newTeacherrHeaderList);
+
+    if (mTeacherHeaderList != newTeacherrHeaderList)
+    {
+        mTeacherHeaderList = std::move(newTeacherrHeaderList);
+        emit teacherInfoHeaderChanged();
     }
 }
 
@@ -89,7 +118,8 @@ void SearchTeacherInfoController::readTeacherInfosFromDB()
 
 void SearchTeacherInfoController::readyForTeacherInfos()
 {
-
+    mIsDBDataExist = true;
+    refreshSearchTeacherInfo();
 }
 
 

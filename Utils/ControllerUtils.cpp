@@ -17,7 +17,6 @@ using CellPtr = std::shared_ptr<Cell>;
 namespace ClassScheduler
 {
 
-//For controller.cpp
 QString toOperateModeString(Controller::OperateMode mode)
 {
     switch (mode)
@@ -74,7 +73,7 @@ bool hasValidHeaders(Document& doc)
 
 void saveData(TeacherInfo& info, QString& headerStr, QString& str)
 {
-    if(str.isEmpty())
+    if(str.isEmpty() || str == "00:00:00.000")
     {
         str = nullString;
     }
@@ -116,6 +115,32 @@ QVariant readCellValue(QString headerStr, CellPtr cell)
     return cell->readValue();
 }
 
+QVariantMap getTeacherListInfo(int id, TeacherInfo teacherInfo)
+{
+    return QVariantMap{{ "id", QString::number(id) },
+                       { "date", teacherInfo.date },
+                       { "weekend", teacherInfo.weekend },
+                       { "studentName", teacherInfo.studentName },
+                       { "school", teacherInfo.school },
+                       { "studentPhoneNubmer", teacherInfo.studentPhoneNubmer },
+                       { "grade", teacherInfo.grade },
+
+                       { "suject", teacherInfo.suject },
+                       { "time", teacherInfo.time },
+                       { "teacherNickName", teacherInfo.teacherNickName },
+                       { "learningType", teacherInfo.learningType },
+                       { "courseTime", teacherInfo.courseTime },
+                       { "studentFee", teacherInfo.studentFee },
+
+                       { "studentTotalFee", teacherInfo.studentTotalFee },
+                       { "teacherName", teacherInfo.teacherName },
+                       { "teacherFee", teacherInfo.teacherFee },
+                       { "gotMoney", teacherInfo.gotMoney },
+                       { "payType", teacherInfo.payType },
+                       { "payDate", teacherInfo.payDate }};
+}
+
+//For controller.cpp
 void CUtils::updateActionItemsList(QVariantList& data, const Controller::OperateMode& selectedMode, const Controller::OperateModes& actionItems)
 {
     for(auto activeItem : actionItems)
@@ -126,6 +151,7 @@ void CUtils::updateActionItemsList(QVariantList& data, const Controller::Operate
     }
 }
 
+//For SearchTeacherInfoController.cpp
 TeacherInfos CUtils::getTeacherInfosFromExcelFile(QString filePath)
 {
     TeacherInfos infos;
@@ -153,7 +179,6 @@ TeacherInfos CUtils::getTeacherInfosFromExcelFile(QString filePath)
             QVariant header = headerCell->readValue();
 
             auto headerStr = header.toString();
-            //cout << row << " " << col << " " << headerStr << " ";
             if(headerStr.isEmpty())
             {
                 break;
@@ -172,7 +197,7 @@ TeacherInfos CUtils::getTeacherInfosFromExcelFile(QString filePath)
             }
             QVariant var = readCellValue(headerStr, cell);
             auto str = var.toString();
-            //cout << str << endl;
+
             saveData(info, headerStr, str);
             col++;
         }
@@ -186,46 +211,23 @@ TeacherInfos CUtils::getTeacherInfosFromExcelFile(QString filePath)
     return infos;
 }
 
-//For SearchTeacherInfoController.cpp
 void CUtils::updateTeacherInfoList(QVariantList& data, TeacherInfos& teacherInfos)
 {
-    QVariantList teacherCourseList;
-    QVariantMap teacherCourse1 = QVariantMap{ { "suject", "test" },
-                                          { "date", "日期1" },
-                                          { "time", "时间1（24小时制）" },
-                                          { "week", "周几1" },
-                                          { "school", "学校1" },
-                                          { "grade", "年级1" },
-                                          { "courseTime", "课时1" },
-                                          { "studentFee", "家长单价1" },
-                                          { "teacherFee", "老师单价1" }};
-    QVariantMap teacherCourse2 = QVariantMap{ { "suject", "科目2" },
-                                             { "date", "日期2" },
-                                             { "time", "时间2（24小时制）" },
-                                             { "week", "周几2" },
-                                             { "school", "学校2" },
-                                             { "grade", "年级2" },
-                                             { "courseTime", "课时2" },
-                                             { "studentFee", "家长单价2" },
-                                             { "teacherFee", "老师单价2" }};
-    QVariantMap teacherCourse3 = QVariantMap{ { "suject", "科目3" },
-                                             { "date", "日期3" },
-                                             { "time", "时间3（24小时制）" },
-                                             { "week", "周几3" },
-                                             { "school", "学校3" },
-                                             { "grade", "年级3" },
-                                             { "courseTime", "课时3" },
-                                             { "studentFee", "家长单价3" },
-                                             { "teacherFee", "老师单价3" }};
-    teacherCourseList.append(teacherCourse1);
-    teacherCourseList.append(teacherCourse2);
-    teacherCourseList.append(teacherCourse3);
-    data.append(QVariantMap{ { "teacherName", "老师1" },
-                            { "teacherCourseList", teacherCourseList }});
-    data.append(QVariantMap{ { "teacherName", "老师2" },
-                            { "teacherCourseList", teacherCourseList }});
-    data.append(QVariantMap{ { "teacherName", "老师3" },
-                            { "teacherCourseList", teacherCourseList }});
+    int id = 1;
+    for(auto teacherInfo : teacherInfos)
+    {
+        auto info = getTeacherListInfo(id++, teacherInfo);
+        data.append(info);
+    }
+}
+
+void CUtils::updateTeacherHeaderList(QVariantList& data)
+{
+    data.append("序号");
+    for(auto header : validExcelHeader)
+    {
+        data.append(header);
+    }
 }
 
 } // namespace PictureManager

@@ -19,8 +19,17 @@ void Controller::initialize()
     mAllOperateMode.emplace_back(OperateMode::ScheduleClass);
     mAllOperateMode.emplace_back(OperateMode::CalcOneToOneMoney);
     mAllOperateMode.emplace_back(OperateMode::CalcClassMoney);
-    onOperateModeSelected(OperateMode::WelcomePage);
+    onOperateModeSelected(OperateMode::LoginView);
+    initDB();
+}
+
+void Controller::initDB()
+{
     mDBManager = std::make_shared<DBManager>();
+    if(mDBManager)
+    {
+        mDBManager->createDBConnection();
+    }
 }
 
 QString Controller::toOperateModeString(OperateMode mode)
@@ -29,6 +38,8 @@ QString Controller::toOperateModeString(OperateMode mode)
     {
     case OperateMode::None:
         return "None";
+    case OperateMode::LoginView:
+        return "LoginView";
     case OperateMode::WelcomePage:
         return "WelcomePage";
     case OperateMode::SearchTeacherInfo:
@@ -49,6 +60,7 @@ void Controller::refreshOperateMode(OperateMode mode)
 {
     mOperateMode = mode;
     mLoadedView = toOperateModeString(mode);
+    mShowActions = mode != OperateMode::LoginView;
     emit operateModeChanged();
 }
 

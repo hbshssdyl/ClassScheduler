@@ -40,6 +40,8 @@ QString Controller::toOperateModeString(OperateMode mode)
         return "None";
     case OperateMode::LoginView:
         return "LoginView";
+    case OperateMode::FileUploadView:
+        return "FileUploadView";
     case OperateMode::WelcomePage:
         return "WelcomePage";
     case OperateMode::SearchTeacherInfo:

@@ -20,56 +20,12 @@ Rectangle {
         width: 1
     }
 
-    Row{
-        id: teacherInfoHeader
 
-        Repeater {
-            id: repeater
-
-            model: controller.teacherHeaderList
-
-            delegate: Rectangle {
-                id: repeaterDelegateItem
-
-                property int mWidth: {
-                    if(modelData == "序号")
-                        return 50;
-                    if(modelData == "学校")
-                        return 170;
-                    return 100;
-                }
-                color: "transparent"
-                width: mWidth
-                height: 50
-
-                border {
-                    color: ColorUtils.getActionItemBorderColor()
-                    width: 1
-                }
-
-                TextEdit{
-                    id: headerText
-
-                    readOnly: true
-                    selectByMouse: true
-                    anchors.centerIn: parent
-                    text: modelData
-                    font {
-                        bold: false
-                        pixelSize: 12
-                    }
-                }
-            }
-        }
-    }
 
     ScrollView {
         id: scrollView
 
-        anchors.top: teacherInfoHeader.bottom
-        anchors.bottom: parent.bottom
-        anchors.left: parent.left
-        anchors.right: parent.right
+        anchors.fill: parent
 
         clip: true
 
@@ -79,15 +35,72 @@ Rectangle {
             model: controller.teacherInfoList
             anchors.fill: parent
             spacing: 0
+            contentWidth: 19 * 100 + 20
+            flickableDirection: Flickable.AutoFlickIfNeeded
+            header: headerView;
+            headerPositioning: ListView.OverlayHeader;
 
             delegate: SearchTeacherInfoDelegate{
                 id: delegateItem
 
-                width: root.width
+                width: listView.contentWidth
                 height: delegateHeight
+                z: 1
+            }
+        }
+
+        Component {
+            id: headerView
+            Rectangle {
+                width: parent.width
+                height: 50
+                color: "transparent"
+                z: 2
+
+                Row{
+                    id: teacherInfoHeader
+
+                    Repeater {
+                        id: repeater
+
+                        model: controller.teacherHeaderList
+
+                        delegate: Rectangle {
+                            id: repeaterDelegateItem
+
+                            property int mWidth: {
+                                if(modelData == "序号")
+                                    return 50;
+                                if(modelData == "学校")
+                                    return 170;
+                                return 100;
+                            }
+                            color: "#66FFFF"
+                            width: mWidth
+                            height: 50
+                            z: 2
+
+                            border {
+                                color: ColorUtils.getActionItemBorderColor()
+                                width: 1
+                            }
+
+                            TextEdit{
+                                id: headerText
+
+                                readOnly: true
+                                selectByMouse: true
+                                anchors.centerIn: parent
+                                text: modelData
+                                font {
+                                    bold: false
+                                    pixelSize: 12
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
     }
-
-
 }

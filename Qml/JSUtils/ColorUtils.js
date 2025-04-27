@@ -7,7 +7,7 @@ function getOperateAreaBackgroundColor() {
 }
 
 function getActionItemBorderColor() {
-    return "#D6D6D6";
+    return "#969696";
 }
 
 function getActionItemBackgroundUnselectedColor() {

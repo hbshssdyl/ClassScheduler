@@ -29,7 +29,7 @@ Rectangle {
             anchors.margins: 24
             spacing: 20
 
-            Text {
+            Text  {
                 id: loginText
 
                 text: "欢迎登录"

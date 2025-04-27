@@ -25,6 +25,7 @@ public:
     {
         None,
         LoginView,
+        FileUploadView,
         WelcomePage,
         SearchTeacherInfo,
         ScheduleClass,

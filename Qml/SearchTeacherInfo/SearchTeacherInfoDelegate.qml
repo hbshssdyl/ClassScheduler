@@ -10,7 +10,7 @@ Rectangle{
     property int delegateHeight: 50
     property int textItemWidth: 100
 
-    color: "transparent"
+    color: index % 2 == 0 ? "transparent" : "#DDDDDD"
     radius: 5
 
     border {
@@ -499,12 +499,12 @@ Rectangle{
             }
 
             TextEdit{
-                id: payTypeFee
+                id: payType
 
                 selectByMouse: true
                 readOnly: true
                 anchors.centerIn: parent
-                text: modelData.studentFee
+                text: modelData.payType
                 font {
                     bold: false
                     pixelSize: 12

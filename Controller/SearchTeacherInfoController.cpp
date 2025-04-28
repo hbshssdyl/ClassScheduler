@@ -9,7 +9,6 @@
 #include "Managers/DBManager.h"
 
 using namespace ClassScheduler;
-const QString TEACHER_INFOS_TABLE_NAME = "teacherInfos";
 
 SearchTeacherInfoController::SearchTeacherInfoController(DBManagerPtr dbManager, QObject* parent)
     : mDBManager(dbManager)
@@ -19,21 +18,20 @@ SearchTeacherInfoController::SearchTeacherInfoController(DBManagerPtr dbManager,
 
 void SearchTeacherInfoController::initialize()
 {
-    dataInit();
     refreshSearchTeacherInfo();
 }
 
-void SearchTeacherInfoController::dataInit()
+void SearchTeacherInfoController::dataInit(QString newFilePath)
 {
+    if(!newFilePath.isEmpty())
+    {
+        cout << "init Teacher Infos From Excel File" << endl;
+        initTeacherInfosFromExcelFile(newFilePath);
+    }
     if(mDBManager->isTableExist(TEACHER_INFOS_TABLE_NAME))
     {
         cout << "DB is exist" << endl;
         mIsDBDataExist = true;
-    }
-    else
-    {
-        cout << "init Teacher Infos From Excel File" << endl;
-        initTeacherInfosFromExcelFile("test.xlsx");
     }
 }
 
@@ -45,24 +43,25 @@ void SearchTeacherInfoController::initTeacherInfosFromExcelFile(QString filePath
         return;
     }
 
-    auto f = [this, filePath] {
-        //std::unique_lock<std::mutex> u_lk(mTeacherInfosMutex);
-        auto teacherInfos = CUtils::getTeacherInfosFromExcelFile(filePath);
-        if(mDBManager->createDBConnection())
-        {
-            if(mDBManager->createTeacherInfosTable())
-            {
-                if(mDBManager->insertDataToTeacherInfosTable(teacherInfos))
-                {
-                    cout << "All datas have been set" << endl;
-                    readyForTeacherInfos();
-                }
-            }
-        }
-    };
+    // auto f = [this, filePath] {
+    //     //std::unique_lock<std::mutex> u_lk(mTeacherInfosMutex);
+    //     auto teacherInfos = CUtils::getTeacherInfosFromExcelFile(filePath);
+    //     if(mDBManager->createDBConnection())
+    //     {
+    //         mDBManager->dropTable(TEACHER_INFOS_TABLE_NAME);
+    //         if(mDBManager->createTeacherInfosTable())
+    //         {
+    //             if(mDBManager->insertDataToTeacherInfosTable(teacherInfos))
+    //             {
+    //                 cout << "All datas have been set" << endl;
+    //                 readyForTeacherInfos();
+    //             }
+    //         }
+    //     }
+    // };
 
-    std::thread t1(f);
-    t1.detach();
+    // std::thread t1(f);
+    // t1.detach();
 }
 
 void SearchTeacherInfoController::refreshSearchTeacherInfo()

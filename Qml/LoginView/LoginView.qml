@@ -1,5 +1,6 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
+import QtQuick.Controls.Basic
 import QtQuick.Layouts 1.12
 import QtQuick.Window 2.15
 
@@ -19,7 +20,7 @@ Rectangle {
         radius: 16
         color: "white"
         anchors.centerIn: parent
-        border.color: "#dddddd"
+        border.color: "#3399FF"
         border.width: 1
 
         ColumnLayout {
@@ -49,7 +50,7 @@ Rectangle {
                 background: Rectangle {
                     color: "#ffffff"
                     radius: 8
-                    border.color: "#cccccc"
+                    border.color: loginUserName.text === "" ? "#cccccc" : "#33CC99"
                     border.width: 1
                 }
                 padding: 8
@@ -65,7 +66,7 @@ Rectangle {
                 background: Rectangle {
                     color: "#ffffff"
                     radius: 8
-                    border.color: "#cccccc"
+                    border.color: loginPassword.text === "" ? "#cccccc" : "#33CC99"
                     border.width: 1
                 }
                 padding: 8
@@ -81,6 +82,11 @@ Rectangle {
                 height: 45
                 radius: 10
                 highlighted: true
+                background: Rectangle{
+                    color: loginButton.hovered ? "#33CCCC" : "#33CC99"
+                    anchors.fill: parent
+                    radius: 10
+                }
 
                 contentItem: Text {
                     id: loginButonText
@@ -93,7 +99,7 @@ Rectangle {
                     anchors.centerIn: parent
                 }
                 onClicked: {
-                    controller.onOperateModeSelected(2);
+                    rootController.onTryToLogin(loginUserName.text, loginPassword.text);
                 }
             }
         }

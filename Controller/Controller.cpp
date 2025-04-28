@@ -14,13 +14,13 @@ Controller::Controller(QObject* parent)
 
 void Controller::initialize()
 {
+    initDB();
     mAllOperateMode.clear();
     mAllOperateMode.emplace_back(OperateMode::SearchTeacherInfo);
     mAllOperateMode.emplace_back(OperateMode::ScheduleClass);
     mAllOperateMode.emplace_back(OperateMode::CalcOneToOneMoney);
     mAllOperateMode.emplace_back(OperateMode::CalcClassMoney);
     onOperateModeSelected(OperateMode::LoginView);
-    initDB();
 }
 
 void Controller::initDB()
@@ -29,6 +29,10 @@ void Controller::initDB()
     if(mDBManager)
     {
         mDBManager->createDBConnection();
+        mDBManager->storeAllTableDataCount();
+        mDataCount = QString::number(mDBManager->getTableDataCount(TEACHER_INFOS_TABLE_NAME));
+        emit dataCountChanged();
+        cout << "initDB, currentDataCount: " << mDataCount.toStdString() << endl;
     }
 }
 
@@ -40,8 +44,8 @@ QString Controller::toOperateModeString(OperateMode mode)
         return "None";
     case OperateMode::LoginView:
         return "LoginView";
-    case OperateMode::FileUploadView:
-        return "FileUploadView";
+    case OperateMode::FileView:
+        return "FileView";
     case OperateMode::WelcomePage:
         return "WelcomePage";
     case OperateMode::SearchTeacherInfo:
@@ -62,13 +66,33 @@ void Controller::refreshOperateMode(OperateMode mode)
 {
     mOperateMode = mode;
     mLoadedView = toOperateModeString(mode);
-    mShowActions = mode != OperateMode::LoginView;
+    switch (mode)
+    {
+        case OperateMode::None:
+        case OperateMode::LoginView:
+        case OperateMode::FileView:
+        {
+            mShowActions = false;
+            break;
+        }
+        case OperateMode::WelcomePage:
+        case OperateMode::SearchTeacherInfo:
+        case OperateMode::ScheduleClass:
+        case OperateMode::CalcOneToOneMoney:
+        case OperateMode::CalcClassMoney:
+        {
+            mShowActions = true;
+            break;
+        }
+        default:
+            break;
+    }
     emit operateModeChanged();
 }
 
 void Controller::onOperateModeSelected(OperateMode mode)
 {
-    cout << toOperateModeString(mode).toStdString() << endl;
+    cout << "当前选中的mod: " << toOperateModeString(mode).toStdString() << endl;
     refreshOperateMode(mode);
 
     QVariantList newActionItemsList;
@@ -81,25 +105,29 @@ void Controller::onOperateModeSelected(OperateMode mode)
     }
 }
 
-void Controller::waitTeacherInfosInited()
+void Controller::onTryToLogin(QString username, QString password)
 {
-    // std::unique_lock<std::mutex> u_lk(mTeacherInfosMutex);
-    // int timeout = 5;
+    onOperateModeSelected(OperateMode::FileView);
+}
 
-    // if (mTeacherInfos.size() > 0)
-    // {
-    //     return;
-    // }
-    // std::cv_status ret = mTeacherInfosCondition.wait_for(u_lk, std::chrono::seconds(timeout));
-    // if (ret == std::cv_status::timeout)
-    // {
-    //     cout << "Maybe there is something wrong with the mTeacherInfos" << endl;
-    // }
-    // else if (ret == std::cv_status::no_timeout)
-    // {
-    //     cout << "mTeacherInfos Initialized" << endl;
-    // }
-    // cout << "mytest waiting stop" << endl;
+void Controller::onFileUploaded(QString filePath)
+{
+    mNewDataFilePath = QUrl(filePath).toLocalFile();
+    cout << "filePath: " << mNewDataFilePath.toStdString() << endl;
+
+    auto fun = [this] {
+        if(mDBManager->refreshDBDataByFile(mNewDataFilePath, true))
+        {
+            mDBManager->storeAllTableDataCount();
+            onOperateModeSelected(OperateMode::WelcomePage);
+        }
+    };
+
+    if(!mNewDataFilePath.isEmpty())
+    {
+        std::thread t1(fun);
+        t1.detach();
+    }
 }
 
 SearchTeacherInfoController* Controller::getSearchTeacherInfoController()
@@ -107,7 +135,6 @@ SearchTeacherInfoController* Controller::getSearchTeacherInfoController()
     if (!mSearchTeacherInfoController)
     {
         mSearchTeacherInfoController = new SearchTeacherInfoController(mDBManager, this);
-        //waitTeacherInfosInited();
         mSearchTeacherInfoController->initialize();
     }
     return mSearchTeacherInfoController;

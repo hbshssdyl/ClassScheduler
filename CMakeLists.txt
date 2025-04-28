@@ -20,6 +20,7 @@ qt_add_qml_module(appClassScheduler
     QML_FILES Main.qml
     QML_FILES Qml/WelcomePage/WelcomePage.qml
     QML_FILES Qml/SearchTeacherInfo/SearchTeacherInfo.qml
+    QML_FILES Qml/SearchTeacherInfo/SearchTeacherInfoDelegate.qml
     QML_FILES Qml/ScheduleClass/ScheduleClass.qml
     QML_FILES Qml/CalcOneToOneMoney/CalcOneToOneMoney.qml
     QML_FILES Qml/CalcClassMoney/CalcClassMoney.qml
@@ -27,9 +28,12 @@ qt_add_qml_module(appClassScheduler
     QML_FILES Qml/ActionItems/ActionItemDelegate.qml
     QML_FILES Qml/OperateArea/OperateArea.qml
     QML_FILES Qml/BasicComponent/MButton.qml
-    QML_FILES Qml/JSUtils/ColorUtils.js
-    QML_FILES Qml/SearchTeacherInfo/SearchTeacherInfoDelegate.qml
     QML_FILES Qml/LoginView/LoginView.qml
+    QML_FILES Qml/FileView/FileView.qml
+    QML_FILES Qml/FileView/FileUploadView.qml
+    QML_FILES Qml/FileView/FileProcessingView.qml
+
+    QML_FILES Qml/JSUtils/ColorUtils.js
 
     SOURCES Controller/Controller.h
     SOURCES Controller/Controller.cpp
@@ -39,7 +43,6 @@ qt_add_qml_module(appClassScheduler
     SOURCES Controller/SearchTeacherInfoController.cpp
     SOURCES Controller/SearchTeacherInfoController.h
     SOURCES Managers/DBManager.h Managers/DBManager.cpp
-    QML_FILES Qml/FileUploadView/FileProcessingView.qml Qml/FileUploadView/FileUploadView.qml
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.

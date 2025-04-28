@@ -19,13 +19,14 @@ public:
     Q_PROPERTY(OperateMode operateMode MEMBER mOperateMode NOTIFY operateModeChanged)
     Q_PROPERTY(bool showActions MEMBER mShowActions NOTIFY operateModeChanged)
     Q_PROPERTY(QString loadedView MEMBER mLoadedView NOTIFY operateModeChanged)
+    Q_PROPERTY(QString dataCount MEMBER mDataCount NOTIFY dataCountChanged)
     Q_PROPERTY(QVariantList actionItemsList MEMBER mActionItemsList NOTIFY actionItemsListChanged)
 
     enum class OperateMode
     {
         None,
         LoginView,
-        FileUploadView,
+        FileView,
         WelcomePage,
         SearchTeacherInfo,
         ScheduleClass,
@@ -43,15 +44,17 @@ public:
 
 public slots:
     void onOperateModeSelected(OperateMode mode);
+    void onTryToLogin(QString username, QString password);
+    void onFileUploaded(QString filePath);
 
 signals:
     void operateModeChanged();
+    void dataCountChanged();
     void actionItemsListChanged();
 
 private:
     QString toOperateModeString(OperateMode mode);
     void refreshOperateMode(OperateMode mode);
-    void waitTeacherInfosInited();
     void getTeacherInfosByExcelFile(QString filePath);
     void initDB();
 
@@ -60,6 +63,8 @@ private:
     DBManagerPtr mDBManager;
     QString mLoadedView { "" };
     bool mShowActions;
+    QString mDataCount { "" };
+    QString mNewDataFilePath { "" };
     QVariantList mActionItemsList;
     OperateModes mAllOperateMode;
     QPointer<SearchTeacherInfoController> mSearchTeacherInfoController;

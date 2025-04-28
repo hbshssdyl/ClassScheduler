@@ -16,10 +16,23 @@ bool DBManager::createDBConnection()
     return true;
 }
 
+int DBManager::getTableDataCount(QString tableName)
+{
+    if(mDataCount.count(tableName) == 1)
+    {
+        return mDataCount[tableName];
+    }
+    else
+    {
+        cout << "table is not exist, table name: " << tableName.toStdString() << endl;
+    }
+    return 0;
+}
+
 bool DBManager::createTeacherInfosTable()
 {
     QSqlQuery query;
-    bool ret = query.exec("CREATE TABLE IF NOT EXISTS teacherInfos("
+    bool ret = query.exec("CREATE TABLE teacherInfos("
                           "id                 INTEGER PRIMARY KEY AUTOINCREMENT,"
                           "date               CHAR(50),"
                           "weekend            CHAR(50)            NOT NULL,"
@@ -45,6 +58,15 @@ bool DBManager::createTeacherInfosTable()
         return false;
     }
     return true;
+}
+
+void DBManager::dropTable(QString tableName)
+{
+    QSqlQuery query;
+    bool ret = query.exec(QString("DROP TABLE '%1'").arg(tableName));
+    if (!ret) {
+        cout << "Failed to drop table: " << query.lastError().text().toStdString() << endl;
+    }
 }
 
 bool DBManager::insertDataToTeacherInfosTable(TeacherInfos& infos)
@@ -73,6 +95,27 @@ bool DBManager::isTableExist(QString tableName)
     QSqlQuery query(mDB);
     query.exec(QString("select * from sqlite_master where type='table' and name='%1'").arg(tableName));
     return query.next();;
+}
+
+bool DBManager::refreshDBDataByFile(QString filePath, bool inNewThread)
+{
+    auto teacherInfos = getTeacherInfosFromExcelFile(filePath);
+    if(inNewThread)
+    {
+        createDBConnection();
+    }
+    dropTable(TEACHER_INFOS_TABLE_NAME);
+    if(createTeacherInfosTable())
+    {
+        if(insertDataToTeacherInfosTable(teacherInfos))
+        {
+            if(getTableDataCount(TEACHER_INFOS_TABLE_NAME) > 0)
+            {
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
 void DBManager::queryDataFromTeacherInfosTable(TeacherInfos& infos)
@@ -105,4 +148,152 @@ void DBManager::queryDataFromTeacherInfosTable(TeacherInfos& infos)
 
         infos.emplace_back(info);
     }
+}
+
+void DBManager::storeAllTableDataCount()
+{
+    QSqlQuery query;
+    for(auto name : allTableNameForDB)
+    {
+        query.exec(QString("SELECT count(*) FROM '%1'").arg(name));
+        query.next();
+        auto count = query.value(0).toInt();
+        mDataCount[name] = count;
+        cout << "All tableDataCount, " << name << ": " << count << endl;
+    }
+}
+
+TeacherInfos DBManager::getTeacherInfosFromExcelFile(QString filePath)
+{
+    TeacherInfos infos;
+    Document doc(filePath);
+    if (!doc.load())
+        return infos;
+
+    if(!hasValidHeaders(doc))
+    {
+        return infos;
+    }
+
+    int row = 2; int col = 1;
+    while(row)
+    {
+        col = 1;
+        TeacherInfo info;
+        while(col)
+        {
+            CellPtr headerCell = doc.cellAt(1, col);
+            if(!headerCell)
+            {
+                break;
+            }
+            QVariant header = headerCell->readValue();
+
+            auto headerStr = header.toString();
+            if(headerStr.isEmpty())
+            {
+                break;
+            }
+            if(!isUsefulHeader(headerStr))
+            {
+                col++;
+                continue;
+            }
+
+            CellPtr cell = doc.cellAt(row, col);
+            if(!cell)
+            {
+                col++;
+                continue;
+            }
+            QVariant var = readCellValue(headerStr, cell);
+            auto str = var.toString();
+
+            saveData(info, headerStr, str);
+            col++;
+        }
+        if(!info.isValidInfo())
+        {
+            break;
+        }
+        infos.emplace_back(info);
+        row++;
+    }
+    return infos;
+}
+
+bool DBManager::hasValidHeaders(Document& doc)
+{
+    int row = 1, col = 1;
+    map<QString, bool> headers;
+    while(col)
+    {
+        CellPtr cell = doc.cellAt(row, col);
+        if(!cell)
+        {
+            break;
+        }
+        QVariant var = cell->value();
+        auto str = var.toString();
+        //cout << str << endl;
+        if(str.isEmpty())
+        {
+            break;
+        }
+        headers[str] = true;
+        col++;
+    }
+    for(auto header : validExcelHeader)
+    {
+        if(!headers[header])
+        {
+            cout << "无该信息: " << header << endl;
+            return false;
+        }
+    }
+    return true;
+}
+
+void DBManager::saveData(TeacherInfo& info, QString& headerStr, QString& str)
+{
+    if(str.isEmpty() || str == "00:00:00.000")
+    {
+        str = nullString;
+    }
+    if(headerStr == "日期") info.date = str;
+    else if(headerStr == "星期") info.weekend = str;
+    else if(headerStr == "姓名") info.studentName = str;
+    else if(headerStr == "学校") info.school = str;
+    else if(headerStr == "电话") info.studentPhoneNubmer = str;
+    else if(headerStr == "年级") info.grade = str;
+    else if(headerStr == "学科") info.suject = str;
+    else if(headerStr == "时间") info.time = str;
+    else if(headerStr == "老师") info.teacherNickName = str;
+    else if(headerStr == "网课or面授") info.learningType = str;
+    else if(headerStr == "课时") info.courseTime = str;
+    else if(headerStr == "金额/小时") info.studentFee = str;
+    else if(headerStr == "课酬总计") info.studentTotalFee = str;
+    else if(headerStr == "老师姓名") info.teacherName = str;
+    else if(headerStr == "老师工资") info.teacherFee = str;
+    else if(headerStr == "已收金额") info.gotMoney = str;
+    else if(headerStr == "付费方式") info.payType = str;
+    else if(headerStr == "收费日期") info.payDate = str;
+}
+
+bool DBManager::isUsefulHeader(QString header)
+{
+    for(auto str : validExcelHeader)
+    {
+        if(header == str) return true;
+    }
+    return false;
+}
+
+QVariant DBManager::readCellValue(QString headerStr, CellPtr cell)
+{
+    if(headerStr == "星期")
+    {
+        return cell->value();
+    }
+    return cell->readValue();
 }

@@ -3,12 +3,15 @@
 
 using namespace ClassScheduler;
 
+#define OPEN_DATABASE()                                    \
+    mDB = QSqlDatabase::addDatabase("QSQLITE");            \
+    mDB.setDatabaseName("ClassScheduler.db");
+
 DBManager::DBManager() {}
 
 bool DBManager::createDBConnection()
 {
-    mDB = QSqlDatabase::addDatabase("QSQLITE");
-    mDB.setDatabaseName("ClassScheduler.db");
+    OPEN_DATABASE()
     if (!mDB.open()) {
         cout << "Failed to connect database." << endl;
         return false;
@@ -71,7 +74,7 @@ void DBManager::dropTable(QString tableName)
 
 bool DBManager::insertDataToTeacherInfosTable(TeacherInfos& infos)
 {
-    for(auto info : infos)
+    for(auto& info : infos)
     {
         QSqlQuery query;
         QString sql = QString("INSERT INTO teacherInfos (date, weekend, studentName, school, studentPhoneNubmer, grade,"

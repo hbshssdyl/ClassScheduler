@@ -21,53 +21,11 @@ void SearchTeacherInfoController::initialize()
     refreshSearchTeacherInfo();
 }
 
-void SearchTeacherInfoController::dataInit(QString newFilePath)
-{
-    if(!newFilePath.isEmpty())
-    {
-        cout << "init Teacher Infos From Excel File" << endl;
-        initTeacherInfosFromExcelFile(newFilePath);
-    }
-    if(mDBManager->isTableExist(TEACHER_INFOS_TABLE_NAME))
-    {
-        cout << "DB is exist" << endl;
-        mIsDBDataExist = true;
-    }
-}
-
-void SearchTeacherInfoController::initTeacherInfosFromExcelFile(QString filePath)
-{
-    if(!mDBManager)
-    {
-        cout << "mDBManager is null" << endl;
-        return;
-    }
-
-    // auto f = [this, filePath] {
-    //     //std::unique_lock<std::mutex> u_lk(mTeacherInfosMutex);
-    //     auto teacherInfos = CUtils::getTeacherInfosFromExcelFile(filePath);
-    //     if(mDBManager->createDBConnection())
-    //     {
-    //         mDBManager->dropTable(TEACHER_INFOS_TABLE_NAME);
-    //         if(mDBManager->createTeacherInfosTable())
-    //         {
-    //             if(mDBManager->insertDataToTeacherInfosTable(teacherInfos))
-    //             {
-    //                 cout << "All datas have been set" << endl;
-    //                 readyForTeacherInfos();
-    //             }
-    //         }
-    //     }
-    // };
-
-    // std::thread t1(f);
-    // t1.detach();
-}
-
 void SearchTeacherInfoController::refreshSearchTeacherInfo()
 {
-    if(!mIsDBDataExist)
+    if(!mDBManager->isTableExist(TEACHER_INFOS_TABLE_NAME))
     {
+        cout << "DB is not exist" << endl;
         return;
     }
 
@@ -80,14 +38,7 @@ void SearchTeacherInfoController::refreshSearchTeacherInfo()
         return;
     }
 
-    QVariantList newTeacherInfoList;
-    CUtils::updateTeacherInfoList(newTeacherInfoList, mTeacherInfosFromDB);
-
-    if (mTeacherInfoList != newTeacherInfoList)
-    {
-        mTeacherInfoList = std::move(newTeacherInfoList);
-        emit teacherInfoListChanged();
-    }
+    updateTeacherInfosList(mTeacherInfosFromDB);
 }
 
 void SearchTeacherInfoController::initTeahcerHeader()
@@ -106,6 +57,7 @@ void SearchTeacherInfoController::readTeacherInfosFromDB()
 {
     if(mDBManager)
     {
+        mDBManager->createDBConnection();
         mDBManager->queryDataFromTeacherInfosTable(mTeacherInfosFromDB);
     }
 
@@ -115,10 +67,32 @@ void SearchTeacherInfoController::readTeacherInfosFromDB()
     }
 }
 
-void SearchTeacherInfoController::readyForTeacherInfos()
+void SearchTeacherInfoController::updateTeacherInfosList(TeacherInfos& infos)
 {
-    mIsDBDataExist = true;
-    refreshSearchTeacherInfo();
+    QVariantList newTeacherInfoList;
+    CUtils::updateTeacherInfoList(newTeacherInfoList, infos);
+
+    if (mTeacherInfoList != newTeacherInfoList)
+    {
+        mTeacherInfoList = std::move(newTeacherInfoList);
+        emit teacherInfoListChanged();
+    }
+}
+
+void SearchTeacherInfoController::onSearchTriggered(QString searchString)
+{
+    TeacherInfos infos;
+    searchString = searchString.simplified();
+    if(searchString.isEmpty())
+    {
+        infos = mTeacherInfosFromDB;
+    }
+    else
+    {
+        CUtils::doSearchTeacherInfos(mTeacherInfosFromDB, infos, searchString);
+    }
+
+    updateTeacherInfosList(infos);
 }
 
 

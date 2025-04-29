@@ -128,6 +128,10 @@ void Controller::onFileUploaded(QString filePath)
         std::thread t1(fun);
         t1.detach();
     }
+    else
+    {
+        onOperateModeSelected(OperateMode::WelcomePage);
+    }
 }
 
 SearchTeacherInfoController* Controller::getSearchTeacherInfoController()

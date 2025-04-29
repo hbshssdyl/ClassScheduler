@@ -2,6 +2,7 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.12
 import QtQuick.Window 2.15
+import "../BasicComponent"
 import "../JSUtils/ColorUtils.js" as ColorUtils
 
 Rectangle {
@@ -20,87 +21,122 @@ Rectangle {
         width: 1
     }
 
-
-
-    ScrollView {
-        id: scrollView
+    ColumnLayout{
+        id: columnLayout
 
         anchors.fill: parent
 
-        clip: true
+        spacing: 5
 
-        ListView {
-            id: listView
 
-            model: controller.teacherInfoList
-            anchors.fill: parent
-            spacing: 0
-            contentWidth: 19 * 100 + 20
-            flickableDirection: Flickable.AutoFlickIfNeeded
-            header: headerView;
-            headerPositioning: ListView.OverlayHeader;
+        SearchBar{
+            id: searchBar
 
-            delegate: SearchTeacherInfoDelegate{
-                id: delegateItem
+            Layout.topMargin: 5
+            Layout.leftMargin: 5
+            Layout.alignment: Qt.AlignTop
+            Layout.preferredHeight: 50
+            Layout.preferredWidth: 400
 
-                width: listView.contentWidth
-                height: delegateHeight
-                z: 1
+            onSearchTriggered: function(query) {
+                controller.onSearchTriggered(query);
             }
         }
 
-        Component {
-            id: headerView
-            Rectangle {
-                width: parent.width
-                height: 50
-                color: "transparent"
-                z: 2
+        Item {
+            id: scrollViewItem
 
-                Row{
-                    id: teacherInfoHeader
+            Layout.alignment: Qt.AlignTop
+            Layout.fillWidth: true
+            Layout.fillHeight: true
 
-                    Repeater {
-                        id: repeater
+            ScrollView {
+                id: scrollView
 
-                        model: controller.teacherHeaderList
+                anchors.fill: parent
 
-                        delegate: Rectangle {
-                            id: repeaterDelegateItem
+                clip: true
 
-                            property int mWidth: {
-                                if(modelData == "序号")
-                                    return 50;
-                                if(modelData == "学校")
-                                    return 170;
-                                return 100;
-                            }
-                            color: "#66FFFF"
-                            width: mWidth
-                            height: 50
-                            z: 2
+                ListView {
+                    id: listView
 
-                            border {
-                                color: ColorUtils.getActionItemBorderColor()
-                                width: 1
-                            }
+                    model: controller.teacherInfoList
+                    anchors.fill: parent
 
-                            TextEdit{
-                                id: headerText
+                    spacing: 0
+                    contentWidth: 19 * 100 + 20
+                    flickableDirection: Flickable.AutoFlickIfNeeded
+                    header: headerView;
+                    headerPositioning: ListView.OverlayHeader;
 
-                                readOnly: true
-                                selectByMouse: true
-                                anchors.centerIn: parent
-                                text: modelData
-                                font {
-                                    bold: false
-                                    pixelSize: 12
+                    delegate: SearchTeacherInfoDelegate{
+                        id: delegateItem
+
+                        width: listView.contentWidth
+                        height: delegateHeight
+                        z: 1
+                    }
+                }
+
+                Component {
+                    id: headerView
+                    Rectangle {
+                        width: parent.width
+                        height: 50
+                        color: "transparent"
+                        z: 2
+
+                        Row{
+                            id: teacherInfoHeader
+
+                            Repeater {
+                                id: repeater
+
+                                model: controller.teacherHeaderList
+
+                                delegate: Rectangle {
+                                    id: repeaterDelegateItem
+
+                                    property int mWidth: {
+                                        if(modelData == "序号")
+                                            return 50;
+                                        if(modelData == "学校")
+                                            return 170;
+                                        return 100;
+                                    }
+                                    color: "#66FFFF"
+                                    width: mWidth
+                                    height: 50
+                                    z: 2
+
+                                    border {
+                                        color: ColorUtils.getActionItemBorderColor()
+                                        width: 1
+                                    }
+
+                                    TextEdit{
+                                        id: headerText
+
+                                        readOnly: true
+                                        selectByMouse: true
+                                        anchors.centerIn: parent
+                                        text: modelData
+                                        font {
+                                            bold: false
+                                            pixelSize: 12
+                                        }
+                                    }
                                 }
                             }
                         }
                     }
                 }
             }
+
         }
+
     }
+
+
+
 }

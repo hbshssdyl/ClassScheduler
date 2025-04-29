@@ -62,6 +62,32 @@ namespace ClassScheduler
             if(cnt < 5) return false;
             return true;
         }
+
+        bool isContains(QString str)
+        {
+            int cnt = 0;
+            if(date.contains(str, Qt::CaseSensitive)) return true;
+            if(weekend.contains(str, Qt::CaseSensitive)) return true;
+            if(studentName.contains(str, Qt::CaseSensitive)) return true;
+            if(school.contains(str, Qt::CaseSensitive)) return true;
+            if(studentPhoneNubmer.contains(str, Qt::CaseSensitive)) return true;
+            if(grade.contains(str, Qt::CaseSensitive)) return true;
+
+            if(suject.contains(str, Qt::CaseSensitive)) return true;
+            if(time.contains(str, Qt::CaseSensitive)) return true;
+            if(teacherNickName.contains(str, Qt::CaseSensitive)) return true;
+            if(learningType.contains(str, Qt::CaseSensitive)) return true;
+            if(courseTime.contains(str, Qt::CaseSensitive)) return true;
+            if(studentFee.contains(str, Qt::CaseSensitive)) return true;
+
+            if(studentTotalFee.contains(str, Qt::CaseSensitive)) return true;
+            if(teacherName.contains(str, Qt::CaseSensitive)) return true;
+            if(teacherFee.contains(str, Qt::CaseSensitive)) return true;
+            if(gotMoney.contains(str, Qt::CaseSensitive)) return true;
+            if(payType.contains(str, Qt::CaseSensitive)) return true;
+            if(payDate.contains(str, Qt::CaseSensitive)) return true;
+            return false;
+        }
     };
 
     using TeacherInfos = vector<TeacherInfo>;

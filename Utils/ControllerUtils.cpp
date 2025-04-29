@@ -79,6 +79,17 @@ void CUtils::updateTeacherInfoList(QVariantList& data, TeacherInfos& teacherInfo
     }
 }
 
+void CUtils::doSearchTeacherInfos(TeacherInfos& allInfos, TeacherInfos& searchInfos, QString searchString)
+{
+    for(auto& info : allInfos)
+    {
+        if(info.isContains(searchString))
+        {
+            searchInfos.emplace_back(info);
+        }
+    }
+}
+
 void CUtils::updateTeacherHeaderList(QVariantList& data)
 {
     data.append("序号");

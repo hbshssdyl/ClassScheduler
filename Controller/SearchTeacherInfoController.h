@@ -32,19 +32,20 @@ public:
 
 public:
     explicit SearchTeacherInfoController(DBManagerPtr dbManager, QObject* parent = nullptr);
-    Q_INVOKABLE void initialize(QString newFilePath);
+    Q_INVOKABLE void initialize();
 
 signals:
     void teacherInfoListChanged();
     void teacherInfoHeaderChanged();
 
+public slots:
+    void onSearchTriggered(QString searchString);
+
 private:
     void refreshSearchTeacherInfo();
     void readTeacherInfosFromDB();
-    void initTeacherInfosFromExcelFile(QString filePath);
-    void readyForTeacherInfos();
-    void dataInit(QString newFilePath);
     void initTeahcerHeader();
+    void updateTeacherInfosList(TeacherInfos& infos);
 
 private:
     QVariantList mTeacherInfoList;

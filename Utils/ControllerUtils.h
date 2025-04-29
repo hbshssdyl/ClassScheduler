@@ -18,6 +18,7 @@ namespace ClassScheduler
         static void updateActionItemsList(QVariantList& data, const Controller::OperateMode& selectedMode, const Controller::OperateModes& actionItems);
         static void updateTeacherInfoList(QVariantList& data, TeacherInfos& teacherInfos);
         static void updateTeacherHeaderList(QVariantList& data);
+        static void doSearchTeacherInfos(TeacherInfos& allInfos, TeacherInfos& searchInfos, QString searchString);
     };
 
 } // namespace PictureManager

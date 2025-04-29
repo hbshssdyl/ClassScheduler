@@ -1,216 +1,135 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
-import QtQuick.Layouts 1.12
-import Qt.labs.folderlistmodel 2.5
-import QtQuick.Dialogs 1.3
+import QtQuick.Layouts 1.15
 
 Rectangle {
     id: root
 
-    property var operateMode
     property var rootController
 
-    color: "#FFFFFF"
-    radius: 5
-
-    border {
-        color: "#D6D6D6"
-        width: 1
-    }
+    color: "#e8f5e9" // 柔和的绿色背景
 
     ColumnLayout {
-        id: columnLayout
+        anchors.centerIn: parent
+        spacing: 20
+        width: parent.width * 0.8
 
-        anchors.fill: parent
-        spacing: 5
+        Text {
+            id: titleText
+            text: "学生排课系统"
+            font.pixelSize: 28
+            font.bold: true
+            color: "#2e7d32" // 深绿色字体
+            horizontalAlignment: Text.AlignHCenter
+            Layout.alignment: Qt.AlignHCenter
+        }
 
-        Rectangle {
-            id: folderPathItem
+        Repeater {
+            model: [
+                { placeholder: "选择科目", options: ["语文", "数学", "英语", "物理", "化学", "生物", "道法"] },
+                { placeholder: "选择年级", options: ["小学", "初一", "初二", "初三", "高一", "高二", "高三"] },
+                { placeholder: "选择星期", options: ["星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日"] }
+            ]
+            delegate: ComboBox {
+                id: comboBox
 
-            Layout.alignment: Qt.AlignTop
-            Layout.preferredHeight: 40
-            Layout.fillWidth: true
-            Layout.topMargin: 2
-            Layout.leftMargin: 7
-            Layout.rightMargin: 7
-
-            RowLayout {
-                id: folderPathItemLayout
-
-                anchors.fill: parent
-                spacing: 5
-
-                Button {
-                    id: folderSelectAction
-
-                    text: qsTr("选择路径")
-                    Layout.fillHeight: true
-                    Layout.topMargin: 5
-                    Layout.bottomMargin: 5
-                    Layout.preferredWidth: 60
-
-                    onClicked: {
-                        folderDialog.open()
-                    }
-
-                    background: Rectangle {
-                        id: buttonBackground
-
-                        anchors.fill: parent
-                        color: "#66ffff"
-                        radius: 5
-
-                        border {
-                            color: "#D6D6D6"
-                            width: 1
-                        }
-                    }
+                Layout.fillWidth: true
+                model: modelData.options
+                font.pixelSize: 16
+                currentIndex: -1
+                //placeholderText: modelData.placeholder
+                background: Rectangle {
+                    color: "#ffffff"
+                    border.color: "#2e7d32"
+                    radius: 5
                 }
-
-                Item {
-                    id: folderPathTextItem
-
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    Layout.topMargin: 5
-                    Layout.bottomMargin: 5
-
-                    TextField  {
-                        id: folderPathText
-
-                        text: ""
-                        color: "#707070"
-                        readOnly: true
-                        activeFocusOnTab: true
-                        selectByMouse: true
-                        selectedTextColor: "white"
-                        selectionColor: "#4A6DBC"
-                        verticalAlignment: TextInput.AlignVCenter
-                        horizontalAlignment: TextInput.AlignLeft
-                        anchors.fill: parent
-                        leftPadding: 10
-                        placeholderText: "请选择一个文件夹"
-                        font {
-                            bold: false
-                            pixelSize: 16
-                        }
-
-                        background: Rectangle {
-                            id: textFieldBackground
-
-                            anchors.fill: parent
-                            color: "#F3F6FA"
-                            radius: 5
-
-                            border{
-                                width: 1
-                                color: "#DFE0E4"
-                            }
-                        }
-                    }
+                contentItem: Text {
+                    text: comboBox.currentText
+                    font.pixelSize: 16
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                    color: comboBox.pressed ? "#1b5e20" : "#2e7d32"
                 }
             }
         }
+        // ComboBox {
+        //     id: subjectComboBox
+        //     Layout.fillWidth: true
+        //     model: ["语文", "数学", "英语", "物理", "化学", "生物", "道法"]
+        //     font.pixelSize: 16
+        //     background: Rectangle {
+        //         color: "#ffffff"
+        //         border.color: "#2e7d32"
+        //         radius: 5
+        //     }
+        //     contentItem: Text {
+        //         text: subjectComboBox.currentText
+        //         font.pixelSize: 16
+        //         horizontalAlignment: Text.AlignHCenter
+        //         verticalAlignment: Text.AlignVCenter
+        //         color: subjectComboBox.pressed ? "#1b5e20" : "#2e7d32"
+        //     }
+        // }
 
-        Rectangle {
-            id: deleteActionItem
+        // ComboBox {
+        //     id: gradeComboBox
+        //     Layout.fillWidth: true
+        //     model: ["小学", "初一", "初二", "初三", "高一", "高二", "高三"]
+        //     font.pixelSize: 16
+        //     background: Rectangle {
+        //         color: "#ffffff"
+        //         border.color: "#2e7d32"
+        //         radius: 5
+        //     }
+        //     contentItem: Text {
+        //         text: gradeComboBox.currentText
+        //         font.pixelSize: 16
+        //         horizontalAlignment: Text.AlignHCenter
+        //         verticalAlignment: Text.AlignVCenter
+        //         color: gradeComboBox.pressed ? "#1b5e20" : "#2e7d32"
+        //     }
+        // }
 
-            visible: imageListView.visible
-            Layout.fillWidth: true
-            Layout.preferredHeight: 30
-            Layout.leftMargin: 20
-            Layout.rightMargin: 20
 
-            color: "#DFE0E4"
-            radius: 5
 
-            border{
-                width: 1
-                color: "#DFE0E4"
+        Button {
+            id: confirmButton
+            text: "确认排课"
+            font.pixelSize: 18
+            font.bold: true
+            hoverEnabled: false
+            Layout.alignment: Qt.AlignHCenter
+            background: Rectangle {
+                color: mouseArea.containsMouse ? "#4caff0" : "#4caf50" // 按钮绿色背景
+                radius: 8
+                border.color: "#2e7d32"
             }
 
-            RowLayout {
-                id: actionLayout
+            MouseArea {
+                id: mouseArea
 
+                hoverEnabled: true
                 anchors.fill: parent
-                spacing: 0
-
-                Text {
-                    id: textItem
-
-                    color: "#707070"
-                    text: "点击“删除”按钮后，红色边框内的图片将会被删除。"
-                    //Layout.preferredWidth: true
-                    Layout.topMargin: 5
-                    Layout.fillHeight: true
-                    Layout.alignment: Qt.AlignCenter
-
-                    font {
-                        bold: false
-                        pixelSize: 16
+                onClicked: {
+                    if (subjectComboBox.currentIndex === -1 || gradeComboBox.currentIndex === -1 || dayComboBox.currentIndex === -1) {
+                        console.log("请完整填写所有信息")
+                    } else {
+                        console.log("排课信息：", subjectComboBox.currentText, gradeComboBox.currentText, dayComboBox.currentText)
                     }
                 }
-
-                MButton {
-                    id: actionButton
-
-                    text: "删除"
-                    textPixelSize: 14
-                    radius: height / 2
-                    Layout.preferredWidth: 50
-                    Layout.preferredHeight: 25
-                    Layout.rightMargin: 10
-                    Layout.alignment: Qt.AlignRight
-
-                    onClicked:{
-                        controller.onDeleteRepeatedImagesAction();
-                        root.controller.onForderPathReceived(folderDialog.fileUrl + "/");
-                    }
-                }
             }
-        }
 
-        Rectangle{
-            id: imagesView
-
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            Layout.bottomMargin: 2
-            Layout.leftMargin: 7
-            Layout.rightMargin: 7
-            clip: true
-
-            ListView {
-                id: imageListView
-
-                visible: false
-                anchors.fill: parent
-                spacing: 0
-
-                model: root.controller.groupRepeatedImages
-
-                delegate: RepeatedImagesDelegate {
-                    id: imageDelegate
-
-                    width: root.width - 20
-                    height: 150
-                }
+            contentItem: Text {
+                text: confirmButton.text
+                color: "#ffffff" // 按钮文字白色
+                font.pixelSize: 18
+                font.bold: true
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
             }
-        }
 
-    }
 
-    FileDialog {
-        id: folderDialog
-
-        title: "请选择一个文件夹"
-        selectFolder: true
-        folder: ""
-        onAccepted: {
-            var dirPath = fileUrl + "/";
-            root.controller.onForderPathReceived(dirPath);
-            imageListView.visible = true;
-            folderPathText.text = dirPath;
         }
     }
 }
+

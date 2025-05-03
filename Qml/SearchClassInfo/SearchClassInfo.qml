@@ -10,7 +10,7 @@ Rectangle {
 
     property var operateMode
     property var rootController
-    property var controller: rootController.getSearchTeacherInfoController()
+    property var controller: rootController.getSearchClassInfoController()
     property int delegateHeight: 50
 
     color: "#FFFFFF"
@@ -60,7 +60,7 @@ Rectangle {
                 ListView {
                     id: listView
 
-                    model: controller.teacherInfoList
+                    model: controller.classInfoList
                     anchors.fill: parent
 
                     spacing: 0
@@ -69,7 +69,7 @@ Rectangle {
                     header: headerView;
                     headerPositioning: ListView.OverlayHeader;
 
-                    delegate: SearchTeacherInfoDelegate{
+                    delegate: SearchClassInfoDelegate{
                         id: delegateItem
 
                         width: listView.contentWidth
@@ -87,12 +87,12 @@ Rectangle {
                         z: 2
 
                         Row{
-                            id: teacherInfoHeader
+                            id: classInfoHeader
 
                             Repeater {
                                 id: repeater
 
-                                model: controller.teacherHeaderList
+                                model: controller.classHeaderList
 
                                 delegate: Rectangle {
                                     id: repeaterDelegateItem

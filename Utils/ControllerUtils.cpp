@@ -16,7 +16,7 @@ QString toOperateModeString(Controller::OperateMode mode)
         return "None";
     case Controller::OperateMode::WelcomePage:
         return "欢迎使用";
-    case Controller::OperateMode::SearchTeacherInfo:
+    case Controller::OperateMode::SearchClassInfo:
         return "查询教师信息";
     case Controller::OperateMode::ScheduleClass:
         return "排课";
@@ -32,29 +32,29 @@ QString toOperateModeString(Controller::OperateMode mode)
 
 
 
-QVariantMap getTeacherListInfo(int id, TeacherInfo teacherInfo)
+QVariantMap getTeacherListInfo(int id, ClassInfo classInfo)
 {
     return QVariantMap{{ "id", QString::number(id) },
-                       { "date", teacherInfo.date },
-                       { "weekend", teacherInfo.weekend },
-                       { "studentName", teacherInfo.studentName },
-                       { "school", teacherInfo.school },
-                       { "studentPhoneNubmer", teacherInfo.studentPhoneNubmer },
-                       { "grade", teacherInfo.grade },
+                       { "date", classInfo.date },
+                       { "weekend", classInfo.weekend },
+                       { "studentName", classInfo.studentName },
+                       { "school", classInfo.school },
+                       { "studentPhoneNubmer", classInfo.studentPhoneNubmer },
+                       { "grade", classInfo.grade },
 
-                       { "suject", teacherInfo.suject },
-                       { "time", teacherInfo.time },
-                       { "teacherNickName", teacherInfo.teacherNickName },
-                       { "learningType", teacherInfo.learningType },
-                       { "courseTime", teacherInfo.courseTime },
-                       { "studentFee", teacherInfo.studentFee },
+                       { "suject", classInfo.suject },
+                       { "time", classInfo.time },
+                       { "teacherNickName", classInfo.teacherNickName },
+                       { "learningType", classInfo.learningType },
+                       { "courseTime", classInfo.courseTime },
+                       { "studentFee", classInfo.studentFee },
 
-                       { "studentTotalFee", teacherInfo.studentTotalFee },
-                       { "teacherName", teacherInfo.teacherName },
-                       { "teacherFee", teacherInfo.teacherFee },
-                       { "gotMoney", teacherInfo.gotMoney },
-                       { "payType", teacherInfo.payType },
-                       { "payDate", teacherInfo.payDate }};
+                       { "studentTotalFee", classInfo.studentTotalFee },
+                       { "teacherName", classInfo.teacherName },
+                       { "teacherFee", classInfo.teacherFee },
+                       { "gotMoney", classInfo.gotMoney },
+                       { "payType", classInfo.payType },
+                       { "payDate", classInfo.payDate }};
 }
 
 //For controller.cpp
@@ -68,18 +68,18 @@ void CUtils::updateActionItemsList(QVariantList& data, const Controller::Operate
     }
 }
 
-//For SearchTeacherInfoController.cpp
-void CUtils::updateTeacherInfoList(QVariantList& data, TeacherInfos& teacherInfos)
+//For SearchClassInfoController.cpp
+void CUtils::updateClassInfoList(QVariantList& data, ClassInfos& classInfos)
 {
     int id = 1;
-    for(auto teacherInfo : teacherInfos)
+    for(auto classInfo : classInfos)
     {
-        auto info = getTeacherListInfo(id++, teacherInfo);
+        auto info = getTeacherListInfo(id++, classInfo);
         data.append(info);
     }
 }
 
-void CUtils::doSearchTeacherInfos(TeacherInfos& allInfos, TeacherInfos& searchInfos, QString searchString)
+void CUtils::doSearchClassInfos(ClassInfos& allInfos, ClassInfos& searchInfos, QString searchString)
 {
     for(auto& info : allInfos)
     {

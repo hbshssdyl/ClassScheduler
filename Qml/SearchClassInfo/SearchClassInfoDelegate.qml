@@ -25,7 +25,7 @@ Rectangle{
         spacing: 0
 
         Rectangle{
-            id: teacherInfoIdItem
+            id: classInfoIdItem
 
             color: "transparent"
 
@@ -38,7 +38,7 @@ Rectangle{
             }
 
             TextEdit{
-                id: teacherInfoId
+                id: classInfoId
 
                 selectByMouse: true
                 readOnly: true

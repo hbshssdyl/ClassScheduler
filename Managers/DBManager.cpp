@@ -32,10 +32,10 @@ int DBManager::getTableDataCount(QString tableName)
     return 0;
 }
 
-bool DBManager::createTeacherInfosTable()
+bool DBManager::createClassInfosTable()
 {
     QSqlQuery query;
-    bool ret = query.exec("CREATE TABLE teacherInfos("
+    bool ret = query.exec("CREATE TABLE classInfos("
                           "id                 INTEGER PRIMARY KEY AUTOINCREMENT,"
                           "date               CHAR(50),"
                           "weekend            CHAR(50)            NOT NULL,"
@@ -72,12 +72,12 @@ void DBManager::dropTable(QString tableName)
     }
 }
 
-bool DBManager::insertDataToTeacherInfosTable(TeacherInfos& infos)
+bool DBManager::insertDataToClassInfosTable(ClassInfos& infos)
 {
     for(auto& info : infos)
     {
         QSqlQuery query;
-        QString sql = QString("INSERT INTO teacherInfos (date, weekend, studentName, school, studentPhoneNubmer, grade,"
+        QString sql = QString("INSERT INTO classInfos (date, weekend, studentName, school, studentPhoneNubmer, grade,"
                               "suject, time, teacherNickName, learningType, courseTime, studentFee,"
                               "studentTotalFee, teacherName, teacherFee, gotMoney, payType, payDate)"
                               "VALUES ('%1', '%2', '%3', '%4', '%5', '%6', '%7', '%8', '%9', '%10', '%11', '%12', '%13', '%14', '%15', '%16', '%17', '%18')")
@@ -102,15 +102,15 @@ bool DBManager::isTableExist(QString tableName)
 
 bool DBManager::refreshDBDataByFile(QString filePath, bool inNewThread)
 {
-    auto teacherInfos = getTeacherInfosFromExcelFile(filePath);
+    auto classInfos = getClassInfosFromExcelFile(filePath);
     if(inNewThread)
     {
         createDBConnection();
     }
     dropTable(TEACHER_INFOS_TABLE_NAME);
-    if(createTeacherInfosTable())
+    if(createClassInfosTable())
     {
-        if(insertDataToTeacherInfosTable(teacherInfos))
+        if(insertDataToClassInfosTable(classInfos))
         {
             if(getTableDataCount(TEACHER_INFOS_TABLE_NAME) > 0)
             {
@@ -121,12 +121,12 @@ bool DBManager::refreshDBDataByFile(QString filePath, bool inNewThread)
     return false;
 }
 
-void DBManager::queryDataFromTeacherInfosTable(TeacherInfos& infos)
+void DBManager::queryDataFromClassInfosTable(ClassInfos& infos)
 {
-    QSqlQuery query("SELECT * FROM teacherInfos");
+    QSqlQuery query("SELECT * FROM classInfos");
     int cnt = 1;
     while (query.next()) {
-        TeacherInfo info;
+        ClassInfo info;
         info.teacherName = query.value("teacherName").toString();
         info.teacherNickName = query.value("teacherNickName").toString();
 
@@ -166,9 +166,9 @@ void DBManager::storeAllTableDataCount()
     }
 }
 
-TeacherInfos DBManager::getTeacherInfosFromExcelFile(QString filePath)
+ClassInfos DBManager::getClassInfosFromExcelFile(QString filePath)
 {
-    TeacherInfos infos;
+    ClassInfos infos;
     Document doc(filePath);
     if (!doc.load())
         return infos;
@@ -182,7 +182,7 @@ TeacherInfos DBManager::getTeacherInfosFromExcelFile(QString filePath)
     while(row)
     {
         col = 1;
-        TeacherInfo info;
+        ClassInfo info;
         while(col)
         {
             CellPtr headerCell = doc.cellAt(1, col);
@@ -257,7 +257,7 @@ bool DBManager::hasValidHeaders(Document& doc)
     return true;
 }
 
-void DBManager::saveData(TeacherInfo& info, QString& headerStr, QString& str)
+void DBManager::saveData(ClassInfo& info, QString& headerStr, QString& str)
 {
     if(str.isEmpty() || str == "00:00:00.000")
     {

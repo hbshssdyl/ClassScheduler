@@ -1,5 +1,6 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
+#include <QQuickStyle>
 #include "Controller/Controller.h"
 #include "Utils/ControllerUtils.h"
 
@@ -32,6 +33,11 @@ int main(int argc, char *argv[])
     app.setOrganizationName("Dylan  ");
     app.setOrganizationDomain("dylan.com");
     app.setApplicationName("Class Scheduler");
+
+    // 设置支持自定义的样式（任选其一）
+    QQuickStyle::setStyle("Fusion");    // 跨平台风格
+    // QQuickStyle::setStyle("Material"); // Material Design风格
+    // QQuickStyle::setStyle("Basic");    // 基本风格
 
     initQmlComponent();
     QQmlApplicationEngine engine;

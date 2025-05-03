@@ -9,7 +9,7 @@
 #include <condition_variable>
 
 #include "Managers/DBManager.h"
-#include "SearchTeacherInfoController.h"
+#include "SearchClassInfoController.h"
 
 using namespace std;
 
@@ -28,7 +28,7 @@ public:
         LoginView,
         FileView,
         WelcomePage,
-        SearchTeacherInfo,
+        SearchClassInfo,
         ScheduleClass,
         CalcOneToOneMoney,
         CalcClassMoney
@@ -40,7 +40,7 @@ public:
     explicit Controller(QObject* parent = nullptr);
     void initialize();
 
-    Q_INVOKABLE virtual SearchTeacherInfoController* getSearchTeacherInfoController();
+    Q_INVOKABLE virtual SearchClassInfoController* getSearchClassInfoController();
 
 public slots:
     void onOperateModeSelected(OperateMode mode);
@@ -55,7 +55,7 @@ signals:
 private:
     QString toOperateModeString(OperateMode mode);
     void refreshOperateMode(OperateMode mode);
-    void getTeacherInfosByExcelFile(QString filePath);
+    void getClassInfosByExcelFile(QString filePath);
     void initDB();
 
 private:
@@ -67,10 +67,10 @@ private:
     QString mNewDataFilePath { "" };
     QVariantList mActionItemsList;
     OperateModes mAllOperateMode;
-    QPointer<SearchTeacherInfoController> mSearchTeacherInfoController;
+    QPointer<SearchClassInfoController> mSearchClassInfoController;
 
-    std::mutex mTeacherInfosMutex;
-    std::condition_variable mTeacherInfosCondition;
+    std::mutex mClassInfosMutex;
+    std::condition_variable mClassInfosCondition;
 
 };
 

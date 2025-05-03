@@ -12,17 +12,17 @@
 using namespace std;
 using namespace ClassScheduler;
 
-class SearchTeacherInfoController : public QObject {
+class SearchClassInfoController : public QObject {
     Q_OBJECT
 public:
-    Q_PROPERTY(QVariantList teacherInfoList MEMBER mTeacherInfoList NOTIFY teacherInfoListChanged)
-    Q_PROPERTY(QVariantList teacherHeaderList MEMBER mTeacherHeaderList NOTIFY teacherInfoHeaderChanged)
+    Q_PROPERTY(QVariantList classInfoList MEMBER mClassInfoList NOTIFY classInfoListChanged)
+    Q_PROPERTY(QVariantList classHeaderList MEMBER mTeacherHeaderList NOTIFY classInfoHeaderChanged)
 
     enum class OperateMode
     {
         None,
         WelcomePage,
-        SearchTeacherInfo,
+        SearchClassInfo,
         ScheduleClass,
         CalcOneToOneMoney,
         CalcClassMoney
@@ -31,26 +31,26 @@ public:
     using OperateModes = std::vector<OperateMode>;
 
 public:
-    explicit SearchTeacherInfoController(DBManagerPtr dbManager, QObject* parent = nullptr);
+    explicit SearchClassInfoController(DBManagerPtr dbManager, QObject* parent = nullptr);
     Q_INVOKABLE void initialize();
 
 signals:
-    void teacherInfoListChanged();
-    void teacherInfoHeaderChanged();
+    void classInfoListChanged();
+    void classInfoHeaderChanged();
 
 public slots:
     void onSearchTriggered(QString searchString);
 
 private:
-    void refreshSearchTeacherInfo();
-    void readTeacherInfosFromDB();
+    void refreshSearchClassInfo();
+    void readClassInfosFromDB();
     void initTeahcerHeader();
-    void updateTeacherInfosList(TeacherInfos& infos);
+    void updateClassInfosList(ClassInfos& infos);
 
 private:
-    QVariantList mTeacherInfoList;
+    QVariantList mClassInfoList;
     QVariantList mTeacherHeaderList;
-    TeacherInfos mTeacherInfosFromDB;
+    ClassInfos mClassInfosFromDB;
     DBManagerPtr mDBManager;
     bool mIsDBDataExist = false;
 

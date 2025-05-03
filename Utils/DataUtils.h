@@ -9,12 +9,31 @@ using namespace std;
 
 namespace ClassScheduler
 {
-    static const QString TEACHER_INFOS_TABLE_NAME = "teacherInfos";
+    static const QString TEACHER_INFOS_TABLE_NAME = "classInfos";
 
     static QString nullString = "无该信息";
     static vector validExcelHeader{"日期", "星期", "姓名", "学校", "电话", "年级", "学科", "时间", "老师", "网课or面授", "课时", "金额/小时", "课酬总计", "老师姓名", "老师工资", "已收金额", "付费方式", "收费日期"};
-    static vector allTableNameForDB{"teacherInfos"};
-    struct TeacherInfo
+    static vector allTableNameForDB{"classInfos"};
+
+    // QVariantList schedulerOptions {
+    //     QVariantMap{
+    //         {"isMust", true},
+    //         {"placeholder", "选择科目"},
+    //         {"options", QVariantList{"语文", "数学", "英语", "物理", "化学", "生物", "道法"}}
+    //     },
+    //     QVariantMap{
+    //         {"isMust", true},
+    //         {"placeholder", "选择年级"},
+    //         {"options", QVariantList{"小学", "初一", "初二", "初三", "高一", "高二", "高三"}}
+    //     },
+    //     QVariantMap{
+    //         {"isMust", true},
+    //         {"placeholder", "选择星期"},
+    //         {"options", QVariantList{"星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日"}}
+    //     }
+    // };
+
+    struct ClassInfo
     {
         QString date;
         QString weekend;
@@ -90,6 +109,6 @@ namespace ClassScheduler
         }
     };
 
-    using TeacherInfos = vector<TeacherInfo>;
+    using ClassInfos = vector<ClassInfo>;
     using TableDataCount = std::map<QString, int>; //QString tableName, int dataCount
 } // namespace ClassScheduler

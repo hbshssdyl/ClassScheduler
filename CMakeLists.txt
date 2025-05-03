@@ -5,6 +5,7 @@ project(ClassScheduler VERSION 0.1 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(Qt6 REQUIRED COMPONENTS Quick)
+find_package(Qt6 REQUIRED COMPONENTS Quick QuickControls2 QuickLayouts)
 find_package(Qt6 REQUIRED COMPONENTS Sql)
 
 qt_standard_project_setup(REQUIRES 6.8)
@@ -19,8 +20,8 @@ qt_add_qml_module(appClassScheduler
 
     QML_FILES Main.qml
     QML_FILES Qml/WelcomePage/WelcomePage.qml
-    QML_FILES Qml/SearchTeacherInfo/SearchTeacherInfo.qml
-    QML_FILES Qml/SearchTeacherInfo/SearchTeacherInfoDelegate.qml
+    QML_FILES Qml/SearchClassInfo/SearchClassInfo.qml
+    QML_FILES Qml/SearchClassInfo/SearchClassInfoDelegate.qml
     QML_FILES Qml/ScheduleClass/ScheduleClass.qml
     QML_FILES Qml/CalcOneToOneMoney/CalcOneToOneMoney.qml
     QML_FILES Qml/CalcClassMoney/CalcClassMoney.qml
@@ -40,8 +41,8 @@ qt_add_qml_module(appClassScheduler
     SOURCES Utils/ControllerUtils.h
     SOURCES Utils/ControllerUtils.cpp
     SOURCES Utils/DataUtils.h
-    SOURCES Controller/SearchTeacherInfoController.cpp
-    SOURCES Controller/SearchTeacherInfoController.h
+    SOURCES Controller/SearchClassInfoController.cpp
+    SOURCES Controller/SearchClassInfoController.h
     SOURCES Managers/DBManager.h Managers/DBManager.cpp
     QML_FILES Qml/BasicComponent/SearchBar.qml
 )
@@ -55,6 +56,10 @@ set_target_properties(appClassScheduler PROPERTIES
     MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
     MACOSX_BUNDLE TRUE
     WIN32_EXECUTABLE TRUE
+)
+
+target_link_libraries(appClassScheduler
+    PRIVATE Qt6::Quick Qt6::QuickControls2
 )
 
 target_link_libraries(appClassScheduler

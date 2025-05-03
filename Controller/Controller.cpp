@@ -16,7 +16,7 @@ void Controller::initialize()
 {
     initDB();
     mAllOperateMode.clear();
-    mAllOperateMode.emplace_back(OperateMode::SearchTeacherInfo);
+    mAllOperateMode.emplace_back(OperateMode::SearchClassInfo);
     mAllOperateMode.emplace_back(OperateMode::ScheduleClass);
     mAllOperateMode.emplace_back(OperateMode::CalcOneToOneMoney);
     mAllOperateMode.emplace_back(OperateMode::CalcClassMoney);
@@ -48,8 +48,8 @@ QString Controller::toOperateModeString(OperateMode mode)
         return "FileView";
     case OperateMode::WelcomePage:
         return "WelcomePage";
-    case OperateMode::SearchTeacherInfo:
-        return "SearchTeacherInfo";
+    case OperateMode::SearchClassInfo:
+        return "SearchClassInfo";
     case OperateMode::ScheduleClass:
         return "ScheduleClass";
     case OperateMode::CalcOneToOneMoney:
@@ -76,7 +76,7 @@ void Controller::refreshOperateMode(OperateMode mode)
             break;
         }
         case OperateMode::WelcomePage:
-        case OperateMode::SearchTeacherInfo:
+        case OperateMode::SearchClassInfo:
         case OperateMode::ScheduleClass:
         case OperateMode::CalcOneToOneMoney:
         case OperateMode::CalcClassMoney:
@@ -134,14 +134,14 @@ void Controller::onFileUploaded(QString filePath)
     }
 }
 
-SearchTeacherInfoController* Controller::getSearchTeacherInfoController()
+SearchClassInfoController* Controller::getSearchClassInfoController()
 {
-    if (!mSearchTeacherInfoController)
+    if (!mSearchClassInfoController)
     {
-        mSearchTeacherInfoController = new SearchTeacherInfoController(mDBManager, this);
-        mSearchTeacherInfoController->initialize();
+        mSearchClassInfoController = new SearchClassInfoController(mDBManager, this);
+        mSearchClassInfoController->initialize();
     }
-    return mSearchTeacherInfoController;
+    return mSearchClassInfoController;
 }
 
 

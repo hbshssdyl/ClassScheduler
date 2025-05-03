@@ -25,10 +25,10 @@ public:
 public:
     bool createDBConnection();
     void storeAllTableDataCount();
-    bool createTeacherInfosTable();
+    bool createClassInfosTable();
     void dropTable(QString tableName);
-    bool insertDataToTeacherInfosTable(TeacherInfos& infos);
-    void queryDataFromTeacherInfosTable(TeacherInfos& infos);
+    bool insertDataToClassInfosTable(ClassInfos& infos);
+    void queryDataFromClassInfosTable(ClassInfos& infos);
     bool isTableExist(QString tableName);
     int getTableDataCount(QString tableName);
     bool refreshDBDataByFile(QString filePath, bool inNewThread);
@@ -36,9 +36,9 @@ public:
 private:
     bool isUsefulHeader(QString header);
     bool hasValidHeaders(Document& doc);
-    void saveData(TeacherInfo& info, QString& headerStr, QString& str);
+    void saveData(ClassInfo& info, QString& headerStr, QString& str);
     QVariant readCellValue(QString headerStr, CellPtr cell);
-    TeacherInfos getTeacherInfosFromExcelFile(QString filePath);
+    ClassInfos getClassInfosFromExcelFile(QString filePath);
 
 private:
     QSqlDatabase mDB;

@@ -109,6 +109,15 @@ namespace ClassScheduler
         }
     };
 
+    struct TeacherInfo
+    {
+        QString teacherName;
+        QString teacherNickNames;
+        QString teacherFees;
+        QString teacherSujects;
+        QString teacherGrades;
+    };
+
     using ClassInfos = vector<ClassInfo>;
     using TableDataCount = std::map<QString, int>; //QString tableName, int dataCount
 } // namespace ClassScheduler

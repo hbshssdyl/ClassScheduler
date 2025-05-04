@@ -17,6 +17,7 @@ void Controller::initialize()
     initDB();
     mAllOperateMode.clear();
     mAllOperateMode.emplace_back(OperateMode::SearchClassInfo);
+    mAllOperateMode.emplace_back(OperateMode::SearchTeacherInfo);
     mAllOperateMode.emplace_back(OperateMode::ScheduleClass);
     mAllOperateMode.emplace_back(OperateMode::CalcOneToOneMoney);
     mAllOperateMode.emplace_back(OperateMode::CalcClassMoney);
@@ -50,6 +51,8 @@ QString Controller::toOperateModeString(OperateMode mode)
         return "WelcomePage";
     case OperateMode::SearchClassInfo:
         return "SearchClassInfo";
+    case OperateMode::SearchTeacherInfo:
+        return "SearchTeacherInfo";
     case OperateMode::ScheduleClass:
         return "ScheduleClass";
     case OperateMode::CalcOneToOneMoney:
@@ -77,6 +80,7 @@ void Controller::refreshOperateMode(OperateMode mode)
         }
         case OperateMode::WelcomePage:
         case OperateMode::SearchClassInfo:
+        case OperateMode::SearchTeacherInfo:
         case OperateMode::ScheduleClass:
         case OperateMode::CalcOneToOneMoney:
         case OperateMode::CalcClassMoney:

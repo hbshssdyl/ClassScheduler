@@ -25,10 +25,11 @@ public:
     enum class OperateMode
     {
         None,
-        LoginView,
-        FileView,
+        LoginView, //once view
+        FileView,  //once view
         WelcomePage,
         SearchClassInfo,
+        SearchTeacherInfo,
         ScheduleClass,
         CalcOneToOneMoney,
         CalcClassMoney

@@ -17,6 +17,8 @@ QString toOperateModeString(Controller::OperateMode mode)
     case Controller::OperateMode::WelcomePage:
         return "欢迎使用";
     case Controller::OperateMode::SearchClassInfo:
+        return "查询课程信息";
+    case Controller::OperateMode::SearchTeacherInfo:
         return "查询教师信息";
     case Controller::OperateMode::ScheduleClass:
         return "排课";

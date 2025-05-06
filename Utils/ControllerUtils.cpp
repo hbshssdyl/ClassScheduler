@@ -34,7 +34,7 @@ QString toOperateModeString(Controller::OperateMode mode)
 
 
 
-QVariantMap getTeacherListInfo(int id, ClassInfo classInfo)
+QVariantMap getClassListInfo(int id, ClassInfo classInfo)
 {
     return QVariantMap{{ "id", QString::number(id) },
                        { "date", classInfo.date },
@@ -76,7 +76,7 @@ void CUtils::updateClassInfoList(QVariantList& data, ClassInfos& classInfos)
     int id = 1;
     for(auto classInfo : classInfos)
     {
-        auto info = getTeacherListInfo(id++, classInfo);
+        auto info = getClassListInfo(id++, classInfo);
         data.append(info);
     }
 }
@@ -92,13 +92,44 @@ void CUtils::doSearchClassInfos(ClassInfos& allInfos, ClassInfos& searchInfos, Q
     }
 }
 
-void CUtils::updateTeacherHeaderList(QVariantList& data)
+void CUtils::updateClassHeaderList(QVariantList& data)
 {
     data.append("序号");
-    for(auto header : validExcelHeader)
+    for(auto header : validExcelClassHeader)
     {
         data.append(header);
     }
+}
+
+//For SearchTeacherInfoController.cpp
+void CUtils::updateTeacherInfoList(QVariantList& data, TeacherInfos& teacherInfos)
+{
+    // int id = 1;
+    // for(auto classInfo : classInfos)
+    // {
+    //     auto info = getTeacherListInfo(id++, classInfo);
+    //     data.append(info);
+    // }
+}
+
+void CUtils::doSearchTeacherInfos(TeacherInfos& allInfos, TeacherInfos& searchInfos, QString searchString)
+{
+    // for(auto& info : allInfos)
+    // {
+    //     if(info.isContains(searchString))
+    //     {
+    //         searchInfos.emplace_back(info);
+    //     }
+    // }
+}
+
+void CUtils::updateTeacherHeaderList(QVariantList& data)
+{
+    // data.append("序号");
+    // for(auto header : validExcelClassHeader)
+    // {
+    //     data.append(header);
+    // }
 }
 
 } // namespace PictureManager

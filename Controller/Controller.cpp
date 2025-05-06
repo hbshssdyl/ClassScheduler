@@ -31,7 +31,7 @@ void Controller::initDB()
     {
         mDBManager->createDBConnection();
         mDBManager->storeAllTableDataCount();
-        mDataCount = QString::number(mDBManager->getTableDataCount(TEACHER_INFOS_TABLE_NAME));
+        mDataCount = QString::number(mDBManager->getTableDataCount(CLASS_INFOS_TABLE_NAME));
         emit dataCountChanged();
         cout << "initDB, currentDataCount: " << mDataCount.toStdString() << endl;
     }

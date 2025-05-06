@@ -23,13 +23,13 @@ void SearchClassInfoController::initialize()
 
 void SearchClassInfoController::refreshSearchClassInfo()
 {
-    if(!mDBManager->isTableExist(TEACHER_INFOS_TABLE_NAME))
+    if(!mDBManager->isTableExist(CLASS_INFOS_TABLE_NAME))
     {
         cout << "DB is not exist" << endl;
         return;
     }
 
-    initTeahcerHeader();
+    initClassHeader();
     readClassInfosFromDB();
 
     if(mClassInfosFromDB.size() == 0)
@@ -41,14 +41,14 @@ void SearchClassInfoController::refreshSearchClassInfo()
     updateClassInfosList(mClassInfosFromDB);
 }
 
-void SearchClassInfoController::initTeahcerHeader()
+void SearchClassInfoController::initClassHeader()
 {
-    QVariantList newTeacherrHeaderList;
-    CUtils::updateTeacherHeaderList(newTeacherrHeaderList);
+    QVariantList newClassHeaderList;
+    CUtils::updateClassHeaderList(newClassHeaderList);
 
-    if (mTeacherHeaderList != newTeacherrHeaderList)
+    if (mClassHeaderList != newClassHeaderList)
     {
-        mTeacherHeaderList = std::move(newTeacherrHeaderList);
+        mClassHeaderList = std::move(newClassHeaderList);
         emit classInfoHeaderChanged();
     }
 }

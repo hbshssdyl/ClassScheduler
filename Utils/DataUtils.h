@@ -9,11 +9,12 @@ using namespace std;
 
 namespace ClassScheduler
 {
-    static const QString TEACHER_INFOS_TABLE_NAME = "classInfos";
+    static const QString CLASS_INFOS_TABLE_NAME = "classInfos";
+    static const QString TEACHER_INFOS_TABLE_NAME = "teacherInfos";
 
     static QString nullString = "无该信息";
-    static vector validExcelHeader{"日期", "星期", "姓名", "学校", "电话", "年级", "学科", "时间", "老师", "网课or面授", "课时", "金额/小时", "课酬总计", "老师姓名", "老师工资", "已收金额", "付费方式", "收费日期"};
-    static vector allTableNameForDB{"classInfos"};
+    static vector validExcelClassHeader{"日期", "星期", "姓名", "学校", "电话", "年级", "学科", "时间", "老师", "网课or面授", "课时", "金额/小时", "课酬总计", "老师姓名", "老师工资", "已收金额", "付费方式", "收费日期"};
+    static vector allTableNameForDB{"classInfos", "teacherInfos"};
 
     // QVariantList schedulerOptions {
     //     QVariantMap{
@@ -119,5 +120,6 @@ namespace ClassScheduler
     };
 
     using ClassInfos = vector<ClassInfo>;
+    using TeacherInfos = vector<TeacherInfo>;
     using TableDataCount = std::map<QString, int>; //QString tableName, int dataCount
 } // namespace ClassScheduler

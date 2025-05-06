@@ -1,47 +1,45 @@
 #pragma once
 
 #include <QCoreApplication>
-#include <thread>
 #include <iostream>
 
-#include "SearchClassInfoController.h"
+#include "SearchTeacherInfoController.h"
 #include "Utils/ControllerUtils.h"
-#include "Managers/DBManager.h"
 
 using namespace ClassScheduler;
 
-SearchClassInfoController::SearchClassInfoController(DBManagerPtr dbManager, QObject* parent)
+SearchTeacherInfoController::SearchTeacherInfoController(DBManagerPtr dbManager, QObject* parent)
     : mDBManager(dbManager)
     , QObject(parent)
 {
 }
 
-void SearchClassInfoController::initialize()
+void SearchTeacherInfoController::initialize()
 {
-    refreshSearchClassInfo();
+    refreshSearchTeacherInfo();
 }
 
-void SearchClassInfoController::refreshSearchClassInfo()
+void SearchTeacherInfoController::refreshSearchTeacherInfo()
 {
-    if(!mDBManager->isTableExist(TEACHER_INFOS_TABLE_NAME))
+    if(!mDBManager->isTableExist(CLASS_INFOS_TABLE_NAME))
     {
         cout << "DB is not exist" << endl;
         return;
     }
 
     initTeahcerHeader();
-    readClassInfosFromDB();
+    readTeacherInfosFromDB();
 
-    if(mClassInfosFromDB.size() == 0)
+    if(mTeacherInfosFromDB.size() == 0)
     {
         cout << "Fail to get class infos from DB" << endl;
         return;
     }
 
-    updateClassInfosList(mClassInfosFromDB);
+    updateTeacherInfosList(mTeacherInfosFromDB);
 }
 
-void SearchClassInfoController::initTeahcerHeader()
+void SearchTeacherInfoController::initTeahcerHeader()
 {
     QVariantList newTeacherrHeaderList;
     CUtils::updateTeacherHeaderList(newTeacherrHeaderList);
@@ -49,50 +47,50 @@ void SearchClassInfoController::initTeahcerHeader()
     if (mTeacherHeaderList != newTeacherrHeaderList)
     {
         mTeacherHeaderList = std::move(newTeacherrHeaderList);
-        emit classInfoHeaderChanged();
+        emit teacherInfoHeaderChanged();
     }
 }
 
-void SearchClassInfoController::readClassInfosFromDB()
+void SearchTeacherInfoController::readTeacherInfosFromDB()
 {
-    if(mDBManager)
-    {
-        mDBManager->createDBConnection();
-        mDBManager->queryDataFromClassInfosTable(mClassInfosFromDB);
-    }
+    // if(mDBManager)
+    // {
+    //     mDBManager->createDBConnection();
+    //     mDBManager->queryDataFromTeacherInfosTable(mTeacherInfosFromDB);
+    // }
 
-    if(mClassInfosFromDB.size() == 0)
+    if(mTeacherInfosFromDB.size() == 0)
     {
         cout << "Fail to read class infos from DB" << endl;
     }
 }
 
-void SearchClassInfoController::updateClassInfosList(ClassInfos& infos)
+void SearchTeacherInfoController::updateTeacherInfosList(TeacherInfos& infos)
 {
-    QVariantList newClassInfoList;
-    CUtils::updateClassInfoList(newClassInfoList, infos);
+    QVariantList newTeacherInfoList;
+    CUtils::updateTeacherInfoList(newTeacherInfoList, infos);
 
-    if (mClassInfoList != newClassInfoList)
+    if (mTeacherInfoList != newTeacherInfoList)
     {
-        mClassInfoList = std::move(newClassInfoList);
-        emit classInfoListChanged();
+        mTeacherInfoList = std::move(newTeacherInfoList);
+        emit teacherInfoListChanged();
     }
 }
 
-void SearchClassInfoController::onSearchTriggered(QString searchString)
+void SearchTeacherInfoController::onSearchTriggered(QString searchString)
 {
-    ClassInfos infos;
+    TeacherInfos infos;
     searchString = searchString.simplified();
     if(searchString.isEmpty())
     {
-        infos = mClassInfosFromDB;
+        infos = mTeacherInfosFromDB;
     }
     else
     {
-        CUtils::doSearchClassInfos(mClassInfosFromDB, infos, searchString);
+        CUtils::doSearchTeacherInfos(mTeacherInfosFromDB, infos, searchString);
     }
 
-    updateClassInfosList(infos);
+    updateTeacherInfosList(infos);
 }
 
 

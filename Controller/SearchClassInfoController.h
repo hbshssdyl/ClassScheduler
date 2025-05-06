@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Utils/DataUtils.h"
-#include "Managers/DBmanager.h"
+#include "Managers/DBManager.h"
 
 #include <QObject>
 #include <cstdio>
@@ -16,7 +16,7 @@ class SearchClassInfoController : public QObject {
     Q_OBJECT
 public:
     Q_PROPERTY(QVariantList classInfoList MEMBER mClassInfoList NOTIFY classInfoListChanged)
-    Q_PROPERTY(QVariantList classHeaderList MEMBER mTeacherHeaderList NOTIFY classInfoHeaderChanged)
+    Q_PROPERTY(QVariantList classHeaderList MEMBER mClassHeaderList NOTIFY classInfoHeaderChanged)
 
     enum class OperateMode
     {
@@ -44,12 +44,12 @@ public slots:
 private:
     void refreshSearchClassInfo();
     void readClassInfosFromDB();
-    void initTeahcerHeader();
+    void initClassHeader();
     void updateClassInfosList(ClassInfos& infos);
 
 private:
     QVariantList mClassInfoList;
-    QVariantList mTeacherHeaderList;
+    QVariantList mClassHeaderList;
     ClassInfos mClassInfosFromDB;
     DBManagerPtr mDBManager;
     bool mIsDBDataExist = false;

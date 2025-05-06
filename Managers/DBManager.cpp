@@ -23,6 +23,7 @@ int DBManager::getTableDataCount(QString tableName)
 {
     if(mDataCount.count(tableName) == 1)
     {
+        cout << "table is exist, table name: " << tableName.toStdString() << ", count: " << mDataCount[tableName] << endl;
         return mDataCount[tableName];
     }
     else
@@ -107,12 +108,18 @@ bool DBManager::refreshDBDataByFile(QString filePath, bool inNewThread)
     {
         createDBConnection();
     }
-    dropTable(TEACHER_INFOS_TABLE_NAME);
+    if(mDataCount[CLASS_INFOS_TABLE_NAME] > 0)
+    {
+        cout << "drop table: " << CLASS_INFOS_TABLE_NAME.toStdString() << endl;
+        dropTable(CLASS_INFOS_TABLE_NAME);
+    }
+
     if(createClassInfosTable())
     {
         if(insertDataToClassInfosTable(classInfos))
         {
-            if(getTableDataCount(TEACHER_INFOS_TABLE_NAME) > 0)
+            storeAllTableDataCount();
+            if(getTableDataCount(CLASS_INFOS_TABLE_NAME) > 0)
             {
                 return true;
             }
@@ -246,7 +253,7 @@ bool DBManager::hasValidHeaders(Document& doc)
         headers[str] = true;
         col++;
     }
-    for(auto header : validExcelHeader)
+    for(auto header : validExcelClassHeader)
     {
         if(!headers[header])
         {
@@ -285,7 +292,7 @@ void DBManager::saveData(ClassInfo& info, QString& headerStr, QString& str)
 
 bool DBManager::isUsefulHeader(QString header)
 {
-    for(auto str : validExcelHeader)
+    for(auto str : validExcelClassHeader)
     {
         if(header == str) return true;
     }

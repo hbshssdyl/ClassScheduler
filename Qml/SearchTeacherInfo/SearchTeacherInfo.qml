@@ -69,7 +69,7 @@ Rectangle {
                     header: headerView;
                     headerPositioning: ListView.OverlayHeader;
 
-                    delegate: SearchClassInfoDelegate{
+                    delegate: SearchTeacherInfoDelegate{
                         id: delegateItem
 
                         width: listView.contentWidth

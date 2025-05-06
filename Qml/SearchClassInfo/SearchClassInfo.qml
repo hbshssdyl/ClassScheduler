@@ -39,8 +39,12 @@ Rectangle {
             Layout.preferredWidth: 400
 
             onSearchTriggered: function(query) {
-                console.debug(controller.classInfoMap.classInfoList.length);
-                console.debug(controller.classInfoMap.classInfoList[10].length);
+                console.debug(typeof(controller.classInfoMap.classInfoList));
+                //console.debug(type(controller.classInfoMap.classInfoList));
+                for(infoList in controller.classInfoMap.classInfoList)
+                    for(info in infoList)
+                        console.debug("mytest" + info);
+                //console.debug(controller.classInfoMap.classInfoList[10].length);
                 controller.onSearchTriggered(query);
             }
         }
@@ -62,7 +66,7 @@ Rectangle {
                 ListView {
                     id: listView
 
-                    model: controller.classInfoMap.classInfoList.length
+                    model: controller.classInfoMap.classInfoList
                     anchors.fill: parent
 
                     spacing: 0
@@ -94,7 +98,7 @@ Rectangle {
                             Repeater {
                                 id: repeater
 
-                                model: controller.classInfoMap.classInfoList[index]
+                                model: modelData
 
                                 delegate: Rectangle{
                                     id: classInfoItem
@@ -115,7 +119,7 @@ Rectangle {
                                         readOnly: true
                                         anchors.centerIn: parent
                                         width: parent.width
-                                        text: repeater.modelData
+                                        text: modelData
                                         horizontalAlignment: Text.AlignHCenter
                                         verticalAlignment: Text.AlignVCenter
                                         leftPadding: 5

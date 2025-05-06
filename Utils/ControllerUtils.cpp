@@ -88,6 +88,9 @@ void CUtils::updateClassInfoList(QVariantMap& data, ClassInfos& classInfos)
         classInfoList.append(classInfo.toInfosList(QString::number(id++)));
     }
 
+    // classInfoList.append(QVariantList{"werwer", "awrwer", "affaewf"});
+    // classInfoList.append(QVariantList{"123", "234", "345", "456"});
+
     data.insert("classInfoHeader", classInfoHeader);
     data.insert("classInfoList", classInfoList);
 }

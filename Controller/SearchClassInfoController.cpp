@@ -75,6 +75,26 @@ void SearchClassInfoController::updateClassInfosList(ClassInfos& infos)
     if (mClassInfoMap != newClassInfoMap)
     {
         mClassInfoMap = std::move(newClassInfoMap);
+        // cout << "mytest1";
+
+        //     auto& item = newClassInfoMap["classInfoList"];
+        //     if (item.canConvert<QVariantList>()) {
+        //         cout << "mytest3";
+        //         QVariantList list = item.toList();
+        //         for(auto& test : list )
+        //         {
+        //             cout << "mytest4";
+
+        //                 if(test.canConvert<QString>())
+        //                 {
+        //                     cout << test.toString().toStdString() << " ";
+        //                 }
+        //                 cout << endl;
+
+
+        //         }
+        //     }
+        //cout << mClassInfoMap["classInfoList"].Size() << " " << newClassInfoMap["classInfoList"].Size() << endl;
         emit classInfoMapChanged();
     }
 }

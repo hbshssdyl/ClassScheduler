@@ -47,6 +47,8 @@ void SearchTeacherInfoController::initTeahcerHeader()
     if (mTeacherHeaderList != newTeacherrHeaderList)
     {
         mTeacherHeaderList = std::move(newTeacherrHeaderList);
+
+
         emit teacherInfoHeaderChanged();
     }
 }

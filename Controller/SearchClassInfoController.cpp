@@ -69,13 +69,13 @@ void SearchClassInfoController::readClassInfosFromDB()
 
 void SearchClassInfoController::updateClassInfosList(ClassInfos& infos)
 {
-    QVariantList newClassInfoList;
-    CUtils::updateClassInfoList(newClassInfoList, infos);
+    QVariantMap newClassInfoMap;
+    CUtils::updateClassInfoList(newClassInfoMap, infos);
 
-    if (mClassInfoList != newClassInfoList)
+    if (mClassInfoMap != newClassInfoMap)
     {
-        mClassInfoList = std::move(newClassInfoList);
-        emit classInfoListChanged();
+        mClassInfoMap = std::move(newClassInfoMap);
+        emit classInfoMapChanged();
     }
 }
 

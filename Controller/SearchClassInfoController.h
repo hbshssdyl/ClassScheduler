@@ -15,7 +15,7 @@ using namespace ClassScheduler;
 class SearchClassInfoController : public QObject {
     Q_OBJECT
 public:
-    Q_PROPERTY(QVariantList classInfoList MEMBER mClassInfoList NOTIFY classInfoListChanged)
+    Q_PROPERTY(QVariantMap classInfoMap MEMBER mClassInfoMap NOTIFY classInfoMapChanged)
     Q_PROPERTY(QVariantList classHeaderList MEMBER mClassHeaderList NOTIFY classInfoHeaderChanged)
 
     enum class OperateMode
@@ -35,7 +35,7 @@ public:
     Q_INVOKABLE void initialize();
 
 signals:
-    void classInfoListChanged();
+    void classInfoMapChanged();
     void classInfoHeaderChanged();
 
 public slots:
@@ -48,7 +48,7 @@ private:
     void updateClassInfosList(ClassInfos& infos);
 
 private:
-    QVariantList mClassInfoList;
+    QVariantMap mClassInfoMap;
     QVariantList mClassHeaderList;
     ClassInfos mClassInfosFromDB;
     DBManagerPtr mDBManager;

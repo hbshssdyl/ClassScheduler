@@ -25,9 +25,7 @@ public:
 public:
     bool createDBConnection();
     void storeAllTableDataCount();
-    bool createClassInfosTable();
     void dropTable(QString tableName);
-    bool insertDataToClassInfosTable(ClassInfos& infos);
     void queryDataFromClassInfosTable(ClassInfos& infos);
     bool isTableExist(QString tableName);
     int getTableDataCount(QString tableName);
@@ -39,6 +37,13 @@ private:
     void saveData(ClassInfo& info, QString& headerStr, QString& str);
     QVariant readCellValue(QString headerStr, CellPtr cell);
     ClassInfos getClassInfosFromExcelFile(QString filePath);
+    bool saveDataToClassInfosTable(ClassInfos& infos);
+    bool saveDataToTeacherInfosTable(TeacherInfos& infos);
+    TeacherInfos getTeacherInfosList(ClassInfos& classInfos);
+    bool createClassInfosTable();
+    bool createTeacherInfosTable();
+    bool insertDataToClassInfosTable(ClassInfos& infos);
+    bool insertDataToTeacherInfosTable(TeacherInfos& infos);
 
 private:
     QSqlDatabase mDB;

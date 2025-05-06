@@ -19,7 +19,7 @@ namespace ClassScheduler
         static void updateActionItemsList(QVariantList& data, const Controller::OperateMode& selectedMode, const Controller::OperateModes& actionItems);
 
         //For SearchClassInfoController.cpp
-        static void updateClassInfoList(QVariantList& data, ClassInfos& classInfos);
+        static void updateClassInfoList(QVariantMap& data, ClassInfos& classInfos);
         static void updateClassHeaderList(QVariantList& data);
         static void doSearchClassInfos(ClassInfos& allInfos, ClassInfos& searchInfos, QString searchString);
 

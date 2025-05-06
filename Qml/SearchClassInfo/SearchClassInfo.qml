@@ -39,6 +39,8 @@ Rectangle {
             Layout.preferredWidth: 400
 
             onSearchTriggered: function(query) {
+                console.debug(controller.classInfoMap.classInfoList.length);
+                console.debug(controller.classInfoMap.classInfoList[10].length);
                 controller.onSearchTriggered(query);
             }
         }
@@ -60,7 +62,7 @@ Rectangle {
                 ListView {
                     id: listView
 
-                    model: controller.classInfoList
+                    model: controller.classInfoMap.classInfoList.length
                     anchors.fill: parent
 
                     spacing: 0
@@ -69,13 +71,73 @@ Rectangle {
                     header: headerView;
                     headerPositioning: ListView.OverlayHeader;
 
-                    delegate: SearchClassInfoDelegate{
-                        id: delegateItem
+                    delegate: Rectangle{
+                        id: delegateroot
 
+                        property int delegateHeight: 50
+                        property int textItemWidth: 100
+                        property var repeaterList
                         width: listView.contentWidth
                         height: delegateHeight
                         z: 1
+                        color: index % 2 == 0 ? "transparent" : "#DDDDDD"
+                        radius: 5
+
+                        border {
+                            color: ColorUtils.getActionItemBorderColor()
+                            width: 1
+                        }
+
+                        Row{
+                            id: classInfo
+
+                            Repeater {
+                                id: repeater
+
+                                model: controller.classInfoMap.classInfoList[index]
+
+                                delegate: Rectangle{
+                                    id: classInfoItem
+
+                                    color: "red"
+                                    width: textItemWidth
+                                    height: delegateHeight
+
+                                    border {
+                                        color: ColorUtils.getActionItemBorderColor()
+                                        width: 1
+                                    }
+
+                                    TextEdit{
+                                        id: classInfoText
+
+                                        selectByMouse: true
+                                        readOnly: true
+                                        anchors.centerIn: parent
+                                        width: parent.width
+                                        text: repeater.modelData
+                                        horizontalAlignment: Text.AlignHCenter
+                                        verticalAlignment: Text.AlignVCenter
+                                        leftPadding: 5
+                                        rightPadding: 5
+                                        wrapMode: TextEdit.WordWrap
+                                        font {
+                                            bold: false
+                                            pixelSize: 12
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
+                    // SearchClassInfoDelegate{
+                    //     id: delegateItem
+
+                    //     repeaterList: controller.classInfoMap.classInfoList
+                    //     width: listView.contentWidth
+                    //     height: delegateHeight
+                    //     z: 1
+                    // }
                 }
 
                 Component {
@@ -92,7 +154,7 @@ Rectangle {
                             Repeater {
                                 id: repeater
 
-                                model: controller.classHeaderList
+                                model: controller.classInfoMap.classInfoHeader
 
                                 delegate: Rectangle {
                                     id: repeaterDelegateItem
@@ -100,8 +162,6 @@ Rectangle {
                                     property int mWidth: {
                                         if(modelData == "序号")
                                             return 50;
-                                        if(modelData == "学校")
-                                            return 170;
                                         return 100;
                                     }
                                     color: "#66FFFF"

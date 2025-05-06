@@ -71,14 +71,25 @@ void CUtils::updateActionItemsList(QVariantList& data, const Controller::Operate
 }
 
 //For SearchClassInfoController.cpp
-void CUtils::updateClassInfoList(QVariantList& data, ClassInfos& classInfos)
+void CUtils::updateClassInfoList(QVariantMap& data, ClassInfos& classInfos)
 {
+    QVariantList classInfoHeader;
+    QVariantList classInfoList;
     int id = 1;
-    for(auto classInfo : classInfos)
+
+    classInfoHeader.append("序号");
+    for(auto header : validExcelClassHeader)
     {
-        auto info = getClassListInfo(id++, classInfo);
-        data.append(info);
+        classInfoHeader.append(header);
     }
+
+    for(auto& classInfo : classInfos)
+    {
+        classInfoList.append(classInfo.toInfosList(QString::number(id++)));
+    }
+
+    data.insert("classInfoHeader", classInfoHeader);
+    data.insert("classInfoList", classInfoList);
 }
 
 void CUtils::doSearchClassInfos(ClassInfos& allInfos, ClassInfos& searchInfos, QString searchString)

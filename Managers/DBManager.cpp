@@ -38,24 +38,42 @@ bool DBManager::createClassInfosTable()
     QSqlQuery query;
     bool ret = query.exec("CREATE TABLE classInfos("
                           "id                 INTEGER PRIMARY KEY AUTOINCREMENT,"
-                          "date               CHAR(50),"
-                          "weekend            CHAR(50)            NOT NULL,"
-                          "studentName        CHAR(50)            NOT NULL,"
-                          "school             CHAR(50),"
-                          "studentPhoneNubmer CHAR(50),"
-                          "grade              CHAR(50),"
-                          "suject             CHAR(50),"
-                          "time               CHAR(50)            NOT NULL,"
-                          "teacherNickName    CHAR(50)            NOT NULL,"
-                          "learningType       CHAR(50)            NOT NULL,"
-                          "courseTime         CHAR(50),"
-                          "studentFee         CHAR(50)            NOT NULL,"
-                          "studentTotalFee    CHAR(50),"
-                          "teacherName        CHAR(50),"
-                          "teacherFee         CHAR(50),"
-                          "gotMoney           CHAR(50),"
-                          "payType            CHAR(50),"
-                          "payDate            CHAR(50)"
+                          "date               TEXT,"
+                          "weekend            TEXT            NOT NULL,"
+                          "studentName        TEXT            NOT NULL,"
+                          "school             TEXT,"
+                          "studentPhoneNubmer TEXT,"
+                          "grade              TEXT,"
+                          "suject             TEXT,"
+                          "time               TEXT            NOT NULL,"
+                          "teacherNickName    TEXT            NOT NULL,"
+                          "learningType       TEXT            NOT NULL,"
+                          "courseTime         TEXT,"
+                          "studentFee         TEXT            NOT NULL,"
+                          "studentTotalFee    TEXT,"
+                          "teacherName        TEXT,"
+                          "teacherFee         TEXT,"
+                          "gotMoney           TEXT,"
+                          "payType            TEXT,"
+                          "payDate            TEXT"
+                          ")");
+    if (!ret) {
+        cout << "Failed to create table: " << query.lastError().text().toStdString() << endl;
+        return false;
+    }
+    return true;
+}
+
+bool DBManager::createTeacherInfosTable()
+{
+    QSqlQuery query;
+    bool ret = query.exec("CREATE TABLE teacherInfos("
+                          "id                 INTEGER PRIMARY KEY   AUTOINCREMENT,"
+                          "teacherName        TEXT,"
+                          "teacherNickNames   TEXT             NOT NULL,"
+                          "teacherFees        TEXT             NOT NULL,"
+                          "teacherSujects     TEXT,"
+                          "teacherGrades      TEXT"
                           ")");
     if (!ret) {
         cout << "Failed to create table: " << query.lastError().text().toStdString() << endl;
@@ -87,7 +105,24 @@ bool DBManager::insertDataToClassInfosTable(ClassInfos& infos)
                           .arg(info.studentTotalFee).arg(info.teacherName).arg(info.teacherFee).arg(info.gotMoney).arg(info.payType).arg(info.payDate);
         bool ret = query.exec(sql);
         if (!ret) {
-            cout << "Failed to insert data: " << query.lastError().text().toStdString() << endl;
+            cout << "Failed to insert data to classInfos: " << query.lastError().text().toStdString() << endl;
+            return false;
+        }
+    }
+    return true;
+}
+
+bool DBManager::insertDataToTeacherInfosTable(TeacherInfos& infos)
+{
+    for(auto& info : infos)
+    {
+        QSqlQuery query;
+        QString sql = QString("INSERT INTO teacherInfos (teacherName, teacherNickNames, teacherFees, teacherSujects, teacherGrades)"
+                              "VALUES ('%1', '%2', '%3', '%4', '%5')")
+                          .arg(info.teacherName).arg(info.getTeacherNickNames()).arg(info.getTeacherFees()).arg(info.getTeacherSujects()).arg(info.getTeacherGrades());
+        bool ret = query.exec(sql);
+        if (!ret) {
+            cout << "Failed to insert data to teacherInfos: " << query.lastError().text().toStdString() << endl;
             return false;
         }
     }
@@ -108,15 +143,31 @@ bool DBManager::refreshDBDataByFile(QString filePath, bool inNewThread)
     {
         createDBConnection();
     }
+
     if(mDataCount[CLASS_INFOS_TABLE_NAME] > 0)
     {
         cout << "drop table: " << CLASS_INFOS_TABLE_NAME.toStdString() << endl;
         dropTable(CLASS_INFOS_TABLE_NAME);
     }
 
+    if(!saveDataToClassInfosTable(classInfos))
+    {
+        return false;
+    }
+    auto teacherInfos = getTeacherInfosList(classInfos);
+    if(!saveDataToTeacherInfosTable(teacherInfos))
+    {
+        return false;
+    }
+
+    return true;
+}
+
+bool DBManager::saveDataToClassInfosTable(ClassInfos& infos)
+{
     if(createClassInfosTable())
     {
-        if(insertDataToClassInfosTable(classInfos))
+        if(insertDataToClassInfosTable(infos))
         {
             storeAllTableDataCount();
             if(getTableDataCount(CLASS_INFOS_TABLE_NAME) > 0)
@@ -128,27 +179,94 @@ bool DBManager::refreshDBDataByFile(QString filePath, bool inNewThread)
     return false;
 }
 
+bool DBManager::saveDataToTeacherInfosTable(TeacherInfos& infos)
+{
+    if(createTeacherInfosTable())
+    {
+        if(insertDataToTeacherInfosTable(infos))
+        {
+            storeAllTableDataCount();
+            if(getTableDataCount(TEACHER_INFOS_TABLE_NAME) > 0)
+            {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+TeacherInfos DBManager::getTeacherInfosList(ClassInfos& classInfos)
+{
+    TeacherInfos teacherInfos;
+
+    //save teacherName
+    for(auto& classInfo : classInfos)
+    {
+        auto teacherName = classInfo.teacherName;
+        bool save = true;
+        for(auto& teacherInfo : teacherInfos)
+        {
+            if(teacherInfo.teacherName == teacherName)
+            {
+                save = false;
+                break;
+            }
+        }
+        if(save)
+        {
+            teacherInfos.emplace_back(TeacherInfo(teacherName));
+        }
+    }
+
+    //save teacherNickNames, teacherFees, teacherSujects, teacherGrades
+    for(auto& classInfo : classInfos)
+    {
+        auto teacherName = classInfo.teacherName;
+        auto teacherNickName = classInfo.teacherNickName;
+        auto teacherSuject = classInfo.suject;
+        auto teacherFee = teacherSuject + "_" + classInfo.teacherFee;
+        auto teacherGrade = teacherSuject + "_" + classInfo.grade;
+        for(auto& teacherInfo : teacherInfos)
+        {
+            if(teacherInfo.teacherName == teacherName)
+            {
+                teacherInfo.saveValue(teacherNickName, teacherInfo.teacherNickNames);
+                teacherInfo.saveValue(teacherFee, teacherInfo.teacherFees);
+                teacherInfo.saveValue(teacherSuject, teacherInfo.teacherSujects);
+                teacherInfo.saveValue(teacherGrade, teacherInfo.teacherGrades);
+                break;
+            }
+        }
+    }
+    //sort teacherInfos
+    for(auto& teacherInfo : teacherInfos)
+    {
+        teacherInfo.sortInfos();
+    }
+    return teacherInfos;
+}
+
 void DBManager::queryDataFromClassInfosTable(ClassInfos& infos)
 {
     QSqlQuery query("SELECT * FROM classInfos");
     int cnt = 1;
     while (query.next()) {
         ClassInfo info;
+
         info.teacherName = query.value("teacherName").toString();
         info.teacherNickName = query.value("teacherNickName").toString();
-
-        //teacherCourseList
         info.date = query.value("date").toString();
         info.weekend = query.value("weekend").toString();
         info.studentName = query.value("studentName").toString();
-
         info.school = query.value("school").toString();
+
         info.studentPhoneNubmer = query.value("studentPhoneNubmer").toString();
         info.grade = query.value("grade").toString();
         info.suject = query.value("suject").toString();
         info.time = query.value("time").toString();
         info.learningType = query.value("learningType").toString();
         info.courseTime = query.value("courseTime").toString();
+
         info.studentFee = query.value("studentFee").toString();
         info.studentTotalFee = query.value("studentTotalFee").toString();
         info.teacherFee = query.value("teacherFee").toString();

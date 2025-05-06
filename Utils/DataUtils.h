@@ -4,6 +4,8 @@
 #include <vector>
 #include <QString>
 #include <map>
+#include <QVariant>
+#include <algorithm>
 
 using namespace std;
 
@@ -56,6 +58,19 @@ namespace ClassScheduler
         QString gotMoney;
         QString payType;
         QString payDate;
+
+        QVariantList toInfosList(QString id)
+        {
+            QVariantList list;
+            if(!id.isEmpty())
+            {
+                list.append(id);
+            }
+            list.append(date);list.append(weekend);list.append(studentName);list.append(school);list.append(studentPhoneNubmer);list.append(grade);
+            list.append(suject);list.append(time);list.append(teacherNickName);list.append(learningType);list.append(courseTime);list.append(studentFee);
+            list.append(studentTotalFee);list.append(teacherName);list.append(teacherFee);list.append(gotMoney);list.append(payType);list.append(payDate);
+            return list;
+        }
 
         bool isValidInfo()
         {
@@ -113,10 +128,76 @@ namespace ClassScheduler
     struct TeacherInfo
     {
         QString teacherName;
-        QString teacherNickNames;
-        QString teacherFees;
-        QString teacherSujects;
-        QString teacherGrades;
+        vector<QString> teacherNickNames;
+        vector<QString> teacherFees;
+        vector<QString> teacherSujects;
+        vector<QString> teacherGrades;
+
+        TeacherInfo(const QString teacherName)
+            : teacherName(teacherName)
+        {
+        }
+
+        void sortInfos()
+        {
+            sort(teacherNickNames.begin(), teacherNickNames.end());
+            sort(teacherFees.begin(), teacherFees.end());
+            sort(teacherSujects.begin(), teacherSujects.end());
+            sort(teacherGrades.begin(), teacherGrades.end());
+        }
+
+        QString getString(vector<QString> stringList)
+        {
+            QString ret = "";
+            bool flag = false;
+            for(auto& str : stringList)
+            {
+                if(flag)
+                {
+                    ret += ", ";
+                }
+                ret += str;
+                flag = true;
+            }
+            return ret;
+        }
+
+        void saveValue(QString value, vector<QString>& values)
+        {
+            bool save = true;
+            for(auto& val : values)
+            {
+                if(value == val)
+                {
+                    save = false;
+                    break;
+                }
+            }
+            if(save)
+            {
+                values.emplace_back(value);
+            }
+        }
+
+        QString getTeacherNickNames()
+        {
+            return getString(teacherNickNames);
+        }
+
+        QString getTeacherFees()
+        {
+            return getString(teacherFees);
+        }
+
+        QString getTeacherSujects()
+        {
+            return getString(teacherSujects);
+        }
+
+        QString getTeacherGrades()
+        {
+            return getString(teacherGrades);
+        }
     };
 
     using ClassInfos = vector<ClassInfo>;

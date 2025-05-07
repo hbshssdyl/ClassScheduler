@@ -6,6 +6,8 @@ import QtQuick.Controls.Basic
 Item {
     id: searchBar
 
+    property int resultsCount: 0
+
     width: 400
     height: 50
 
@@ -62,5 +64,25 @@ Item {
                 }
             }
         }
+    }
+
+    TextEdit {
+        id: resultText
+
+        readOnly: true
+        visible: resultsCount > 0
+        selectByMouse: true
+        height: parent.height
+        verticalAlignment: Text.AlignVCenter
+        anchors.left: background.right
+        anchors.leftMargin: 10
+
+        text: "当前页面共有： " + resultsCount + " 条数据"
+
+        font {
+            bold: true
+            pixelSize: 16
+        }
+
     }
 }

@@ -8,8 +8,9 @@
 #include <QPointer>
 #include <condition_variable>
 
-#include "Managers/DBManager.h"
+#include "Managers/DataManager.h"
 #include "SearchClassInfoController.h"
+#include "SearchTeacherInfoController.h"
 
 using namespace std;
 
@@ -42,6 +43,7 @@ public:
     void initialize();
 
     Q_INVOKABLE virtual SearchClassInfoController* getSearchClassInfoController();
+    Q_INVOKABLE virtual SearchTeacherInfoController* getSearchTeacherInfoController();
 
 public slots:
     void onOperateModeSelected(OperateMode mode);
@@ -61,7 +63,7 @@ private:
 
 private:
     OperateMode mOperateMode { OperateMode::None };
-    DBManagerPtr mDBManager;
+    DataManagerPtr mDataManager;
     QString mLoadedView { "" };
     bool mShowActions;
     QString mDataCount { "" };
@@ -69,6 +71,7 @@ private:
     QVariantList mActionItemsList;
     OperateModes mAllOperateMode;
     QPointer<SearchClassInfoController> mSearchClassInfoController;
+    QPointer<SearchTeacherInfoController> mSearchTeacherInfoController;
 
     std::mutex mClassInfosMutex;
     std::condition_variable mClassInfosCondition;

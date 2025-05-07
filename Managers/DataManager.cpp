@@ -1,4 +1,4 @@
-#include "DBManager.h"
+#include "DataManager.h"
 #include <iostream>
 
 using namespace ClassScheduler;
@@ -7,9 +7,9 @@ using namespace ClassScheduler;
     mDB = QSqlDatabase::addDatabase("QSQLITE");            \
     mDB.setDatabaseName("ClassScheduler.db");
 
-DBManager::DBManager() {}
+DataManager::DataManager() {}
 
-bool DBManager::createDBConnection()
+bool DataManager::createDBConnection()
 {
     OPEN_DATABASE()
     if (!mDB.open()) {
@@ -19,7 +19,7 @@ bool DBManager::createDBConnection()
     return true;
 }
 
-int DBManager::getTableDataCount(QString tableName)
+int DataManager::getTableDataCount(QString tableName)
 {
     if(mDataCount.count(tableName) == 1)
     {
@@ -33,7 +33,7 @@ int DBManager::getTableDataCount(QString tableName)
     return 0;
 }
 
-bool DBManager::createClassInfosTable()
+bool DataManager::createClassInfosTable()
 {
     QSqlQuery query;
     bool ret = query.exec("CREATE TABLE classInfos("
@@ -64,16 +64,15 @@ bool DBManager::createClassInfosTable()
     return true;
 }
 
-bool DBManager::createTeacherInfosTable()
+bool DataManager::createTeacherInfosTable()
 {
     QSqlQuery query;
     bool ret = query.exec("CREATE TABLE teacherInfos("
-                          "id                 INTEGER PRIMARY KEY   AUTOINCREMENT,"
-                          "teacherName        TEXT,"
-                          "teacherNickNames   TEXT             NOT NULL,"
-                          "teacherFees        TEXT             NOT NULL,"
-                          "teacherSujects     TEXT,"
-                          "teacherGrades      TEXT"
+                          "id                        INTEGER  PRIMARY KEY   AUTOINCREMENT,"
+                          "teacherName               TEXT                   NOT NULL,"
+                          "teacherNickNames          TEXT                   NOT NULL,"
+                          "teacherSujectsAndFees     TEXT                   NOT NULL,"
+                          "teacherSujectsAndGrades   TEXT"
                           ")");
     if (!ret) {
         cout << "Failed to create table: " << query.lastError().text().toStdString() << endl;
@@ -82,7 +81,7 @@ bool DBManager::createTeacherInfosTable()
     return true;
 }
 
-void DBManager::dropTable(QString tableName)
+void DataManager::dropTable(QString tableName)
 {
     QSqlQuery query;
     bool ret = query.exec(QString("DROP TABLE '%1'").arg(tableName));
@@ -91,7 +90,7 @@ void DBManager::dropTable(QString tableName)
     }
 }
 
-bool DBManager::insertDataToClassInfosTable(ClassInfos& infos)
+bool DataManager::insertDataToClassInfosTable(ClassInfos& infos)
 {
     for(auto& info : infos)
     {
@@ -112,14 +111,14 @@ bool DBManager::insertDataToClassInfosTable(ClassInfos& infos)
     return true;
 }
 
-bool DBManager::insertDataToTeacherInfosTable(TeacherInfos& infos)
+bool DataManager::insertDataToTeacherInfosTable(TeacherInfos& infos)
 {
     for(auto& info : infos)
     {
         QSqlQuery query;
-        QString sql = QString("INSERT INTO teacherInfos (teacherName, teacherNickNames, teacherFees, teacherSujects, teacherGrades)"
-                              "VALUES ('%1', '%2', '%3', '%4', '%5')")
-                          .arg(info.teacherName).arg(info.getTeacherNickNames()).arg(info.getTeacherFees()).arg(info.getTeacherSujects()).arg(info.getTeacherGrades());
+        QString sql = QString("INSERT INTO teacherInfos (teacherName, teacherNickNames, teacherSujectsAndFees, teacherSujectsAndGrades)"
+                              "VALUES ('%1', '%2', '%3', '%4')")
+                          .arg(info.teacherName).arg(info.getTeacherNickNames()).arg(info.getTeacherSujectsAndFees()).arg(info.getTeacherSujectsAndGrades());
         bool ret = query.exec(sql);
         if (!ret) {
             cout << "Failed to insert data to teacherInfos: " << query.lastError().text().toStdString() << endl;
@@ -129,14 +128,14 @@ bool DBManager::insertDataToTeacherInfosTable(TeacherInfos& infos)
     return true;
 }
 
-bool DBManager::isTableExist(QString tableName)
+bool DataManager::isTableExist(QString tableName)
 {
     QSqlQuery query(mDB);
     query.exec(QString("select * from sqlite_master where type='table' and name='%1'").arg(tableName));
     return query.next();;
 }
 
-bool DBManager::refreshDBDataByFile(QString filePath, bool inNewThread)
+bool DataManager::refreshDBDataByFile(QString filePath, bool inNewThread)
 {
     auto classInfos = getClassInfosFromExcelFile(filePath);
     if(inNewThread)
@@ -148,6 +147,12 @@ bool DBManager::refreshDBDataByFile(QString filePath, bool inNewThread)
     {
         cout << "drop table: " << CLASS_INFOS_TABLE_NAME.toStdString() << endl;
         dropTable(CLASS_INFOS_TABLE_NAME);
+    }
+
+    if(mDataCount[TEACHER_INFOS_TABLE_NAME] > 0)
+    {
+        cout << "drop table: " << TEACHER_INFOS_TABLE_NAME.toStdString() << endl;
+        dropTable(TEACHER_INFOS_TABLE_NAME);
     }
 
     if(!saveDataToClassInfosTable(classInfos))
@@ -163,7 +168,7 @@ bool DBManager::refreshDBDataByFile(QString filePath, bool inNewThread)
     return true;
 }
 
-bool DBManager::saveDataToClassInfosTable(ClassInfos& infos)
+bool DataManager::saveDataToClassInfosTable(ClassInfos& infos)
 {
     if(createClassInfosTable())
     {
@@ -179,7 +184,7 @@ bool DBManager::saveDataToClassInfosTable(ClassInfos& infos)
     return false;
 }
 
-bool DBManager::saveDataToTeacherInfosTable(TeacherInfos& infos)
+bool DataManager::saveDataToTeacherInfosTable(TeacherInfos& infos)
 {
     if(createTeacherInfosTable())
     {
@@ -195,7 +200,7 @@ bool DBManager::saveDataToTeacherInfosTable(TeacherInfos& infos)
     return false;
 }
 
-TeacherInfos DBManager::getTeacherInfosList(ClassInfos& classInfos)
+TeacherInfos DataManager::getTeacherInfosList(ClassInfos& classInfos)
 {
     TeacherInfos teacherInfos;
 
@@ -224,16 +229,15 @@ TeacherInfos DBManager::getTeacherInfosList(ClassInfos& classInfos)
         auto teacherName = classInfo.teacherName;
         auto teacherNickName = classInfo.teacherNickName;
         auto teacherSuject = classInfo.suject;
-        auto teacherFee = teacherSuject + "_" + classInfo.teacherFee;
-        auto teacherGrade = teacherSuject + "_" + classInfo.grade;
+        auto teacherSujectAndFee = teacherSuject + "_" + classInfo.teacherFee;
+        auto teacherSujectAndGrade = teacherSuject + "_" + classInfo.grade;
         for(auto& teacherInfo : teacherInfos)
         {
             if(teacherInfo.teacherName == teacherName)
             {
                 teacherInfo.saveValue(teacherNickName, teacherInfo.teacherNickNames);
-                teacherInfo.saveValue(teacherFee, teacherInfo.teacherFees);
-                teacherInfo.saveValue(teacherSuject, teacherInfo.teacherSujects);
-                teacherInfo.saveValue(teacherGrade, teacherInfo.teacherGrades);
+                teacherInfo.saveValue(teacherSujectAndFee, teacherInfo.teacherSujectsAndFees);
+                teacherInfo.saveValue(teacherSujectAndGrade, teacherInfo.teacherSujectsAndGrades);
                 break;
             }
         }
@@ -246,7 +250,7 @@ TeacherInfos DBManager::getTeacherInfosList(ClassInfos& classInfos)
     return teacherInfos;
 }
 
-void DBManager::queryDataFromClassInfosTable(ClassInfos& infos)
+void DataManager::queryDataFromClassInfosTable(ClassInfos& infos)
 {
     QSqlQuery query("SELECT * FROM classInfos");
     int cnt = 1;
@@ -278,7 +282,23 @@ void DBManager::queryDataFromClassInfosTable(ClassInfos& infos)
     }
 }
 
-void DBManager::storeAllTableDataCount()
+void DataManager::queryDataFromTeacherInfosTable(TeacherInfos& infos)
+{
+    QSqlQuery query("SELECT * FROM teacherInfos");
+    int cnt = 1;
+    while (query.next()) {
+        TeacherInfo info;
+
+        info.teacherName = query.value("teacherName").toString();
+        info.strTeacherNickNames = query.value("teacherNickNames").toString();
+        info.strTeacherSujectsAndFees = query.value("teacherSujectsAndFees").toString();
+        info.strTeacherSujectsAndGrades = query.value("teacherSujectsAndGrades").toString();
+
+        infos.emplace_back(info);
+    }
+}
+
+void DataManager::storeAllTableDataCount()
 {
     QSqlQuery query;
     for(auto name : allTableNameForDB)
@@ -291,7 +311,7 @@ void DBManager::storeAllTableDataCount()
     }
 }
 
-ClassInfos DBManager::getClassInfosFromExcelFile(QString filePath)
+ClassInfos DataManager::getClassInfosFromExcelFile(QString filePath)
 {
     ClassInfos infos;
     Document doc(filePath);
@@ -350,7 +370,7 @@ ClassInfos DBManager::getClassInfosFromExcelFile(QString filePath)
     return infos;
 }
 
-bool DBManager::hasValidHeaders(Document& doc)
+bool DataManager::hasValidHeaders(Document& doc)
 {
     int row = 1, col = 1;
     map<QString, bool> headers;
@@ -382,7 +402,7 @@ bool DBManager::hasValidHeaders(Document& doc)
     return true;
 }
 
-void DBManager::saveData(ClassInfo& info, QString& headerStr, QString& str)
+void DataManager::saveData(ClassInfo& info, QString& headerStr, QString& str)
 {
     if(str.isEmpty() || str == "00:00:00.000")
     {
@@ -408,7 +428,7 @@ void DBManager::saveData(ClassInfo& info, QString& headerStr, QString& str)
     else if(headerStr == "收费日期") info.payDate = str;
 }
 
-bool DBManager::isUsefulHeader(QString header)
+bool DataManager::isUsefulHeader(QString header)
 {
     for(auto str : validExcelClassHeader)
     {
@@ -417,7 +437,7 @@ bool DBManager::isUsefulHeader(QString header)
     return false;
 }
 
-QVariant DBManager::readCellValue(QString headerStr, CellPtr cell)
+QVariant DataManager::readCellValue(QString headerStr, CellPtr cell)
 {
     if(headerStr == "星期")
     {

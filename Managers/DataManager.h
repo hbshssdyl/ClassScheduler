@@ -1,5 +1,5 @@
-#ifndef DBMANAGER_H
-#define DBMANAGER_H
+#ifndef DATAMANAGER_H
+#define DATAMANAGER_H
 #include "Utils/DataUtils.h"
 #include "xlsxdocument.h"
 // #include "xlsxchartsheet.h"
@@ -14,19 +14,20 @@
 using namespace ClassScheduler;
 using namespace QXlsx;
 using CellPtr = std::shared_ptr<Cell>;
-using DBManagerPtr = std::shared_ptr<class DBManager>;
+using DataManagerPtr = std::shared_ptr<class DataManager>;
 
-class DBManager : public std::enable_shared_from_this<DBManager>
+class DataManager : public std::enable_shared_from_this<DataManager>
 {
 public:
-    DBManager();
-    virtual ~DBManager() = default;
+    DataManager();
+    virtual ~DataManager() = default;
 
 public:
     bool createDBConnection();
     void storeAllTableDataCount();
     void dropTable(QString tableName);
     void queryDataFromClassInfosTable(ClassInfos& infos);
+    void queryDataFromTeacherInfosTable(TeacherInfos& infos);
     bool isTableExist(QString tableName);
     int getTableDataCount(QString tableName);
     bool refreshDBDataByFile(QString filePath, bool inNewThread);
@@ -51,4 +52,4 @@ private:
 
 };
 
-#endif // DBMANAGER_H
+#endif // DATAMANAGER_H

@@ -16,6 +16,7 @@ namespace ClassScheduler
 
     static QString nullString = "无该信息";
     static vector validExcelClassHeader{"日期", "星期", "姓名", "学校", "电话", "年级", "学科", "时间", "老师", "网课or面授", "课时", "金额/小时", "课酬总计", "老师姓名", "老师工资", "已收金额", "付费方式", "收费日期"};
+    static vector validTeacherHeader{"老师姓名", "使用过的昵称", "科目及工资（每小时）", "科目及年级"};
     static vector allTableNameForDB{"classInfos", "teacherInfos"};
 
     // QVariantList schedulerOptions {
@@ -59,9 +60,9 @@ namespace ClassScheduler
         QString payType;
         QString payDate;
 
-        QVariantList toInfosList(QString id)
+        QStringList toInfosList(QString id)
         {
-            QVariantList list;
+            QStringList list;
             if(!id.isEmpty())
             {
                 list.append(id);
@@ -100,7 +101,6 @@ namespace ClassScheduler
 
         bool isContains(QString str)
         {
-            int cnt = 0;
             if(date.contains(str, Qt::CaseSensitive)) return true;
             if(weekend.contains(str, Qt::CaseSensitive)) return true;
             if(studentName.contains(str, Qt::CaseSensitive)) return true;
@@ -129,21 +129,41 @@ namespace ClassScheduler
     {
         QString teacherName;
         vector<QString> teacherNickNames;
-        vector<QString> teacherFees;
-        vector<QString> teacherSujects;
-        vector<QString> teacherGrades;
+        vector<QString> teacherSujectsAndFees;
+        vector<QString> teacherSujectsAndGrades;
+
+        QString strTeacherNickNames;
+        QString strTeacherSujectsAndFees;
+        QString strTeacherSujectsAndGrades;
+
+        TeacherInfo()
+        {
+        }
 
         TeacherInfo(const QString teacherName)
             : teacherName(teacherName)
         {
         }
 
+        QStringList toInfosList(QString id)
+        {
+            QStringList list;
+            if(!id.isEmpty())
+            {
+                list.append(id);
+            }
+            list.append(teacherName);
+            list.append(strTeacherNickNames);
+            list.append(strTeacherSujectsAndFees);
+            list.append(strTeacherSujectsAndGrades);
+            return list;
+        }
+
         void sortInfos()
         {
             sort(teacherNickNames.begin(), teacherNickNames.end());
-            sort(teacherFees.begin(), teacherFees.end());
-            sort(teacherSujects.begin(), teacherSujects.end());
-            sort(teacherGrades.begin(), teacherGrades.end());
+            sort(teacherSujectsAndFees.begin(), teacherSujectsAndFees.end());
+            sort(teacherSujectsAndGrades.begin(), teacherSujectsAndGrades.end());
         }
 
         QString getString(vector<QString> stringList)
@@ -184,19 +204,23 @@ namespace ClassScheduler
             return getString(teacherNickNames);
         }
 
-        QString getTeacherFees()
+        QString getTeacherSujectsAndFees()
         {
-            return getString(teacherFees);
+            return getString(teacherSujectsAndFees);
         }
 
-        QString getTeacherSujects()
+        QString getTeacherSujectsAndGrades()
         {
-            return getString(teacherSujects);
+            return getString(teacherSujectsAndGrades);
         }
 
-        QString getTeacherGrades()
+        bool isContains(QString str)
         {
-            return getString(teacherGrades);
+            if(teacherName.contains(str, Qt::CaseSensitive)) return true;
+            if(strTeacherNickNames.contains(str, Qt::CaseSensitive)) return true;
+            if(strTeacherSujectsAndFees.contains(str, Qt::CaseSensitive)) return true;
+            if(strTeacherSujectsAndGrades.contains(str, Qt::CaseSensitive)) return true;
+            return false;
         }
     };
 

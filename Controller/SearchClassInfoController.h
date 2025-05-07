@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Utils/DataUtils.h"
-#include "Managers/DBManager.h"
+#include "Managers/DataManager.h"
 
 #include <QObject>
 #include <cstdio>
@@ -16,7 +16,6 @@ class SearchClassInfoController : public QObject {
     Q_OBJECT
 public:
     Q_PROPERTY(QVariantMap classInfoMap MEMBER mClassInfoMap NOTIFY classInfoMapChanged)
-    Q_PROPERTY(QVariantList classHeaderList MEMBER mClassHeaderList NOTIFY classInfoHeaderChanged)
 
     enum class OperateMode
     {
@@ -31,27 +30,24 @@ public:
     using OperateModes = std::vector<OperateMode>;
 
 public:
-    explicit SearchClassInfoController(DBManagerPtr dbManager, QObject* parent = nullptr);
+    explicit SearchClassInfoController(DataManagerPtr DataManager, QObject* parent = nullptr);
     Q_INVOKABLE void initialize();
+    void refreshSearchClassInfo();
 
 signals:
     void classInfoMapChanged();
-    void classInfoHeaderChanged();
 
 public slots:
     void onSearchTriggered(QString searchString);
 
 private:
-    void refreshSearchClassInfo();
     void readClassInfosFromDB();
-    void initClassHeader();
     void updateClassInfosList(ClassInfos& infos);
 
 private:
     QVariantMap mClassInfoMap;
-    QVariantList mClassHeaderList;
     ClassInfos mClassInfosFromDB;
-    DBManagerPtr mDBManager;
+    DataManagerPtr mDataManager;
     bool mIsDBDataExist = false;
 
 };

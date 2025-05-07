@@ -1,17 +1,16 @@
 #pragma once
 
 #include <QCoreApplication>
-#include <thread>
 #include <iostream>
 
 #include "SearchClassInfoController.h"
 #include "Utils/ControllerUtils.h"
-#include "Managers/DBManager.h"
+#include "Managers/DataManager.h"
 
 using namespace ClassScheduler;
 
-SearchClassInfoController::SearchClassInfoController(DBManagerPtr dbManager, QObject* parent)
-    : mDBManager(dbManager)
+SearchClassInfoController::SearchClassInfoController(DataManagerPtr DataManager, QObject* parent)
+    : mDataManager(DataManager)
     , QObject(parent)
 {
 }
@@ -23,14 +22,16 @@ void SearchClassInfoController::initialize()
 
 void SearchClassInfoController::refreshSearchClassInfo()
 {
-    if(!mDBManager->isTableExist(CLASS_INFOS_TABLE_NAME))
+    if(mClassInfosFromDB.size() == 0)
     {
-        cout << "DB is not exist" << endl;
-        return;
-    }
+        if(!mDataManager->isTableExist(CLASS_INFOS_TABLE_NAME))
+        {
+            cout << "DB is not exist" << endl;
+            return;
+        }
 
-    initClassHeader();
-    readClassInfosFromDB();
+        readClassInfosFromDB();
+    }
 
     if(mClassInfosFromDB.size() == 0)
     {
@@ -41,24 +42,12 @@ void SearchClassInfoController::refreshSearchClassInfo()
     updateClassInfosList(mClassInfosFromDB);
 }
 
-void SearchClassInfoController::initClassHeader()
-{
-    QVariantList newClassHeaderList;
-    CUtils::updateClassHeaderList(newClassHeaderList);
-
-    if (mClassHeaderList != newClassHeaderList)
-    {
-        mClassHeaderList = std::move(newClassHeaderList);
-        emit classInfoHeaderChanged();
-    }
-}
-
 void SearchClassInfoController::readClassInfosFromDB()
 {
-    if(mDBManager)
+    if(mDataManager)
     {
-        mDBManager->createDBConnection();
-        mDBManager->queryDataFromClassInfosTable(mClassInfosFromDB);
+        mDataManager->createDBConnection();
+        mDataManager->queryDataFromClassInfosTable(mClassInfosFromDB);
     }
 
     if(mClassInfosFromDB.size() == 0)
@@ -75,26 +64,6 @@ void SearchClassInfoController::updateClassInfosList(ClassInfos& infos)
     if (mClassInfoMap != newClassInfoMap)
     {
         mClassInfoMap = std::move(newClassInfoMap);
-        // cout << "mytest1";
-
-        //     auto& item = newClassInfoMap["classInfoList"];
-        //     if (item.canConvert<QVariantList>()) {
-        //         cout << "mytest3";
-        //         QVariantList list = item.toList();
-        //         for(auto& test : list )
-        //         {
-        //             cout << "mytest4";
-
-        //                 if(test.canConvert<QString>())
-        //                 {
-        //                     cout << test.toString().toStdString() << " ";
-        //                 }
-        //                 cout << endl;
-
-
-        //         }
-        //     }
-        //cout << mClassInfoMap["classInfoList"].Size() << " " << newClassInfoMap["classInfoList"].Size() << endl;
         emit classInfoMapChanged();
     }
 }

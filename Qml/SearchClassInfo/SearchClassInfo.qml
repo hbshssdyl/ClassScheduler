@@ -1,9 +1,10 @@
+import "../BasicComponent"
+import "../JSUtils/ColorUtils.js" as ColorUtils
+import "../JSUtils/MainUtils.js" as MainUtils
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.12
 import QtQuick.Window 2.15
-import "../BasicComponent"
-import "../JSUtils/ColorUtils.js" as ColorUtils
 
 Rectangle {
     id: root
@@ -21,15 +22,13 @@ Rectangle {
         width: 1
     }
 
-    ColumnLayout{
+    ColumnLayout {
         id: columnLayout
 
         anchors.fill: parent
-
         spacing: 5
 
-
-        SearchBar{
+        SearchBar {
             id: searchBar
 
             Layout.topMargin: 5
@@ -37,14 +36,8 @@ Rectangle {
             Layout.alignment: Qt.AlignTop
             Layout.preferredHeight: 50
             Layout.preferredWidth: 400
-
+            resultsCount: controller.classInfoMap.classInfoList.length
             onSearchTriggered: function(query) {
-                console.debug(typeof(controller.classInfoMap.classInfoList));
-                //console.debug(type(controller.classInfoMap.classInfoList));
-                for(infoList in controller.classInfoMap.classInfoList)
-                    for(info in infoList)
-                        console.debug("mytest" + info);
-                //console.debug(controller.classInfoMap.classInfoList[10].length);
                 controller.onSearchTriggered(query);
             }
         }
@@ -60,99 +53,40 @@ Rectangle {
                 id: scrollView
 
                 anchors.fill: parent
-
                 clip: true
 
                 ListView {
                     id: listView
 
                     model: controller.classInfoMap.classInfoList
-                    anchors.fill: parent
-
                     spacing: 0
-                    contentWidth: 19 * 100 + 20
+                    width: listView.contentWidth
+                    z: 1
+                    //contentWidth: 18 * 100 + 50
                     flickableDirection: Flickable.AutoFlickIfNeeded
-                    header: headerView;
-                    headerPositioning: ListView.OverlayHeader;
+                    header: headerView
+                    headerPositioning: ListView.OverlayHeader
 
-                    delegate: Rectangle{
-                        id: delegateroot
+                    delegate: SearchClassInfoDelegate {
+                        id: delegateItem
 
-                        property int delegateHeight: 50
-                        property int textItemWidth: 100
-                        property var repeaterList
                         width: listView.contentWidth
                         height: delegateHeight
                         z: 1
-                        color: index % 2 == 0 ? "transparent" : "#DDDDDD"
-                        radius: 5
-
-                        border {
-                            color: ColorUtils.getActionItemBorderColor()
-                            width: 1
-                        }
-
-                        Row{
-                            id: classInfo
-
-                            Repeater {
-                                id: repeater
-
-                                model: modelData
-
-                                delegate: Rectangle{
-                                    id: classInfoItem
-
-                                    color: "red"
-                                    width: textItemWidth
-                                    height: delegateHeight
-
-                                    border {
-                                        color: ColorUtils.getActionItemBorderColor()
-                                        width: 1
-                                    }
-
-                                    TextEdit{
-                                        id: classInfoText
-
-                                        selectByMouse: true
-                                        readOnly: true
-                                        anchors.centerIn: parent
-                                        width: parent.width
-                                        text: modelData
-                                        horizontalAlignment: Text.AlignHCenter
-                                        verticalAlignment: Text.AlignVCenter
-                                        leftPadding: 5
-                                        rightPadding: 5
-                                        wrapMode: TextEdit.WordWrap
-                                        font {
-                                            bold: false
-                                            pixelSize: 12
-                                        }
-                                    }
-                                }
-                            }
-                        }
                     }
-                    // SearchClassInfoDelegate{
-                    //     id: delegateItem
 
-                    //     repeaterList: controller.classInfoMap.classInfoList
-                    //     width: listView.contentWidth
-                    //     height: delegateHeight
-                    //     z: 1
-                    // }
                 }
 
                 Component {
                     id: headerView
+
                     Rectangle {
                         width: parent.width
                         height: 50
                         color: "transparent"
                         z: 2
 
-                        Row{
+                        Row {
                             id: classInfoHeader
 
                             Repeater {
@@ -163,44 +97,45 @@ Rectangle {
                                 delegate: Rectangle {
                                     id: repeaterDelegateItem
 
-                                    property int mWidth: {
-                                        if(modelData == "序号")
-                                            return 50;
-                                        return 100;
-                                    }
                                     color: "#66FFFF"
-                                    width: mWidth
+                                    width: MainUtils.getClassInfoWidth(index)
                                     height: 50
-                                    z: 2
+                                    z: 3
 
                                     border {
                                         color: ColorUtils.getActionItemBorderColor()
                                         width: 1
                                     }
 
-                                    TextEdit{
+                                    TextEdit {
                                         id: headerText
 
                                         readOnly: true
                                         selectByMouse: true
                                         anchors.centerIn: parent
                                         text: modelData
+
                                         font {
                                             bold: false
                                             pixelSize: 12
                                         }
+
                                     }
+
                                 }
+
                             }
+
                         }
+
                     }
+
                 }
+
             }
 
         }
 
     }
-
-
 
 }

@@ -8,8 +8,8 @@
 
 using namespace ClassScheduler;
 
-SearchTeacherInfoController::SearchTeacherInfoController(DBManagerPtr dbManager, QObject* parent)
-    : mDBManager(dbManager)
+SearchTeacherInfoController::SearchTeacherInfoController(DataManagerPtr DataManager, QObject* parent)
+    : mDataManager(DataManager)
     , QObject(parent)
 {
 }
@@ -21,14 +21,16 @@ void SearchTeacherInfoController::initialize()
 
 void SearchTeacherInfoController::refreshSearchTeacherInfo()
 {
-    if(!mDBManager->isTableExist(CLASS_INFOS_TABLE_NAME))
+    if(mTeacherInfosFromDB.size() == 0)
     {
-        cout << "DB is not exist" << endl;
-        return;
-    }
+        if(!mDataManager->isTableExist(TEACHER_INFOS_TABLE_NAME))
+        {
+            cout << "DB is not exist" << endl;
+            return;
+        }
 
-    initTeahcerHeader();
-    readTeacherInfosFromDB();
+        readTeacherInfosFromDB();
+    }
 
     if(mTeacherInfosFromDB.size() == 0)
     {
@@ -39,27 +41,13 @@ void SearchTeacherInfoController::refreshSearchTeacherInfo()
     updateTeacherInfosList(mTeacherInfosFromDB);
 }
 
-void SearchTeacherInfoController::initTeahcerHeader()
-{
-    QVariantList newTeacherrHeaderList;
-    CUtils::updateTeacherHeaderList(newTeacherrHeaderList);
-
-    if (mTeacherHeaderList != newTeacherrHeaderList)
-    {
-        mTeacherHeaderList = std::move(newTeacherrHeaderList);
-
-
-        emit teacherInfoHeaderChanged();
-    }
-}
-
 void SearchTeacherInfoController::readTeacherInfosFromDB()
 {
-    // if(mDBManager)
-    // {
-    //     mDBManager->createDBConnection();
-    //     mDBManager->queryDataFromTeacherInfosTable(mTeacherInfosFromDB);
-    // }
+    if(mDataManager)
+    {
+        mDataManager->createDBConnection();
+        mDataManager->queryDataFromTeacherInfosTable(mTeacherInfosFromDB);
+    }
 
     if(mTeacherInfosFromDB.size() == 0)
     {
@@ -69,13 +57,13 @@ void SearchTeacherInfoController::readTeacherInfosFromDB()
 
 void SearchTeacherInfoController::updateTeacherInfosList(TeacherInfos& infos)
 {
-    QVariantList newTeacherInfoList;
-    CUtils::updateTeacherInfoList(newTeacherInfoList, infos);
+    QVariantMap newTeacherInfoMap;
+    CUtils::updateTeacherInfoList(newTeacherInfoMap, infos);
 
-    if (mTeacherInfoList != newTeacherInfoList)
+    if (mTeacherInfoMap != newTeacherInfoMap)
     {
-        mTeacherInfoList = std::move(newTeacherInfoList);
-        emit teacherInfoListChanged();
+        mTeacherInfoMap = std::move(newTeacherInfoMap);
+        emit teacherInfoMapChanged();
     }
 }
 

@@ -26,12 +26,12 @@ void Controller::initialize()
 
 void Controller::initDB()
 {
-    mDBManager = std::make_shared<DBManager>();
-    if(mDBManager)
+    mDataManager = std::make_shared<DataManager>();
+    if(mDataManager)
     {
-        mDBManager->createDBConnection();
-        mDBManager->storeAllTableDataCount();
-        mDataCount = QString::number(mDBManager->getTableDataCount(CLASS_INFOS_TABLE_NAME));
+        mDataManager->createDBConnection();
+        mDataManager->storeAllTableDataCount();
+        mDataCount = QString::number(mDataManager->getTableDataCount(CLASS_INFOS_TABLE_NAME));
         emit dataCountChanged();
         cout << "initDB, currentDataCount: " << mDataCount.toStdString() << endl;
     }
@@ -78,9 +78,22 @@ void Controller::refreshOperateMode(OperateMode mode)
             mShowActions = false;
             break;
         }
-        case OperateMode::WelcomePage:
+
         case OperateMode::SearchClassInfo:
+        {
+            if(mSearchTeacherInfoController)
+            {
+                mSearchTeacherInfoController->refreshSearchTeacherInfo();
+            }
+        }
         case OperateMode::SearchTeacherInfo:
+        {
+            if(mSearchClassInfoController)
+            {
+                mSearchClassInfoController->refreshSearchClassInfo();
+            }
+        }
+        case OperateMode::WelcomePage:
         case OperateMode::ScheduleClass:
         case OperateMode::CalcOneToOneMoney:
         case OperateMode::CalcClassMoney:
@@ -120,9 +133,9 @@ void Controller::onFileUploaded(QString filePath)
     cout << "filePath: " << mNewDataFilePath.toStdString() << endl;
 
     auto fun = [this] {
-        if(mDBManager->refreshDBDataByFile(mNewDataFilePath, true))
+        if(mDataManager->refreshDBDataByFile(mNewDataFilePath, true))
         {
-            mDBManager->storeAllTableDataCount();
+            mDataManager->storeAllTableDataCount();
             onOperateModeSelected(OperateMode::WelcomePage);
         }
     };
@@ -142,10 +155,20 @@ SearchClassInfoController* Controller::getSearchClassInfoController()
 {
     if (!mSearchClassInfoController)
     {
-        mSearchClassInfoController = new SearchClassInfoController(mDBManager, this);
+        mSearchClassInfoController = new SearchClassInfoController(mDataManager, this);
         mSearchClassInfoController->initialize();
     }
     return mSearchClassInfoController;
+}
+
+SearchTeacherInfoController* Controller::getSearchTeacherInfoController()
+{
+    if (!mSearchTeacherInfoController)
+    {
+        mSearchTeacherInfoController = new SearchTeacherInfoController(mDataManager, this);
+        mSearchTeacherInfoController->initialize();
+    }
+    return mSearchTeacherInfoController;
 }
 
 

@@ -1,16 +1,17 @@
+import "../BasicComponent"
+import "../JSUtils/ColorUtils.js" as ColorUtils
+import "../JSUtils/MainUtils.js" as MainUtils
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.12
 import QtQuick.Window 2.15
-import "../BasicComponent"
-import "../JSUtils/ColorUtils.js" as ColorUtils
 
 Rectangle {
     id: root
 
     property var operateMode
     property var rootController
-    property var controller: rootController.getSearchClassInfoController()
+    property var controller: rootController.getSearchTeacherInfoController()
     property int delegateHeight: 50
 
     color: "#FFFFFF"
@@ -21,15 +22,13 @@ Rectangle {
         width: 1
     }
 
-    ColumnLayout{
+    ColumnLayout {
         id: columnLayout
 
         anchors.fill: parent
-
         spacing: 5
 
-
-        SearchBar{
+        SearchBar {
             id: searchBar
 
             Layout.topMargin: 5
@@ -37,7 +36,7 @@ Rectangle {
             Layout.alignment: Qt.AlignTop
             Layout.preferredHeight: 50
             Layout.preferredWidth: 400
-
+            resultsCount: controller.teacherInfoMap.teacherInfoList.length
             onSearchTriggered: function(query) {
                 controller.onSearchTriggered(query);
             }
@@ -54,89 +53,89 @@ Rectangle {
                 id: scrollView
 
                 anchors.fill: parent
-
                 clip: true
 
                 ListView {
                     id: listView
 
-                    model: controller.classInfoList
-                    anchors.fill: parent
-
+                    model: controller.teacherInfoMap.teacherInfoList
                     spacing: 0
-                    contentWidth: 19 * 100 + 20
+                    width: listView.contentWidth
+                    z: 1
+                    //contentWidth: 18 * 100 + 50
                     flickableDirection: Flickable.AutoFlickIfNeeded
-                    header: headerView;
-                    headerPositioning: ListView.OverlayHeader;
+                    header: headerView
+                    headerPositioning: ListView.OverlayHeader
 
-                    delegate: SearchTeacherInfoDelegate{
+                    delegate: SearchTeacherInfoDelegate {
                         id: delegateItem
 
                         width: listView.contentWidth
                         height: delegateHeight
                         z: 1
                     }
+
                 }
 
                 Component {
                     id: headerView
+
                     Rectangle {
                         width: parent.width
                         height: 50
                         color: "transparent"
                         z: 2
 
-                        Row{
-                            id: classInfoHeader
+                        Row {
+                            id: teacherInfoHeader
 
                             Repeater {
                                 id: repeater
 
-                                model: controller.classHeaderList
+                                model: controller.teacherInfoMap.teacherInfoHeader
 
                                 delegate: Rectangle {
                                     id: repeaterDelegateItem
 
-                                    property int mWidth: {
-                                        if(modelData == "序号")
-                                            return 50;
-                                        if(modelData == "学校")
-                                            return 170;
-                                        return 100;
-                                    }
                                     color: "#66FFFF"
-                                    width: mWidth
+                                    width: MainUtils.getTeacherInfoWidth(index)
                                     height: 50
-                                    z: 2
+                                    z: 3
 
                                     border {
                                         color: ColorUtils.getActionItemBorderColor()
                                         width: 1
                                     }
 
-                                    TextEdit{
+                                    TextEdit {
                                         id: headerText
 
                                         readOnly: true
                                         selectByMouse: true
                                         anchors.centerIn: parent
                                         text: modelData
+
                                         font {
                                             bold: false
                                             pixelSize: 12
                                         }
+
                                     }
+
                                 }
+
                             }
+
                         }
+
                     }
+
                 }
+
             }
 
         }
 
     }
-
-
 
 }

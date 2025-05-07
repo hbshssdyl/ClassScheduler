@@ -88,9 +88,6 @@ void CUtils::updateClassInfoList(QVariantMap& data, ClassInfos& classInfos)
         classInfoList.append(classInfo.toInfosList(QString::number(id++)));
     }
 
-    // classInfoList.append(QVariantList{"werwer", "awrwer", "affaewf"});
-    // classInfoList.append(QVariantList{"123", "234", "345", "456"});
-
     data.insert("classInfoHeader", classInfoHeader);
     data.insert("classInfoList", classInfoList);
 }
@@ -106,44 +103,37 @@ void CUtils::doSearchClassInfos(ClassInfos& allInfos, ClassInfos& searchInfos, Q
     }
 }
 
-void CUtils::updateClassHeaderList(QVariantList& data)
-{
-    data.append("序号");
-    for(auto header : validExcelClassHeader)
-    {
-        data.append(header);
-    }
-}
-
 //For SearchTeacherInfoController.cpp
-void CUtils::updateTeacherInfoList(QVariantList& data, TeacherInfos& teacherInfos)
+void CUtils::updateTeacherInfoList(QVariantMap& data, TeacherInfos& teacherInfos)
 {
-    // int id = 1;
-    // for(auto classInfo : classInfos)
-    // {
-    //     auto info = getTeacherListInfo(id++, classInfo);
-    //     data.append(info);
-    // }
+    QVariantList teacherInfoHeader;
+    QVariantList teacherInfoList;
+    int id = 1;
+
+    teacherInfoHeader.append("序号");
+    for(auto header : validTeacherHeader)
+    {
+        teacherInfoHeader.append(header);
+    }
+
+    for(auto& teacherInfo : teacherInfos)
+    {
+        teacherInfoList.append(teacherInfo.toInfosList(QString::number(id++)));
+    }
+
+    data.insert("teacherInfoHeader", teacherInfoHeader);
+    data.insert("teacherInfoList", teacherInfoList);
 }
 
 void CUtils::doSearchTeacherInfos(TeacherInfos& allInfos, TeacherInfos& searchInfos, QString searchString)
 {
-    // for(auto& info : allInfos)
-    // {
-    //     if(info.isContains(searchString))
-    //     {
-    //         searchInfos.emplace_back(info);
-    //     }
-    // }
-}
-
-void CUtils::updateTeacherHeaderList(QVariantList& data)
-{
-    // data.append("序号");
-    // for(auto header : validExcelClassHeader)
-    // {
-    //     data.append(header);
-    // }
+    for(auto& info : allInfos)
+    {
+        if(info.isContains(searchString))
+        {
+            searchInfos.emplace_back(info);
+        }
+    }
 }
 
 } // namespace PictureManager

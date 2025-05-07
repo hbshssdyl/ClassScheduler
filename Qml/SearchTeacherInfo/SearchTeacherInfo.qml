@@ -72,6 +72,7 @@ Rectangle {
 
                         width: listView.contentWidth
                         height: delegateHeight
+                        rootWidth: root.width
                         z: 1
                     }
 
@@ -98,7 +99,7 @@ Rectangle {
                                     id: repeaterDelegateItem
 
                                     color: "#66FFFF"
-                                    width: MainUtils.getTeacherInfoWidth(index)
+                                    width: MainUtils.getTeacherInfoWidth(root.width, index, controller.teacherInfoMap.teacherInfoHeader.length)
                                     height: 50
                                     z: 3
 

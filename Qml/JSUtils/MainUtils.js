@@ -1,6 +1,5 @@
-function getClassInfoWidth(index){
-    //40 80 60 60 100 100 40 40 80 80 80 40 80 80 60 60 60 60 80
-    //"日期", "星期", "姓名", "学校", "电话", "年级", "学科", "时间", "老师", "网课or面授", "课时", "金额/小时", "课酬总计", "老师姓名", "老师工资", "已收金额", "付费方式", "收费日期"
+function getMinClassInfoWidth(index)
+{
     switch(index)
     {
         case 0://序号
@@ -39,15 +38,31 @@ function getClassInfoWidth(index){
             return 60;
         case 17://付费方式
             return 60;
-        case 17://收费日期
+        case 18://收费日期
             return 80;
         default:
             return 100;
     }
 }
 
-function getTeacherInfoWidth(index){
-    //"老师姓名", "使用过的昵称", "科目及工资（每小时）", "科目及年级"
+function getClassInfoWidth(windowWidth, index, count){
+    //40 80 60 60 100 100 40 40 80 80 80 40 80 80 60 60 60 60 80
+    //"日期", "星期", "姓名", "学校", "电话", "年级", "学科", "时间", "老师", "网课or面授", "课时", "金额/小时", "课酬总计", "老师姓名", "老师工资", "已收金额", "付费方式", "收费日期"
+    var sum = 0;
+    for(var i=0; i<count; i++)
+    {
+        sum += getMinClassInfoWidth(i);
+    }
+
+    if(windowWidth > sum)
+    {
+        return getMinClassInfoWidth(index) + (windowWidth - sum) / count;
+    }
+    return getMinClassInfoWidth(index);
+}
+
+function getMinTeacherInfoWidth(index)
+{
     switch(index)
     {
         case 0://序号
@@ -63,4 +78,19 @@ function getTeacherInfoWidth(index){
         default:
             return 200;
     }
+}
+
+function getTeacherInfoWidth(windowWidth, index, count){
+    //"老师姓名", "使用过的昵称", "科目及工资（每小时）", "科目及年级"
+    var sum = 0;
+    for(var i=0; i<count; i++)
+    {
+        sum += getMinTeacherInfoWidth(i);
+    }
+
+    if(windowWidth > sum)
+    {
+        return getMinTeacherInfoWidth(index) + (windowWidth - sum) / count;
+    }
+    return getMinTeacherInfoWidth(index);
 }

@@ -10,6 +10,7 @@ Rectangle{
     id: delegateroot
 
     property int delegateHeight: 50
+    property int rootWidth
 
     color: index % 2 == 0 ? "transparent" : "#DDDDDD"
     radius: 5
@@ -31,7 +32,7 @@ Rectangle{
                 id: classInfoItem
 
                 color: "transparent"
-                width: MainUtils.getClassInfoWidth(index)
+                width: MainUtils.getClassInfoWidth(rootWidth, index, controller.classInfoMap.classInfoHeader.length)
                 height: delegateHeight
 
                 border {

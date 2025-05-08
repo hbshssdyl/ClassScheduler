@@ -25,12 +25,11 @@ public:
 public:
     bool createDBConnection();
     void storeAllTableDataCount();
-    void dropTable(QString tableName);
-    void queryDataFromClassInfosTable(ClassInfos& infos);
-    void queryDataFromTeacherInfosTable(TeacherInfos& infos);
-    bool isTableExist(QString tableName);
     int getTableDataCount(QString tableName);
-    bool refreshDBDataByFile(QString filePath, bool inNewThread);
+    bool refreshDBDataByFile(QString filePath);
+    void refreshAllDataFromDB();
+    ClassInfos getClassInfosFromDB();
+    TeacherInfos getTeacherInfosFromDB();
 
 private:
     bool isUsefulHeader(QString header);
@@ -45,9 +44,16 @@ private:
     bool createTeacherInfosTable();
     bool insertDataToClassInfosTable(ClassInfos& infos);
     bool insertDataToTeacherInfosTable(TeacherInfos& infos);
+    void queryDataFromClassInfosTable(ClassInfos& infos);
+    void queryDataFromTeacherInfosTable(TeacherInfos& infos);
+    bool isTableExist(QString tableName);
+    void dropTable(QString tableName);
+    QString formatTime(const QString& time);
 
 private:
     QSqlDatabase mDB;
+    ClassInfos mClassInfosFromDB;
+    TeacherInfos mTeacherInfosFromDB;
     TableDataCount mDataCount;
 
 };

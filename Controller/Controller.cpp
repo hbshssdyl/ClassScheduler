@@ -31,6 +31,7 @@ void Controller::initDB()
     {
         mDataManager->createDBConnection();
         mDataManager->storeAllTableDataCount();
+        mDataManager->refreshAllDataFromDB();
         mDataCount = QString::number(mDataManager->getTableDataCount(CLASS_INFOS_TABLE_NAME));
         emit dataCountChanged();
         cout << "initDB, currentDataCount: " << mDataCount.toStdString() << endl;
@@ -133,9 +134,9 @@ void Controller::onFileUploaded(QString filePath)
     cout << "filePath: " << mNewDataFilePath.toStdString() << endl;
 
     auto fun = [this] {
-        if(mDataManager->refreshDBDataByFile(mNewDataFilePath, true))
+        mDataManager->createDBConnection();
+        if(mDataManager->refreshDBDataByFile(mNewDataFilePath))
         {
-            mDataManager->storeAllTableDataCount();
             onOperateModeSelected(OperateMode::WelcomePage);
         }
     };
@@ -156,7 +157,6 @@ SearchClassInfoController* Controller::getSearchClassInfoController()
     if (!mSearchClassInfoController)
     {
         mSearchClassInfoController = new SearchClassInfoController(mDataManager, this);
-        mSearchClassInfoController->initialize();
     }
     return mSearchClassInfoController;
 }
@@ -166,9 +166,17 @@ SearchTeacherInfoController* Controller::getSearchTeacherInfoController()
     if (!mSearchTeacherInfoController)
     {
         mSearchTeacherInfoController = new SearchTeacherInfoController(mDataManager, this);
-        mSearchTeacherInfoController->initialize();
     }
     return mSearchTeacherInfoController;
+}
+
+ScheduleClassController* Controller::getScheduleClassController()
+{
+    if (!mScheduleClassController)
+    {
+        mScheduleClassController = new ScheduleClassController(mDataManager, this);
+    }
+    return mScheduleClassController;
 }
 
 

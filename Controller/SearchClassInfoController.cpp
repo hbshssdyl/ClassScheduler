@@ -13,6 +13,7 @@ SearchClassInfoController::SearchClassInfoController(DataManagerPtr DataManager,
     : mDataManager(DataManager)
     , QObject(parent)
 {
+    initialize();
 }
 
 void SearchClassInfoController::initialize()
@@ -24,13 +25,7 @@ void SearchClassInfoController::refreshSearchClassInfo()
 {
     if(mClassInfosFromDB.size() == 0)
     {
-        if(!mDataManager->isTableExist(CLASS_INFOS_TABLE_NAME))
-        {
-            cout << "DB is not exist" << endl;
-            return;
-        }
-
-        readClassInfosFromDB();
+        mClassInfosFromDB = mDataManager->getClassInfosFromDB();
     }
 
     if(mClassInfosFromDB.size() == 0)
@@ -40,20 +35,6 @@ void SearchClassInfoController::refreshSearchClassInfo()
     }
 
     updateClassInfosList(mClassInfosFromDB);
-}
-
-void SearchClassInfoController::readClassInfosFromDB()
-{
-    if(mDataManager)
-    {
-        mDataManager->createDBConnection();
-        mDataManager->queryDataFromClassInfosTable(mClassInfosFromDB);
-    }
-
-    if(mClassInfosFromDB.size() == 0)
-    {
-        cout << "Fail to read class infos from DB" << endl;
-    }
 }
 
 void SearchClassInfoController::updateClassInfosList(ClassInfos& infos)

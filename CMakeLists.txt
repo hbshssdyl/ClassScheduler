@@ -48,6 +48,7 @@ qt_add_qml_module(appClassScheduler
     SOURCES Controller/SearchTeacherInfoController.cpp Controller/SearchTeacherInfoController.h
     QML_FILES Qml/SearchTeacherInfo/SearchTeacherInfo.qml Qml/SearchTeacherInfo/SearchTeacherInfoDelegate.qml
     QML_FILES Qml/JSUtils/MainUtils.js
+    SOURCES Controller/ScheduleClassController.h Controller/ScheduleClassController.cpp
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.

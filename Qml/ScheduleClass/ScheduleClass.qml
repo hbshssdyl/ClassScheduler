@@ -7,6 +7,20 @@ Rectangle {
 
     property var operateMode
     property var rootController
+    property var controller: rootController.getScheduleClassController()
+
+    function generateTimeModel() {
+        var timeList = [];
+        for (var h = 8; h < 23; h++) {
+            for (var m = 0; m < 60; m += 5) {
+                var hour = h < 10 ? "0" + h : h;
+                var minute = m < 10 ? "0" + m : m;
+                timeList.push(hour + ":" + minute);
+            }
+        }
+        timeList.push("22:00");
+        return timeList;
+    }
 
     color: "#FFFFFF"
     radius: 5
@@ -45,7 +59,7 @@ Rectangle {
 
                 Text {
                     id: titleText
-                    text: "学生排课系统"
+                    text: "一对一排课"
                     font.pixelSize: 28
                     font.bold: true
                     color: "#2e7d32" // 深绿色字体
@@ -57,21 +71,27 @@ Rectangle {
                     id: repeater
                     model: [
                         { placeholder: "选择科目", options: ["语文", "数学", "英语", "物理", "化学", "生物", "道法", "跨学科", "政治", "地理", "历史"] },
-                        { placeholder: "选择年级", options: ["小学", "初一", "初二", "初三", "高一", "高二", "高三"] },
+                        { placeholder: "选择年级", options: ["小学", "预备", "初一", "初二", "初三", "高一", "高二", "高三"] },
                         { placeholder: "选择星期", options: ["星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日"] }
                     ]
 
                     delegate: ComboBox {
                         id: comboBox
+
+                        property bool isValid: true
+
                         Layout.fillWidth: true
                         model: modelData.options
                         font.pixelSize: 16
                         implicitHeight: 30
+
                         background: Rectangle {
-                            color: "#ffffff"
+                            color: isValid ? "#ffffff" : "red"
                             border.color: comboBox.hovered ? "#3399FF" : "#2e7d32"
+                            border.width: isValid ? 1 : 2
                             radius: 5
                         }
+
                         contentItem: Text {
                             text: comboBox.currentIndex === -1 ? modelData.placeholder : comboBox.currentText
                             font.pixelSize: 16
@@ -79,7 +99,51 @@ Rectangle {
                             verticalAlignment: Text.AlignVCenter
                             color: comboBox.pressed ? "#1b5e20" : "#2e7d32"
                         }
+
                         Component.onCompleted: comboBox.currentIndex = -1
+                    }
+                }
+
+                RowLayout {
+                    id: timeLayout
+
+                    spacing: 5
+
+                    Repeater {
+                        id: timeRepeater
+                        model: [
+                            { placeholder: "开始时间", options: generateTimeModel() },
+                            { placeholder: "结束时间", options: generateTimeModel() }
+                        ]
+
+                        delegate: ComboBox {
+                            id: timeComboBox
+
+                            property bool isValid: true
+
+                            Layout.fillWidth: true
+                            model: modelData.options
+                            font.pixelSize: 16
+                            implicitHeight: 30
+
+                            background: Rectangle {
+                                color: isValid ? "#ffffff" : "red"
+                                border.color: timeComboBox.hovered ? "#3399FF" : "#2e7d32"
+                                border.width: isValid ? 1 : 2
+                                radius: 5
+                            }
+
+                            contentItem: Text {
+                                text: timeComboBox.currentIndex === -1 ? modelData.placeholder : timeComboBox.currentText
+                                font.pixelSize: 16
+                                horizontalAlignment: Text.AlignHCenter
+                                verticalAlignment: Text.AlignVCenter
+                                leftPadding: 5
+                                color: timeComboBox.pressed ? "#1b5e20" : "#2e7d32"
+                            }
+
+                            Component.onCompleted: timeComboBox.currentIndex = -1
+                        }
                     }
                 }
 
@@ -96,19 +160,36 @@ Rectangle {
                         border.color: "#2e7d32"
                     }
                     onClicked: {
+                        var infosList = [];
+                        let isValidList = true;
+
                         var count = repeater.count;
-                        var selectedValues = [];
+                        var noDataIndexs = [];
                         for (var i = 0; i < count; i++) {
                             var comboBox = repeater.itemAt(i);
                             if (comboBox.currentIndex !== -1) {
-                                selectedValues.push(comboBox.currentText);
+                                infosList.push(comboBox.currentText);
                             } else {
-                                selectedValues.push("未选择");
+                                comboBox.isValid = false;
+                                isValidList = false;
                             }
                         }
-                        console.log("科目:", selectedValues[0]);
-                        console.log("年级:", selectedValues[1]);
-                        console.log("星期:", selectedValues[2]);
+
+                        var timeCount = timeRepeater.count;
+                        for (var j = 0; j < timeCount; j++) {
+                            var timeComboBox = timeRepeater.itemAt(j);
+                            if (timeComboBox.currentIndex !== -1) {
+                                infosList.push(timeComboBox.currentText);
+                            } else {
+                                timeComboBox.isValid = false;
+                                isValidList = false;
+                            }
+                        }
+
+                        if(isValidList)
+                        {
+                            controller.onRequiredInfosReceived(infosList);
+                        }
                     }
                     contentItem: Text {
                         text: confirmButton.text
@@ -143,13 +224,15 @@ Rectangle {
                 model: ListModel {
                     ListElement {
                         name: "张三"
+                        nickName: "三三"
                         freeTime: "星期X 无课的时间段：12:00-13:00"
                         salary: "科目XX 历史工资：400, 300, 100"
                         grades: "所有教过的年级：高三, 初三"
                     }
                     ListElement {
                         name: "李四"
-                        freeTime: "星期X 无课的时间段：12:00-13:00"
+                        nickName: "四四"
+                        freeTime: "星期X 无课的时间段：12:00-13:00, 12:00-13:00, 12:00-13:00, 12:00-13:00, 12:00-13:00"
                         salary: "科目XX 历史工资：400, 300, 100"
                         grades: "所有教过的年级：高三, 初三"
                     }
@@ -157,7 +240,7 @@ Rectangle {
 
                 delegate: Item {
                     width: ListView.view.width
-                    height: 150
+                    height: contentLayout.implicitHeight + 20
 
                     Rectangle {
                         anchors.fill: parent
@@ -167,6 +250,8 @@ Rectangle {
                         border.width: 1
 
                         ColumnLayout {
+                            id: contentLayout
+
                             anchors.fill: parent
                             anchors.margins: 10
                             spacing: 5
@@ -174,16 +259,21 @@ Rectangle {
                             Repeater {
                                 model: [
                                     { "label": "老师姓名：", "value": name },
+                                    { "label": "老师昵称：", "value": nickName },
                                     { "label": "", "value": freeTime },
                                     { "label": "", "value": salary },
                                     { "label": "", "value": grades }
                                 ]
 
-                                Text {
+                                TextEdit {
+
+                                    selectByMouse: true
+                                    readOnly: true
                                     text: modelData.label + modelData.value
                                     font.pixelSize: 14
                                     color: "#555555"
                                     Layout.fillWidth: true
+                                    wrapMode: TextEdit.WordWrap
                                 }
                             }
                         }

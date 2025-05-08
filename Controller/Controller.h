@@ -11,6 +11,7 @@
 #include "Managers/DataManager.h"
 #include "SearchClassInfoController.h"
 #include "SearchTeacherInfoController.h"
+#include "ScheduleClassController.h"
 
 using namespace std;
 
@@ -44,6 +45,7 @@ public:
 
     Q_INVOKABLE virtual SearchClassInfoController* getSearchClassInfoController();
     Q_INVOKABLE virtual SearchTeacherInfoController* getSearchTeacherInfoController();
+    Q_INVOKABLE virtual ScheduleClassController* getScheduleClassController();
 
 public slots:
     void onOperateModeSelected(OperateMode mode);
@@ -72,6 +74,7 @@ private:
     OperateModes mAllOperateMode;
     QPointer<SearchClassInfoController> mSearchClassInfoController;
     QPointer<SearchTeacherInfoController> mSearchTeacherInfoController;
+    QPointer<ScheduleClassController> mScheduleClassController;
 
     std::mutex mClassInfosMutex;
     std::condition_variable mClassInfosCondition;

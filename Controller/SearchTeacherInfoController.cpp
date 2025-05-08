@@ -12,6 +12,7 @@ SearchTeacherInfoController::SearchTeacherInfoController(DataManagerPtr DataMana
     : mDataManager(DataManager)
     , QObject(parent)
 {
+    initialize();
 }
 
 void SearchTeacherInfoController::initialize()
@@ -23,13 +24,7 @@ void SearchTeacherInfoController::refreshSearchTeacherInfo()
 {
     if(mTeacherInfosFromDB.size() == 0)
     {
-        if(!mDataManager->isTableExist(TEACHER_INFOS_TABLE_NAME))
-        {
-            cout << "DB is not exist" << endl;
-            return;
-        }
-
-        readTeacherInfosFromDB();
+        mTeacherInfosFromDB = mDataManager->getTeacherInfosFromDB();
     }
 
     if(mTeacherInfosFromDB.size() == 0)
@@ -39,20 +34,6 @@ void SearchTeacherInfoController::refreshSearchTeacherInfo()
     }
 
     updateTeacherInfosList(mTeacherInfosFromDB);
-}
-
-void SearchTeacherInfoController::readTeacherInfosFromDB()
-{
-    if(mDataManager)
-    {
-        mDataManager->createDBConnection();
-        mDataManager->queryDataFromTeacherInfosTable(mTeacherInfosFromDB);
-    }
-
-    if(mTeacherInfosFromDB.size() == 0)
-    {
-        cout << "Fail to read class infos from DB" << endl;
-    }
 }
 
 void SearchTeacherInfoController::updateTeacherInfosList(TeacherInfos& infos)

@@ -31,7 +31,6 @@ public:
 
 public:
     explicit SearchTeacherInfoController(DataManagerPtr DataManager, QObject* parent = nullptr);
-    Q_INVOKABLE void initialize();
     void refreshSearchTeacherInfo();
 
 signals:
@@ -41,14 +40,13 @@ public slots:
     void onSearchTriggered(QString searchString);
 
 private:
-    void readTeacherInfosFromDB();
+    void initialize();
     void updateTeacherInfosList(TeacherInfos& infos);
 
 private:
     QVariantMap mTeacherInfoMap;
     TeacherInfos mTeacherInfosFromDB;
     DataManagerPtr mDataManager;
-    bool mIsDBDataExist = false;
 
 };
 

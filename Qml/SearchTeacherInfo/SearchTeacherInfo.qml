@@ -14,7 +14,7 @@ Rectangle {
     property var controller: rootController.getSearchTeacherInfoController()
     property int delegateHeight: 50
 
-    color: "#FFFFFF"
+    color: "#e8f5e9"
     radius: 5
     clip: true
 
@@ -63,7 +63,7 @@ Rectangle {
                     spacing: 0
                     width: listView.contentWidth
                     z: 1
-                    //contentWidth: 18 * 100 + 50
+                    contentWidth: root.width
                     flickableDirection: Flickable.AutoFlickIfNeeded
                     header: headerView
                     headerPositioning: ListView.OverlayHeader

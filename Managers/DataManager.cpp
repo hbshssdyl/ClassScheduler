@@ -135,13 +135,9 @@ bool DataManager::isTableExist(QString tableName)
     return query.next();;
 }
 
-bool DataManager::refreshDBDataByFile(QString filePath, bool inNewThread)
+bool DataManager::refreshDBDataByFile(QString filePath)
 {
     auto classInfos = getClassInfosFromExcelFile(filePath);
-    if(inNewThread)
-    {
-        createDBConnection();
-    }
 
     if(mDataCount[CLASS_INFOS_TABLE_NAME] > 0)
     {
@@ -165,7 +161,31 @@ bool DataManager::refreshDBDataByFile(QString filePath, bool inNewThread)
         return false;
     }
 
+    storeAllTableDataCount();
+    if(getTableDataCount(CLASS_INFOS_TABLE_NAME) == 0 || getTableDataCount(TEACHER_INFOS_TABLE_NAME) == 0)
+    {
+        return false;
+    }
+
+    refreshAllDataFromDB();
+
     return true;
+}
+
+void DataManager::refreshAllDataFromDB()
+{
+    queryDataFromClassInfosTable(mClassInfosFromDB);
+    queryDataFromTeacherInfosTable(mTeacherInfosFromDB);
+}
+
+ClassInfos DataManager::getClassInfosFromDB()
+{
+    return mClassInfosFromDB;
+}
+
+TeacherInfos DataManager::getTeacherInfosFromDB()
+{
+    return mTeacherInfosFromDB;
 }
 
 bool DataManager::saveDataToClassInfosTable(ClassInfos& infos)
@@ -174,11 +194,7 @@ bool DataManager::saveDataToClassInfosTable(ClassInfos& infos)
     {
         if(insertDataToClassInfosTable(infos))
         {
-            storeAllTableDataCount();
-            if(getTableDataCount(CLASS_INFOS_TABLE_NAME) > 0)
-            {
-                return true;
-            }
+            return true;
         }
     }
     return false;
@@ -190,11 +206,7 @@ bool DataManager::saveDataToTeacherInfosTable(TeacherInfos& infos)
     {
         if(insertDataToTeacherInfosTable(infos))
         {
-            storeAllTableDataCount();
-            if(getTableDataCount(TEACHER_INFOS_TABLE_NAME) > 0)
-            {
-                return true;
-            }
+            return true;
         }
     }
     return false;
@@ -303,6 +315,10 @@ void DataManager::storeAllTableDataCount()
     QSqlQuery query;
     for(auto name : allTableNameForDB)
     {
+        if(!isTableExist(name))
+        {
+            cout << "Table " << name << " is not exist" << endl;
+        }
         query.exec(QString("SELECT count(*) FROM '%1'").arg(name));
         query.next();
         auto count = query.value(0).toInt();
@@ -402,6 +418,36 @@ bool DataManager::hasValidHeaders(Document& doc)
     return true;
 }
 
+QString DataManager::formatTime(const QString& timeRange) {
+    QStringList rangeParts = timeRange.split('-');
+    if (rangeParts.size() != 2) {
+        return ""; // 返回空字符串表示格式错误
+    }
+
+    auto formatTime = [](const QString& time) -> QString {
+        QStringList parts = time.split(':');
+        if (parts.size() != 2) {
+            return ""; // 返回空字符串表示格式错误
+        }
+
+        int hour = parts[0].toInt();
+        int minute = parts[1].toInt();
+
+        return QString("%1:%2")
+            .arg(hour, 2, 10, QChar('0'))
+            .arg(minute, 2, 10, QChar('0'));
+    };
+
+    QString startTime = formatTime(rangeParts[0]);
+    QString endTime = formatTime(rangeParts[1]);
+
+    if (startTime.isEmpty() || endTime.isEmpty()) {
+        return ""; // 返回空字符串表示格式错误
+    }
+
+    return (startTime + "-" + endTime);
+}
+
 void DataManager::saveData(ClassInfo& info, QString& headerStr, QString& str)
 {
     if(str.isEmpty() || str == "00:00:00.000")
@@ -415,7 +461,7 @@ void DataManager::saveData(ClassInfo& info, QString& headerStr, QString& str)
     else if(headerStr == "电话") info.studentPhoneNubmer = str;
     else if(headerStr == "年级") info.grade = str;
     else if(headerStr == "学科") info.suject = str;
-    else if(headerStr == "时间") info.time = str;
+    else if(headerStr == "时间") info.time = formatTime(str);
     else if(headerStr == "老师") info.teacherNickName = str;
     else if(headerStr == "网课or面授") info.learningType = str;
     else if(headerStr == "课时") info.courseTime = str;

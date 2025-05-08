@@ -16,6 +16,7 @@ Rectangle {
 
     color: "#FFFFFF"
     radius: 5
+    clip: true
 
     border {
         color: "#D6D6D6"

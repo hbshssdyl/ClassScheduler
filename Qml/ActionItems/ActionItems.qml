@@ -8,6 +8,7 @@ Rectangle{
 
     property var controller
     color: "transparent"
+    clip: true
 
 
     ListView {

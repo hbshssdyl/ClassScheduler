@@ -17,7 +17,7 @@ function getMinClassInfoWidth(index)
         case 6://年级
             return 40;
         case 7://学科
-            return 40;
+            return 50;
         case 8://时间
             return 80;
         case 9://老师

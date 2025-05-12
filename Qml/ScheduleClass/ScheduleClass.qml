@@ -100,6 +100,10 @@ Rectangle {
                             color: comboBox.pressed ? "#1b5e20" : "#2e7d32"
                         }
 
+                        onCurrentIndexChanged:{
+                            comboBox.isValid = true;
+                        }
+
                         Component.onCompleted: comboBox.currentIndex = -1
                     }
                 }
@@ -140,6 +144,10 @@ Rectangle {
                                 verticalAlignment: Text.AlignVCenter
                                 leftPadding: 5
                                 color: timeComboBox.pressed ? "#1b5e20" : "#2e7d32"
+                            }
+
+                            onCurrentIndexChanged:{
+                                timeComboBox.isValid = true;
                             }
 
                             Component.onCompleted: timeComboBox.currentIndex = -1

@@ -32,8 +32,6 @@ QString toOperateModeString(Controller::OperateMode mode)
 
 }
 
-
-
 QVariantMap getClassListInfo(int id, ClassInfo classInfo)
 {
     return QVariantMap{{ "id", QString::number(id) },
@@ -133,6 +131,152 @@ void CUtils::doSearchTeacherInfos(TeacherInfos& allInfos, TeacherInfos& searchIn
         {
             searchInfos.emplace_back(info);
         }
+    }
+}
+
+//For ScheduleClassController.cpp
+bool CUtils::isTimeOverlap(const QString& timeRange1, const QString& timeRange2) {
+    QStringList range1 = timeRange1.split('-');
+    QStringList range2 = timeRange2.split('-');
+
+    if (range1.size() != 2 || range2.size() != 2) {
+        return false;
+    }
+
+    QTime start1 = QTime::fromString(range1[0], "hh:mm");
+    QTime end1 = QTime::fromString(range1[1], "hh:mm");
+    QTime start2 = QTime::fromString(range2[0], "hh:mm");
+    QTime end2 = QTime::fromString(range2[1], "hh:mm");
+
+    if (!start1.isValid() || !end1.isValid() || !start2.isValid() || !end2.isValid()) {
+        cout << "Invalid time format" << endl;
+        return false; // Invalid time format
+    }
+
+    if(start1 <= start2 && end1 >= end2)
+    {
+        return true;
+    }
+
+    if(start2 <= start1 && end2 >= end1)
+    {
+        return true;
+    }
+
+    if(start2 >= start1 && start2 < end1 && end2 >= end1)
+    {
+        return true;
+    }
+
+    if(start1 >= start2 && start1 < end2 && end1 >= end2)
+    {
+        return true;
+    }
+
+    return false;
+}
+
+void CUtils::updateScheduleClassResultsList(QList<QList<QVariantMap>>& data, ScheduleClassInputInfo& inputInfos, ClassInfos& classInfosList)
+{
+    map<QString, bool> isValidTeacher;
+
+    for(auto& classInfo : classInfosList)
+    {
+        if(isValidTeacher.count(classInfo.teacherName) == 1)
+        {
+            if(!isValidTeacher[classInfo.teacherName])
+            {
+                continue;
+            }
+        }
+
+        if(classInfo.suject == inputInfos.suject)
+        {
+            isValidTeacher[classInfo.teacherName] = true;
+            if(classInfo.weekend == inputInfos.week)
+            {
+                if(isTimeOverlap(classInfo.time, inputInfos.timeRange))
+                {
+                    cout << "classInfo.time: " << classInfo.time.toStdString() << "inputInfos.timeRange: " << inputInfos.timeRange.toStdString() << endl;
+                    isValidTeacher[classInfo.teacherName] = false;
+                }
+            }
+        }
+    }
+
+    ScheduleClassResultInfos resultInfoList;
+    for(auto& classInfo : classInfosList)
+    {
+        if(isValidTeacher[classInfo.teacherName])
+        {
+            bool isNewTeacher = true;
+            for(auto& result : resultInfoList)
+            {
+                if(result.teacherName == classInfo.teacherName)
+                {
+                    isNewTeacher = false;
+                    result.saveValue(classInfo.teacherNickName, result.teacherNickNames);
+                    if(classInfo.weekend == inputInfos.week)
+                    {
+                        result.saveValue(classInfo.teacherFee, result.teacherFees);
+                        result.saveValue(classInfo.grade, result.teacherWorkGrade);
+                        result.saveValue(classInfo.time, result.teacherWorkTime, false);
+                    }
+                    break;
+                }
+            }
+            if(isNewTeacher)
+            {
+                ScheduleClassResultInfo info;
+                info.teacherName = classInfo.teacherName;
+                info.teacherNickNames.emplace_back(classInfo.teacherNickName);
+
+                if(classInfo.weekend == inputInfos.week)
+                {
+                    info.teacherFees.emplace_back(classInfo.teacherFee);
+                    info.teacherWorkTime.emplace_back(classInfo.time);
+                    info.teacherWorkGrade.emplace_back(classInfo.grade);
+                }
+                resultInfoList.emplace_back(info);
+            }
+        }
+    }
+
+    for(auto& result : resultInfoList)
+    {
+        result.generateValidWorkTime();
+        result.generateTeacherFreeTime();
+        result.generateValidFreeTime(inputInfos.timeLength);
+        result.sortInfos();
+        result.generateInfoString();
+    }
+
+    for(auto& result : resultInfoList)
+    {
+        if(!result.isValid(inputInfos.timeRange))
+        {
+            continue;
+        }
+
+        QList<QVariantMap> tmp;
+        tmp.append(QVariantMap{ { "label", "姓　　名： " },
+                                 { "value", result.teacherName } });
+
+        tmp.append(QVariantMap{ { "label", "昵　　称： " },
+                                 { "value", result.strTeacherNickNames } });
+
+        tmp.append(QVariantMap{ { "label", "费　　用： " },
+                                 { "value", result.strTeacherFees } });
+
+        tmp.append(QVariantMap{ { "label", "教过年级： " },
+                                 { "value", result.strTeacherWorkGrade } });
+
+        tmp.append(QVariantMap{ { "label", "有课时间： " },
+                                 { "value", result.strTeacherValidWorkTime } });
+
+        tmp.append(QVariantMap{ { "label", "无课时间： " },
+                                 { "value", result.strTeacherValidFreeTime } });
+        data.append(tmp);
     }
 }
 

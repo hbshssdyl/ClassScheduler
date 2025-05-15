@@ -3,6 +3,7 @@
 #include <String>
 #include <vector>
 #include <QString>
+#include <QTime>
 #include <map>
 #include <QVariant>
 #include <algorithm>
@@ -224,6 +225,274 @@ namespace ClassScheduler
         }
     };
 
+    struct ScheduleClassInputInfo
+    {
+        QString suject;
+        QString grade;
+        QString week;
+        QString startTime;
+        QString endTime;
+        QString timeLength;//单位小时
+        QString timeRange;
+
+        ScheduleClassInputInfo()
+        {
+        }
+
+        ScheduleClassInputInfo(QVariantList requiredInfosList)
+        {
+            if(requiredInfosList.size() < 5)
+            {
+                return;
+            }
+            suject = requiredInfosList[0].toString();
+            grade = requiredInfosList[1].toString();
+            week = requiredInfosList[2].toString();
+            startTime = requiredInfosList[3].toString();
+            endTime = requiredInfosList[4].toString();
+            timeRange = startTime + "-" + endTime;
+            timeLength = calculateHoursInRange(timeRange);
+        }
+
+        ScheduleClassInputInfo(QString suject, QString grade, QString week, QString startTime, QString endTime)
+            : suject(suject)
+            , grade(grade)
+            , week(week)
+            , startTime(startTime)
+            , endTime(endTime)
+        {
+            timeRange = startTime + "-" + endTime;
+        }
+
+        QString calculateHoursInRange(const QString& requiredTimeRange) {
+            QStringList timeParts = requiredTimeRange.split("-");
+            if (timeParts.size() != 2) {
+                return "Invalid input";
+            }
+
+            QTime startTime = QTime::fromString(timeParts[0], "hh:mm");
+            QTime endTime = QTime::fromString(timeParts[1], "hh:mm");
+
+            if (!startTime.isValid() || !endTime.isValid()) {
+                return "Invalid input";
+            }
+
+            int durationInMinutes = startTime.secsTo(endTime) / 60;
+            int hours = durationInMinutes / 60;
+            int minutes = durationInMinutes % 60;
+
+            return QString("%1:%2").arg(hours, 2, 10, QChar('0')).arg(minutes, 2, 10, QChar('0'));
+        }
+    };
+
+    struct TimeRange {
+        int startHour;
+        int startMinute;
+        int endHour;
+        int endMinute;
+    };
+
+    struct ScheduleClassResultInfo
+    {
+        QString teacherName;
+        vector<QString> teacherNickNames;
+        vector<QString> teacherFees;
+        vector<QString> teacherFreeTime;
+        vector<QString> teacherValidFreeTime;
+        vector<QString> teacherWorkTime;
+        vector<QString> teacherValidWorkTime;
+        vector<QString> teacherWorkGrade;
+
+        QString strTeacherNickNames;
+        QString strTeacherFees;
+        QString strTeacherFreeTime;
+        QString strTeacherValidFreeTime;
+        QString strTeacherWorkTime;
+        QString strTeacherValidWorkTime;
+        QString strTeacherWorkGrade;
+
+        ScheduleClassResultInfo()
+        {
+        }
+
+        void sortInfos()
+        {
+            sort(teacherNickNames.begin(), teacherNickNames.end());
+            sort(teacherFees.begin(), teacherFees.end());
+            sort(teacherFreeTime.begin(), teacherFreeTime.end());
+            sort(teacherValidFreeTime.begin(), teacherValidFreeTime.end());
+            sort(teacherWorkTime.begin(), teacherWorkTime.end());
+            sort(teacherValidWorkTime.begin(), teacherValidWorkTime.end());
+            sort(teacherWorkGrade.begin(), teacherWorkGrade.end());
+        }
+
+        QString getString(vector<QString> stringList)
+        {
+            QString ret = "";
+            bool flag = false;
+            for(auto& str : stringList)
+            {
+                if(flag)
+                {
+                    ret += ", ";
+                }
+                ret += str;
+                flag = true;
+            }
+            return ret;
+        }
+
+        void generateInfoString()
+        {
+            strTeacherNickNames = getString(teacherNickNames);
+            strTeacherFees = getString(teacherFees);
+            strTeacherFreeTime = getString(teacherFreeTime);
+            strTeacherValidFreeTime = getString(teacherValidFreeTime);
+            strTeacherWorkTime = getString(teacherWorkTime);
+            strTeacherValidWorkTime = getString(teacherValidWorkTime);
+            strTeacherWorkGrade = getString(teacherWorkGrade);
+            if(strTeacherWorkTime.isEmpty())
+            {
+                strTeacherWorkTime = "这天无课";
+            }
+        }
+
+        void generateValidWorkTime()
+        {
+            std::unordered_map<QString, int> timeCount;
+
+            for (const auto& time : teacherWorkTime) {
+                timeCount[time]++;
+            }
+
+            for (const auto& [time, count] : timeCount) {
+                if (count >= 2) {
+                    teacherValidWorkTime.emplace_back(time);
+                }
+            }
+        }
+
+        void generateValidFreeTime(QString timeLengthStr)
+        {
+            bool ok;
+            double timeLength = timeLengthStr.toDouble(&ok); // Convert QString to double
+            if (!ok) {
+                return;
+            }
+
+            for (const auto& range : teacherFreeTime) {
+                QStringList times = range.split('-');
+                if (times.size() == 2) {
+                    QString startTime = times[0];
+                    QString endTime = times[1];
+
+                    QTime start = QTime::fromString(startTime, "hh:mm");
+                    QTime end = QTime::fromString(endTime, "hh:mm");
+
+                    if (start.isValid() && end.isValid()) {
+                        double duration = start.secsTo(end) / 3600.0; // Convert seconds to hours
+                        if (duration >= timeLength) {
+                            teacherValidFreeTime.emplace_back(range);
+                        }
+                    }
+                }
+            }
+        }
+
+        bool isTimeRangeContained(const QString& requiredTimeRange, const std::vector<QString>& freeTimeRange) {
+            auto parseTime = [](const QString& time) {
+                int hours = time.mid(0, 2).toInt();
+                int minutes = time.mid(3, 2).toInt();
+                return hours * 60 + minutes; // Convert time to minutes
+            };
+
+            int requiredStart = parseTime(requiredTimeRange.split('-')[0]);
+            int requiredEnd = parseTime(requiredTimeRange.split('-')[1]);
+
+            for (const auto& range : freeTimeRange) {
+                int freeStart = parseTime(range.split('-')[0]);
+                int freeEnd = parseTime(range.split('-')[1]);
+
+                if (freeStart <= requiredStart && freeEnd >= requiredEnd) {
+                    return true; // Found a free time range that contains the required time range
+                }
+            }
+
+            return false; // No free time range contains the required time range
+        }
+
+        bool isValid(const QString& requiredTimeRange)
+        {
+            return isTimeRangeContained(requiredTimeRange, teacherFreeTime);
+        }
+
+        void generateTeacherFreeTime()
+        {
+            // 定义一天的起始和结束时间
+            QTime startOfDay = QTime::fromString("08:00", "HH:mm");
+            QTime endOfDay = QTime::fromString("23:00", "HH:mm");
+
+            // 将工作时间段转换为 QTime 对象的 pair
+            std::vector<std::pair<QTime, QTime>> workTimes;
+            for (const auto& range : teacherValidWorkTime) {
+                QStringList times = range.split("-");
+                if (times.size() == 2) {
+                    QTime start = QTime::fromString(times[0], "HH:mm");
+                    QTime end = QTime::fromString(times[1], "HH:mm");
+                    if (start.isValid() && end.isValid()) {
+                        workTimes.emplace_back(start, end);
+                    }
+                }
+            }
+
+            // 按起始时间排序工作时间段
+            std::sort(workTimes.begin(), workTimes.end(), [](const auto& a, const auto& b) {
+                return a.first < b.first;
+            });
+
+            // 计算剩余时间段
+            QTime currentStart = startOfDay;
+
+            for (const auto& workTime : workTimes) {
+                if (currentStart < workTime.first) {
+                    // 如果当前时间段的开始时间小于工作时间段的开始时间，说明有空闲时间
+                    teacherFreeTime.push_back(
+                        QString("%1-%2").arg(currentStart.toString("HH:mm")).arg(workTime.first.toString("HH:mm"))
+                        );
+                }
+                // 更新当前时间段的开始时间
+                if (currentStart < workTime.second) {
+                    currentStart = workTime.second;
+                }
+            }
+
+            // 检查最后一个时间段是否有剩余
+            if (currentStart < endOfDay) {
+                teacherFreeTime.push_back(
+                    QString("%1-%2").arg(currentStart.toString("HH:mm")).arg(endOfDay.toString("HH:mm"))
+                    );
+            }
+        }
+
+        void saveValue(QString value, vector<QString>& values, bool removeDuplicate = true)
+        {
+            bool save = true;
+            for(auto& val : values)
+            {
+                if(removeDuplicate && value == val)
+                {
+                    save = false;
+                    break;
+                }
+            }
+            if(save)
+            {
+                values.emplace_back(value);
+            }
+        }
+    };
+
+    using ScheduleClassResultInfos = vector<ScheduleClassResultInfo>;
     using ClassInfos = vector<ClassInfo>;
     using TeacherInfos = vector<TeacherInfo>;
     using TableDataCount = std::map<QString, int>; //QString tableName, int dataCount

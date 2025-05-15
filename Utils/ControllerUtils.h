@@ -25,6 +25,10 @@ namespace ClassScheduler
         //For SearchTeacherInfoController.cpp
         static void updateTeacherInfoList(QVariantMap& data, TeacherInfos& teacherInfos);
         static void doSearchTeacherInfos(TeacherInfos& allInfos, TeacherInfos& searchInfos, QString searchString);
+
+        //For SearchTeacherInfoController.cpp
+        static bool isTimeOverlap(const QString& timeRange1, const QString& timeRange2);
+        static void updateScheduleClassResultsList(QList<QList<QVariantMap>>& data, ScheduleClassInputInfo& inputInfos, ClassInfos& classInfosList);
     };
 
 } // namespace PictureManager

@@ -17,18 +17,6 @@ class SearchTeacherInfoController : public QObject {
 public:
     Q_PROPERTY(QVariantMap teacherInfoMap MEMBER mTeacherInfoMap NOTIFY teacherInfoMapChanged)
 
-    enum class OperateMode
-    {
-        None,
-        WelcomePage,
-        SearchTeacherInfo,
-        ScheduleClass,
-        CalcOneToOneMoney,
-        CalcClassMoney
-    };
-    Q_ENUM(OperateMode)
-    using OperateModes = std::vector<OperateMode>;
-
 public:
     explicit SearchTeacherInfoController(DataManagerPtr DataManager, QObject* parent = nullptr);
     void refreshSearchTeacherInfo();

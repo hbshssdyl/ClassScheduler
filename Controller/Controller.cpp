@@ -8,7 +8,6 @@ using namespace ClassScheduler;
 
 Controller::Controller(QObject* parent)
 {
-    refreshOperateMode(OperateMode::WelcomePage);
     initialize();
 }
 

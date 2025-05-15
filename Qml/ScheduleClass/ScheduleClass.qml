@@ -194,10 +194,10 @@ Rectangle {
                             }
                         }
 
-                        if(isValidList)
-                        {
+                        // if(isValidList)
+                        // {
                             controller.onRequiredInfosReceived(infosList);
-                        }
+                        // }
                     }
                     contentItem: Text {
                         text: confirmButton.text
@@ -229,22 +229,7 @@ Rectangle {
                 anchors.margins: 20
                 spacing: 10
                 clip: true
-                model: ListModel {
-                    ListElement {
-                        name: "张三"
-                        nickName: "三三"
-                        freeTime: "星期X 无课的时间段：12:00-13:00"
-                        salary: "科目XX 历史工资：400, 300, 100"
-                        grades: "所有教过的年级：高三, 初三"
-                    }
-                    ListElement {
-                        name: "李四"
-                        nickName: "四四"
-                        freeTime: "星期X 无课的时间段：12:00-13:00, 12:00-13:00, 12:00-13:00, 12:00-13:00, 12:00-13:00"
-                        salary: "科目XX 历史工资：400, 300, 100"
-                        grades: "所有教过的年级：高三, 初三"
-                    }
-                }
+                model: controller.scheduleClassResultsList
 
                 delegate: Item {
                     width: ListView.view.width
@@ -265,20 +250,16 @@ Rectangle {
                             spacing: 5
 
                             Repeater {
-                                model: [
-                                    { "label": "老师姓名：", "value": name },
-                                    { "label": "老师昵称：", "value": nickName },
-                                    { "label": "", "value": freeTime },
-                                    { "label": "", "value": salary },
-                                    { "label": "", "value": grades }
-                                ]
+                                model: modelData
 
                                 TextEdit {
 
                                     selectByMouse: true
                                     readOnly: true
-                                    text: modelData.label + modelData.value
+                                    text: "<b>" + modelData["label"] + "</b>" + modelData["value"]
                                     font.pixelSize: 14
+                                    font.bold: false
+                                    textFormat: Text.RichText
                                     color: "#555555"
                                     Layout.fillWidth: true
                                     wrapMode: TextEdit.WordWrap

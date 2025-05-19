@@ -448,6 +448,20 @@ QString DataManager::formatTime(const QString& timeRange) {
     return (startTime + "-" + endTime);
 }
 
+QString DataManager::transToChinese(QString englishWeekday)
+{
+    QString day = englishWeekday.toLower();
+    day[0] = day[0].toUpper();
+    if (day == "Monday") return "星期一";
+    if (day == "Tuesday") return "星期二";
+    if (day == "Wednesday") return "星期三";
+    if (day == "Thursday") return "星期四";
+    if (day == "Friday") return "星期五";
+    if (day == "Saturday") return "星期六";
+    if (day == "Sunday") return "星期日";
+    return englishWeekday;
+}
+
 void DataManager::saveData(ClassInfo& info, QString& headerStr, QString& str)
 {
     if(str.isEmpty() || str == "00:00:00.000")
@@ -455,7 +469,7 @@ void DataManager::saveData(ClassInfo& info, QString& headerStr, QString& str)
         str = nullString;
     }
     if(headerStr == "日期") info.date = str;
-    else if(headerStr == "星期") info.weekend = str;
+    else if(headerStr == "星期") info.weekend = transToChinese(str);
     else if(headerStr == "姓名") info.studentName = str;
     else if(headerStr == "学校") info.school = str;
     else if(headerStr == "电话") info.studentPhoneNubmer = str;

@@ -57,6 +57,14 @@ QVariantMap getClassListInfo(int id, ClassInfo classInfo)
                        { "payDate", classInfo.payDate }};
 }
 
+bool isCurrentMonth(const QString& dateStr) {
+    //return true;
+    QDate inputDate = QDate::fromString(dateStr, "yyyy-MM-dd");
+    if (!inputDate.isValid()) return false;
+    QDate currentDate = QDate::currentDate();
+    return (inputDate.year() == currentDate.year() && inputDate.month() == currentDate.month() - 2);
+}
+
 //For controller.cpp
 void CUtils::updateActionItemsList(QVariantList& data, const Controller::OperateMode& selectedMode, const Controller::OperateModes& actionItems)
 {
@@ -94,7 +102,7 @@ void CUtils::doSearchClassInfos(ClassInfos& allInfos, ClassInfos& searchInfos, Q
 {
     for(auto& info : allInfos)
     {
-        if(info.isContains(searchString))
+        if(info.isAllContains(searchString))
         {
             searchInfos.emplace_back(info);
         }
@@ -127,7 +135,7 @@ void CUtils::doSearchTeacherInfos(TeacherInfos& allInfos, TeacherInfos& searchIn
 {
     for(auto& info : allInfos)
     {
-        if(info.isContains(searchString))
+        if(info.isAllContains(searchString))
         {
             searchInfos.emplace_back(info);
         }
@@ -182,6 +190,11 @@ void CUtils::updateScheduleClassResultsList(QList<QList<QVariantMap>>& data, Sch
 
     for(auto& classInfo : classInfosList)
     {
+        if(!isCurrentMonth(classInfo.date))
+        {
+            continue;
+        }
+
         if(isValidTeacher.count(classInfo.teacherName) == 1)
         {
             if(!isValidTeacher[classInfo.teacherName])
@@ -197,7 +210,7 @@ void CUtils::updateScheduleClassResultsList(QList<QList<QVariantMap>>& data, Sch
             {
                 if(isTimeOverlap(classInfo.time, inputInfos.timeRange))
                 {
-                    cout << "classInfo.time: " << classInfo.time.toStdString() << "inputInfos.timeRange: " << inputInfos.timeRange.toStdString() << endl;
+                    cout << "TimeOverlap: classInfo.time: " << classInfo.time.toStdString() << ", inputInfos.timeRange: " << inputInfos.timeRange.toStdString() << endl;
                     isValidTeacher[classInfo.teacherName] = false;
                 }
             }
@@ -207,7 +220,12 @@ void CUtils::updateScheduleClassResultsList(QList<QList<QVariantMap>>& data, Sch
     ScheduleClassResultInfos resultInfoList;
     for(auto& classInfo : classInfosList)
     {
-        if(isValidTeacher[classInfo.teacherName])
+        if(!isCurrentMonth(classInfo.date))
+        {
+            continue;
+        }
+
+        if(isValidTeacher[classInfo.teacherName] && inputInfos.suject == classInfo.suject)
         {
             bool isNewTeacher = true;
             for(auto& result : resultInfoList)
@@ -216,10 +234,11 @@ void CUtils::updateScheduleClassResultsList(QList<QList<QVariantMap>>& data, Sch
                 {
                     isNewTeacher = false;
                     result.saveValue(classInfo.teacherNickName, result.teacherNickNames);
+                    result.saveValue(classInfo.grade + "_" + classInfo.teacherFee, result.teacherGradeFees);
+
                     if(classInfo.weekend == inputInfos.week)
                     {
-                        result.saveValue(classInfo.teacherFee, result.teacherFees);
-                        result.saveValue(classInfo.grade, result.teacherWorkGrade);
+                        //result.saveValue(classInfo.grade, result.teacherWorkGrade);
                         result.saveValue(classInfo.time, result.teacherWorkTime, false);
                     }
                     break;
@@ -229,13 +248,14 @@ void CUtils::updateScheduleClassResultsList(QList<QList<QVariantMap>>& data, Sch
             {
                 ScheduleClassResultInfo info;
                 info.teacherName = classInfo.teacherName;
+                info.week = inputInfos.week;
                 info.teacherNickNames.emplace_back(classInfo.teacherNickName);
+                info.teacherGradeFees.emplace_back(classInfo.grade + "_" + classInfo.teacherFee);
 
                 if(classInfo.weekend == inputInfos.week)
                 {
-                    info.teacherFees.emplace_back(classInfo.teacherFee);
                     info.teacherWorkTime.emplace_back(classInfo.time);
-                    info.teacherWorkGrade.emplace_back(classInfo.grade);
+                    //info.teacherWorkGrade.emplace_back(classInfo.grade);
                 }
                 resultInfoList.emplace_back(info);
             }
@@ -265,11 +285,11 @@ void CUtils::updateScheduleClassResultsList(QList<QList<QVariantMap>>& data, Sch
         tmp.append(QVariantMap{ { "label", "昵　　称： " },
                                  { "value", result.strTeacherNickNames } });
 
-        tmp.append(QVariantMap{ { "label", "费　　用： " },
-                                 { "value", result.strTeacherFees } });
+        tmp.append(QVariantMap{ { "label", "年级费用： " },
+                                 { "value", result.strTeacherGradeFees } });
 
-        tmp.append(QVariantMap{ { "label", "教过年级： " },
-                                 { "value", result.strTeacherWorkGrade } });
+        // tmp.append(QVariantMap{ { "label", "教过年级： " },
+        //                          { "value", result.strTeacherWorkTime } });
 
         tmp.append(QVariantMap{ { "label", "有课时间： " },
                                  { "value", result.strTeacherValidWorkTime } });

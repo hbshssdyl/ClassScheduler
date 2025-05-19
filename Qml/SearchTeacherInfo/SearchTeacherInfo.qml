@@ -72,7 +72,6 @@ Rectangle {
                         id: delegateItem
 
                         width: listView.contentWidth
-                        height: delegateHeight
                         rootWidth: root.width
                         z: 1
                     }

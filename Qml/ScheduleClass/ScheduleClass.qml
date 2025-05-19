@@ -18,7 +18,7 @@ Rectangle {
                 timeList.push(hour + ":" + minute);
             }
         }
-        timeList.push("22:00");
+        timeList.push("23:00");
         return timeList;
     }
 
@@ -194,10 +194,10 @@ Rectangle {
                             }
                         }
 
-                        // if(isValidList)
-                        // {
+                        if(isValidList)
+                        {
                             controller.onRequiredInfosReceived(infosList);
-                        // }
+                        }
                     }
                     contentItem: Text {
                         text: confirmButton.text

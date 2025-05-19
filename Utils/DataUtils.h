@@ -102,27 +102,42 @@ namespace ClassScheduler
 
         bool isContains(QString str)
         {
-            if(date.contains(str, Qt::CaseSensitive)) return true;
-            if(weekend.contains(str, Qt::CaseSensitive)) return true;
-            if(studentName.contains(str, Qt::CaseSensitive)) return true;
-            if(school.contains(str, Qt::CaseSensitive)) return true;
-            if(studentPhoneNubmer.contains(str, Qt::CaseSensitive)) return true;
-            if(grade.contains(str, Qt::CaseSensitive)) return true;
+            if(date.contains(str, Qt::CaseInsensitive)) return true;
+            if(weekend.contains(str, Qt::CaseInsensitive)) return true;
+            if(studentName.contains(str, Qt::CaseInsensitive)) return true;
+            if(school.contains(str, Qt::CaseInsensitive)) return true;
+            if(studentPhoneNubmer.contains(str, Qt::CaseInsensitive)) return true;
+            if(grade.contains(str, Qt::CaseInsensitive)) return true;
 
-            if(suject.contains(str, Qt::CaseSensitive)) return true;
-            if(time.contains(str, Qt::CaseSensitive)) return true;
-            if(teacherNickName.contains(str, Qt::CaseSensitive)) return true;
-            if(learningType.contains(str, Qt::CaseSensitive)) return true;
-            if(courseTime.contains(str, Qt::CaseSensitive)) return true;
-            if(studentFee.contains(str, Qt::CaseSensitive)) return true;
+            if(suject.contains(str, Qt::CaseInsensitive)) return true;
+            if(time.contains(str, Qt::CaseInsensitive)) return true;
+            if(teacherNickName.contains(str, Qt::CaseInsensitive)) return true;
+            if(learningType.contains(str, Qt::CaseInsensitive)) return true;
+            if(courseTime.contains(str, Qt::CaseInsensitive)) return true;
+            if(studentFee.contains(str, Qt::CaseInsensitive)) return true;
 
-            if(studentTotalFee.contains(str, Qt::CaseSensitive)) return true;
-            if(teacherName.contains(str, Qt::CaseSensitive)) return true;
-            if(teacherFee.contains(str, Qt::CaseSensitive)) return true;
-            if(gotMoney.contains(str, Qt::CaseSensitive)) return true;
-            if(payType.contains(str, Qt::CaseSensitive)) return true;
-            if(payDate.contains(str, Qt::CaseSensitive)) return true;
+            if(studentTotalFee.contains(str, Qt::CaseInsensitive)) return true;
+            if(teacherName.contains(str, Qt::CaseInsensitive)) return true;
+            if(teacherFee.contains(str, Qt::CaseInsensitive)) return true;
+            if(gotMoney.contains(str, Qt::CaseInsensitive)) return true;
+            if(payType.contains(str, Qt::CaseInsensitive)) return true;
+            if(payDate.contains(str, Qt::CaseInsensitive)) return true;
             return false;
+        }
+
+        bool isAllContains(QString str)
+        {
+            str.replace(QChar(u'，'), QChar(','));
+            QStringList parts = str.split(',');
+            bool result = true;
+            for (const QString& part : parts) {
+                if(!isContains(part))
+                {
+                    result = false;
+                    break;
+                }
+            }
+            return result;
         }
     };
 
@@ -223,6 +238,21 @@ namespace ClassScheduler
             if(strTeacherSujectsAndGrades.contains(str, Qt::CaseSensitive)) return true;
             return false;
         }
+
+        bool isAllContains(QString str)
+        {
+            str.replace(QChar(u'，'), QChar(','));
+            QStringList parts = str.split(',');
+            bool result = true;
+            for (const QString& part : parts) {
+                if(!isContains(part))
+                {
+                    result = false;
+                    break;
+                }
+            }
+            return result;
+        }
     };
 
     struct ScheduleClassInputInfo
@@ -277,11 +307,9 @@ namespace ClassScheduler
                 return "Invalid input";
             }
 
-            int durationInMinutes = startTime.secsTo(endTime) / 60;
-            int hours = durationInMinutes / 60;
-            int minutes = durationInMinutes % 60;
+            double durationInHours = startTime.secsTo(endTime) / 3600;
 
-            return QString("%1:%2").arg(hours, 2, 10, QChar('0')).arg(minutes, 2, 10, QChar('0'));
+            return QString::number(durationInHours);
         }
     };
 
@@ -295,21 +323,22 @@ namespace ClassScheduler
     struct ScheduleClassResultInfo
     {
         QString teacherName;
+        QString week;
         vector<QString> teacherNickNames;
-        vector<QString> teacherFees;
+        vector<QString> teacherGradeFees;
         vector<QString> teacherFreeTime;
         vector<QString> teacherValidFreeTime;
         vector<QString> teacherWorkTime;
         vector<QString> teacherValidWorkTime;
-        vector<QString> teacherWorkGrade;
+        //vector<QString> teacherWorkGrade;
 
         QString strTeacherNickNames;
-        QString strTeacherFees;
+        QString strTeacherGradeFees;
         QString strTeacherFreeTime;
         QString strTeacherValidFreeTime;
         QString strTeacherWorkTime;
         QString strTeacherValidWorkTime;
-        QString strTeacherWorkGrade;
+        //QString strTeacherWorkGrade;
 
         ScheduleClassResultInfo()
         {
@@ -318,12 +347,12 @@ namespace ClassScheduler
         void sortInfos()
         {
             sort(teacherNickNames.begin(), teacherNickNames.end());
-            sort(teacherFees.begin(), teacherFees.end());
+            sort(teacherGradeFees.begin(), teacherGradeFees.end());
             sort(teacherFreeTime.begin(), teacherFreeTime.end());
             sort(teacherValidFreeTime.begin(), teacherValidFreeTime.end());
             sort(teacherWorkTime.begin(), teacherWorkTime.end());
             sort(teacherValidWorkTime.begin(), teacherValidWorkTime.end());
-            sort(teacherWorkGrade.begin(), teacherWorkGrade.end());
+            //sort(teacherWorkGrade.begin(), teacherWorkGrade.end());
         }
 
         QString getString(vector<QString> stringList)
@@ -345,15 +374,15 @@ namespace ClassScheduler
         void generateInfoString()
         {
             strTeacherNickNames = getString(teacherNickNames);
-            strTeacherFees = getString(teacherFees);
+            strTeacherGradeFees = getString(teacherGradeFees);
             strTeacherFreeTime = getString(teacherFreeTime);
             strTeacherValidFreeTime = getString(teacherValidFreeTime);
             strTeacherWorkTime = getString(teacherWorkTime);
             strTeacherValidWorkTime = getString(teacherValidWorkTime);
-            strTeacherWorkGrade = getString(teacherWorkGrade);
-            if(strTeacherWorkTime.isEmpty())
+            //strTeacherWorkGrade = getString(teacherWorkGrade);
+            if(strTeacherValidWorkTime.isEmpty())
             {
-                strTeacherWorkTime = "这天无课";
+                strTeacherValidWorkTime = week + "无课";
             }
         }
 

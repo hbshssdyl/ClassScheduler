@@ -48,6 +48,7 @@ private:
     void queryDataFromTeacherInfosTable(TeacherInfos& infos);
     bool isTableExist(QString tableName);
     void dropTable(QString tableName);
+    QString transToChinese(QString englishWeekday);
     QString formatTime(const QString& time);
 
 private:

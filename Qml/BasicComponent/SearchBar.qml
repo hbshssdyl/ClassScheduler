@@ -32,7 +32,7 @@ Item {
                 id: searchField
 
                 Layout.fillWidth: true
-                placeholderText: "请输入需要搜索的内容..."
+                placeholderText: "输入搜索的内容，多个关键词用逗号隔开..."
                 font.pixelSize: 16
                 background: Rectangle {
                     color: "#ffffff"

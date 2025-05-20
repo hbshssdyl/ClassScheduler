@@ -20,24 +20,6 @@ namespace ClassScheduler
     static vector validTeacherHeader{"老师姓名", "使用过的昵称", "科目及工资（每小时）", "科目及年级"};
     static vector allTableNameForDB{"classInfos", "teacherInfos"};
 
-    // QVariantList schedulerOptions {
-    //     QVariantMap{
-    //         {"isMust", true},
-    //         {"placeholder", "选择科目"},
-    //         {"options", QVariantList{"语文", "数学", "英语", "物理", "化学", "生物", "道法"}}
-    //     },
-    //     QVariantMap{
-    //         {"isMust", true},
-    //         {"placeholder", "选择年级"},
-    //         {"options", QVariantList{"小学", "初一", "初二", "初三", "高一", "高二", "高三"}}
-    //     },
-    //     QVariantMap{
-    //         {"isMust", true},
-    //         {"placeholder", "选择星期"},
-    //         {"options", QVariantList{"星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日"}}
-    //     }
-    // };
-
     struct ClassInfo
     {
         QString date;
@@ -147,6 +129,7 @@ namespace ClassScheduler
         vector<QString> teacherNickNames;
         vector<QString> teacherSujectsAndFees;
         vector<QString> teacherSujectsAndGrades;
+        map<QString, QVariantList> studentCounts;
 
         QString strTeacherNickNames;
         QString strTeacherSujectsAndFees;

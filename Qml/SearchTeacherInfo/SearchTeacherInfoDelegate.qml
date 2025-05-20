@@ -11,7 +11,7 @@ Rectangle{
 
     property int infoHeight: 60
     property int chartHeight: 300
-    property int delegateHeight: infoHeight + chartHeight
+    property int delegateHeight: infoHeight + chartHeight * 3
     property int rootWidth
 
     color: "transparent"
@@ -86,60 +86,81 @@ Rectangle{
                 }
             }
         }
-
-        Rectangle{
-            id: chartRoot
-
-            color: "transparent"
-            radius: 5
+        Column {
+            id: chartViewColumn
+            spacing: 2
 
             Layout.alignment: Qt.AlignTop
             Layout.fillWidth: true
-            Layout.preferredHeight: chartHeight
-            ChartView {
-                //title: "物理学生人数变化趋势图"
-                anchors.fill: parent
-                legend.visible: false
-                antialiasing: true
+            Layout.preferredHeight: chartHeight * 3
 
-                LineSeries {
-                    // Y轴
-                    axisY: ValueAxis {
-                        min: 0
-                        max: 10
-                        tickType: ValueAxis.TicksFixed
-                        tickInterval: 1
-                        labelFormat: "%d"
-                        titleText: "物理学生人数"
-                    }
-                    // X轴：一月到十二月
-                    axisX: CategoryAxis {
-                        min: 1
-                        max: 12
-                        //titleText: "月份"
-                        labelsPosition: CategoryAxis.AxisLabelsPositionOnValue
-                        CategoryRange { label: "一月"; endValue: 1 }
-                        CategoryRange { label: "二月"; endValue: 2 }
-                        CategoryRange { label: "三月"; endValue: 3 }
-                        CategoryRange { label: "四月"; endValue: 4 }
-                        CategoryRange { label: "五月"; endValue: 5 }
-                        CategoryRange { label: "六月"; endValue: 6 }
-                        CategoryRange { label: "七月"; endValue: 7 }
-                        CategoryRange { label: "八月"; endValue: 8 }
-                        CategoryRange { label: "九月"; endValue: 9 }
-                        CategoryRange { label: "十月"; endValue: 10 }
-                        CategoryRange { label: "十一月"; endValue: 11 }
-                        CategoryRange { label: "十二月"; endValue: 12 }
-                    }
+            Repeater {
+                id: chartViewRepeater
 
-                    XYPoint { x: 1; y: 4 }
-                    XYPoint { x: 2; y: 4 }
-                    XYPoint { x: 3; y: 4 }
-                    XYPoint { x: 4; y: 3 }
-                    XYPoint { x: 5; y: 5 }
-                    // 其余月份可补充数据
+                model: 3
+
+                Rectangle{
+                    id: chartRoot
+
+                    color: "transparent"
+                    radius: 5
+                    height: chartHeight
+                    width: parent.width
+
+                    ChartView {
+                        //title: "物理学生人数变化趋势图"
+                        anchors.fill: parent
+                        legend.visible: false
+                        antialiasing: true
+
+                        LineSeries {
+                            // Y轴
+                            pointLabelsVisible: true
+                            //pointLabelsColor: "#4f8cff"
+                            pointLabelsFont.pixelSize: 15
+                            pointLabelsFormat: "@yPoint" // 只显示y值
+
+                            axisY: ValuesAxis {
+                                min: 0
+                                max: 10
+                                tickType: ValuesAxis.TicksFixed
+                                tickInterval: 1
+                                labelFormat: "%d"
+                                titleText: "物理学生人数"
+                            }
+                            // X轴：一月到十二月
+                            axisX: CategoryAxis {
+                                min: 1
+                                max: 12
+                                //titleText: "月份"
+                                labelsPosition: CategoryAxis.AxisLabelsPositionOnValue
+                                CategoryRange { label: "一月"; endValue: 1 }
+                                CategoryRange { label: "二月"; endValue: 2 }
+                                CategoryRange { label: "三月"; endValue: 3 }
+                                CategoryRange { label: "四月"; endValue: 4 }
+                                CategoryRange { label: "五月"; endValue: 5 }
+                                CategoryRange { label: "六月"; endValue: 6 }
+                                CategoryRange { label: "七月"; endValue: 7 }
+                                CategoryRange { label: "八月"; endValue: 8 }
+                                CategoryRange { label: "九月"; endValue: 9 }
+                                CategoryRange { label: "十月"; endValue: 10 }
+                                CategoryRange { label: "十一月"; endValue: 11 }
+                                CategoryRange { label: "十二月"; endValue: 12 }
+                            }
+
+                            XYPoint { x: 1; y: 4 }
+                            XYPoint { x: 2; y: 4 }
+                            XYPoint { x: 3; y: 4 }
+                            XYPoint { x: 4; y: 3 }
+                            XYPoint { x: 5; y: 5 }
+                            // 其余月份可补充数据
+                        }
+                    }
                 }
             }
+
+
         }
+
     }
 }

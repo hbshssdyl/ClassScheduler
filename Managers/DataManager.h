@@ -51,6 +51,9 @@ private:
     QString transToChinese(QString englishWeekday);
     QString formatTime(const QString& time);
 
+    //teacherStudentCount
+
+
 private:
     QSqlDatabase mDB;
     ClassInfos mClassInfosFromDB;

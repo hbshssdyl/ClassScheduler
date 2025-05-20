@@ -114,6 +114,7 @@ void CUtils::updateTeacherInfoList(QVariantMap& data, TeacherInfos& teacherInfos
 {
     QVariantList teacherInfoHeader;
     QVariantList teacherInfoList;
+    QVariantList teacherStudentCounts;
     int id = 1;
 
     teacherInfoHeader.append("序号");
@@ -126,6 +127,8 @@ void CUtils::updateTeacherInfoList(QVariantMap& data, TeacherInfos& teacherInfos
     {
         teacherInfoList.append(teacherInfo.toInfosList(QString::number(id++)));
     }
+
+
 
     data.insert("teacherInfoHeader", teacherInfoHeader);
     data.insert("teacherInfoList", teacherInfoList);

@@ -5,14 +5,17 @@ import QtCharts
 import "../JSUtils/ColorUtils.js" as ColorUtils
 import "../JSUtils/MainUtils.js" as MainUtils
 
-
-Rectangle{
+Rectangle {
     id: delegateroot
 
     property int infoHeight: 60
     property int chartHeight: 300
-    property int delegateHeight: infoHeight + chartHeight * 3
+    property int chartCount: modelData.studentInfo.length
+    property int delegateHeight: infoHeight + chartHeight * chartCount
     property int rootWidth
+    // 假设这个属性是从 C++ 传入的月份列表
+    property var monthLabels: ["一月", "二月", "三月", "四月", "五月", "六月",
+                             "七月", "八月", "九月", "十月", "十一月", "十二月"]
 
     color: "transparent"
     radius: 5
@@ -29,7 +32,7 @@ Rectangle{
         anchors.fill: parent
         spacing: 0
 
-        Rectangle{
+        Rectangle {
             id: infoRoot
 
             color: index % 2 == 0 ? "transparent" : "#DDDDDD"
@@ -44,7 +47,7 @@ Rectangle{
                 width: 1
             }
 
-            Row{
+            Row {
                 id: teacherInfo
 
                 Repeater {
@@ -52,7 +55,7 @@ Rectangle{
 
                     model: modelData.basicInfo
 
-                    delegate: Rectangle{
+                    delegate: Rectangle {
                         id: teacherInfoItem
 
                         color: "transparent"
@@ -64,7 +67,7 @@ Rectangle{
                             width: 1
                         }
 
-                        TextEdit{
+                        TextEdit {
                             id: teacherInfoText
 
                             selectByMouse: true
@@ -88,7 +91,7 @@ Rectangle{
         }
         Column {
             id: chartViewColumn
-            spacing: 2
+            spacing: 0
 
             Layout.alignment: Qt.AlignTop
             Layout.fillWidth: true
@@ -99,7 +102,7 @@ Rectangle{
 
                 model: modelData.studentInfo
 
-                delegate: Rectangle{
+                delegate: Rectangle {
                     id: chartRoot
 
                     color: "transparent"
@@ -108,26 +111,16 @@ Rectangle{
                     width: parent.width
 
                     ChartView {
-                        //title: "物理学生人数变化趋势图"
                         anchors.fill: parent
                         legend.visible: false
                         antialiasing: true
 
-                        ListModel {
-                            id: pointModel
-                            ListElement { x: 1; y: 4 }
-                            ListElement { x: 2; y: 4 }
-                            ListElement { x: 3; y: 4 }
-                            ListElement { x: 4; y: 3 }
-                            ListElement { x: 5; y: 5 }
-                        }
-
                         LineSeries {
                             id: series
-                            // Y轴
                             pointLabelsVisible: true
-                            pointLabelsFont.pixelSize: 15 // 只设置 pixelSize
+                            pointLabelsFont.pixelSize: 15
                             pointLabelsFormat: "@yPoint"
+                            pointLabelsClipping: false  // 允许标签超出图表区域
 
                             axisY: ValuesAxis {
                                 min: 0
@@ -135,42 +128,32 @@ Rectangle{
                                 tickType: ValuesAxis.TicksFixed
                                 tickInterval: 1
                                 labelFormat: "%d"
-                                titleText: "学生人数"
+                                titleText: modelData.suject + "学生人数"
                             }
-                            // X轴：一月到十二月
+
                             axisX: CategoryAxis {
                                 min: 1
-                                max: 12
-                                //titleText: "月份"
+                                max: monthLabels.length
                                 labelsPosition: CategoryAxis.AxisLabelsPositionOnValue
-                                CategoryRange { label: "一月"; endValue: 1 }
-                                CategoryRange { label: "二月"; endValue: 2 }
-                                CategoryRange { label: "三月"; endValue: 3 }
-                                CategoryRange { label: "四月"; endValue: 4 }
-                                CategoryRange { label: "五月"; endValue: 5 }
-                                CategoryRange { label: "六月"; endValue: 6 }
-                                CategoryRange { label: "七月"; endValue: 7 }
-                                CategoryRange { label: "八月"; endValue: 8 }
-                                CategoryRange { label: "九月"; endValue: 9 }
-                                CategoryRange { label: "十月"; endValue: 10 }
-                                CategoryRange { label: "十一月"; endValue: 11 }
-                                CategoryRange { label: "十二月"; endValue: 12 }
+
+                                // 动态创建 CategoryRange
+                                Component.onCompleted: {
+                                    for (var i = 0; i < monthLabels.length; i++) {
+                                        append(monthLabels[i], i + 1);
+                                    }
+                                }
                             }
 
                             Component.onCompleted: {
-                                for (let i = 0; i < pointModel.count; ++i) {
-                                    let item = pointModel.get(i);
-                                    series.append(item.x, item.y);
+                                for (let i = 0; i < modelData.monthStudentCounts.length; ++i) {
+                                    let item = modelData.monthStudentCounts[i];
+                                    series.append(i + 1, item);
                                 }
                             }
-                            // 其余月份可补充数据
                         }
                     }
                 }
             }
-
-
         }
-
     }
 }

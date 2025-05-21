@@ -30,6 +30,7 @@ public:
     void refreshAllDataFromDB();
     ClassInfos getClassInfosFromDB();
     TeacherInfos getTeacherInfosFromDB();
+    TeacherStudentInfos getTeacherStudentInfosFromDB();
 
 private:
     bool isUsefulHeader(QString header);
@@ -51,13 +52,14 @@ private:
     QString transToChinese(QString englishWeekday);
     QString formatTime(const QString& time);
 
-    //teacherStudentCount
-
+    //teacherStudentInfos
+    void generateTeacherStudentInfos();
 
 private:
     QSqlDatabase mDB;
     ClassInfos mClassInfosFromDB;
     TeacherInfos mTeacherInfosFromDB;
+    TeacherStudentInfos mTeacherStudentInfos;
     TableDataCount mDataCount;
 
 };

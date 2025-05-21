@@ -29,11 +29,12 @@ public slots:
 
 private:
     void initialize();
-    void updateTeacherInfosList(TeacherInfos& infos);
+    void updateTeacherInfosList(TeacherInfos& teacherInfos, TeacherStudentInfos& teacherStudentInfos);
 
 private:
     QVariantMap mTeacherInfoMap;
     TeacherInfos mTeacherInfosFromDB;
+    TeacherStudentInfos mTeacherStudentInfosFromDB;
     DataManagerPtr mDataManager;
 
 };

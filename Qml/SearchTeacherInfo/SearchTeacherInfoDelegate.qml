@@ -50,7 +50,7 @@ Rectangle{
                 Repeater {
                     id: repeater
 
-                    model: modelData
+                    model: modelData.basicInfo
 
                     delegate: Rectangle{
                         id: teacherInfoItem
@@ -97,9 +97,9 @@ Rectangle{
             Repeater {
                 id: chartViewRepeater
 
-                model: 3
+                model: modelData.studentInfo
 
-                Rectangle{
+                delegate: Rectangle{
                     id: chartRoot
 
                     color: "transparent"
@@ -113,12 +113,21 @@ Rectangle{
                         legend.visible: false
                         antialiasing: true
 
+                        ListModel {
+                            id: pointModel
+                            ListElement { x: 1; y: 4 }
+                            ListElement { x: 2; y: 4 }
+                            ListElement { x: 3; y: 4 }
+                            ListElement { x: 4; y: 3 }
+                            ListElement { x: 5; y: 5 }
+                        }
+
                         LineSeries {
+                            id: series
                             // Y轴
                             pointLabelsVisible: true
-                            //pointLabelsColor: "#4f8cff"
-                            pointLabelsFont.pixelSize: 15
-                            pointLabelsFormat: "@yPoint" // 只显示y值
+                            pointLabelsFont.pixelSize: 15 // 只设置 pixelSize
+                            pointLabelsFormat: "@yPoint"
 
                             axisY: ValuesAxis {
                                 min: 0
@@ -126,33 +135,23 @@ Rectangle{
                                 tickType: ValuesAxis.TicksFixed
                                 tickInterval: 1
                                 labelFormat: "%d"
-                                titleText: "物理学生人数"
+                                titleText: "学生人数"
                             }
                             // X轴：一月到十二月
-                            axisX: CategoryAxis {
-                                min: 1
-                                max: 12
+                            axisX: BarCategoryAxis {
+                                // min: 1
+                                // max: 12
                                 //titleText: "月份"
-                                labelsPosition: CategoryAxis.AxisLabelsPositionOnValue
-                                CategoryRange { label: "一月"; endValue: 1 }
-                                CategoryRange { label: "二月"; endValue: 2 }
-                                CategoryRange { label: "三月"; endValue: 3 }
-                                CategoryRange { label: "四月"; endValue: 4 }
-                                CategoryRange { label: "五月"; endValue: 5 }
-                                CategoryRange { label: "六月"; endValue: 6 }
-                                CategoryRange { label: "七月"; endValue: 7 }
-                                CategoryRange { label: "八月"; endValue: 8 }
-                                CategoryRange { label: "九月"; endValue: 9 }
-                                CategoryRange { label: "十月"; endValue: 10 }
-                                CategoryRange { label: "十一月"; endValue: 11 }
-                                CategoryRange { label: "十二月"; endValue: 12 }
+                                //labelsPosition: CategoryAxis.AxisLabelsPositionOnValue
+                                categories: ["总数", "投入", "产出", "欠数"];
                             }
 
-                            XYPoint { x: 1; y: 4 }
-                            XYPoint { x: 2; y: 4 }
-                            XYPoint { x: 3; y: 4 }
-                            XYPoint { x: 4; y: 3 }
-                            XYPoint { x: 5; y: 5 }
+                            Component.onCompleted: {
+                                for (let i = 0; i < pointModel.count; ++i) {
+                                    let item = pointModel.get(i);
+                                    series.append(item.x, item.y);
+                                }
+                            }
                             // 其余月份可补充数据
                         }
                     }

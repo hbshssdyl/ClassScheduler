@@ -122,6 +122,7 @@ namespace ClassScheduler
             return result;
         }
     };
+    using ClassInfos = vector<ClassInfo>;
 
     struct TeacherInfo
     {
@@ -129,7 +130,6 @@ namespace ClassScheduler
         vector<QString> teacherNickNames;
         vector<QString> teacherSujectsAndFees;
         vector<QString> teacherSujectsAndGrades;
-        map<QString, QVariantList> studentCounts;
 
         QString strTeacherNickNames;
         QString strTeacherSujectsAndFees;
@@ -237,6 +237,124 @@ namespace ClassScheduler
             return result;
         }
     };
+    using TeacherInfos = vector<TeacherInfo>;
+
+    struct MonthStudentInfo {
+        QString yearMonth;
+        vector<QString> studentNames;
+        int studentCount;
+
+        MonthStudentInfo(QString yMonth, QString studentName)
+        {
+            yearMonth = yMonth;
+            studentNames.emplace_back(studentName);
+            studentCount = 1;
+        }
+
+        void saveStudentName(QString name)
+        {
+            bool save = true;
+            for(auto& val : studentNames)
+            {
+                if(name == val)
+                {
+                    save = false;
+                    break;
+                }
+            }
+            if(save)
+            {
+                studentNames.emplace_back(name);
+                studentCount++;
+            }
+        }
+    };
+    using MonthStudentInfos = vector<MonthStudentInfo>;
+
+    struct SujectStudentInfo {
+        QString suject;
+        MonthStudentInfos monthStudentInfos;
+
+        SujectStudentInfo(QString sujectStr, QString yMonth, QString studentName)
+        {
+            suject = sujectStr;
+            MonthStudentInfo monthStudentInfo(yMonth, studentName);
+            monthStudentInfos.emplace_back(monthStudentInfo);
+        }
+
+        void sortMonthStudentInfosByYearMonth() {
+            std::sort(monthStudentInfos.begin(), monthStudentInfos.end(), [](const MonthStudentInfo& a, const MonthStudentInfo& b) {
+                return a.yearMonth < b.yearMonth;
+            });
+        }
+
+        QVariantMap toMapStyle()
+        {
+            QStringList monthstudentInfoList;
+            for(auto& info : monthStudentInfos)
+            {
+                monthstudentInfoList.append(QString::number(info.studentCount));
+            }
+            return QVariantMap{ {"suject", suject},
+                                {"monthStudentCounts", monthstudentInfoList} };
+        }
+    };
+    using SujectStudentInfos = vector<SujectStudentInfo>;
+
+    struct TeacherStudentInfo {
+        QString teacherName;
+        SujectStudentInfos sujectStudentInfos;
+
+        TeacherStudentInfo(QString tName, QString suject, QString date, QString studentName)
+        {
+            teacherName = tName;
+            addInfo(suject, date, studentName);
+        }
+
+        void addInfo(QString suject, QString date, QString studentName)
+        {
+            auto yearMonth = getYearMonth(date);
+
+            bool hasSuject = false;
+            for(auto& sujectStudentInfo : sujectStudentInfos)
+            {
+                if(suject == sujectStudentInfo.suject)
+                {
+                    hasSuject = true;
+                    bool hasYearMonth = false;
+                    for(auto& monthStudentInfo : sujectStudentInfo.monthStudentInfos)
+                    {
+                        if(yearMonth == monthStudentInfo.yearMonth)
+                        {
+                            hasYearMonth = true;
+                            monthStudentInfo.saveStudentName(studentName);
+                            break;
+                        }
+                    }
+                    if(!hasYearMonth)
+                    {
+                        MonthStudentInfo monthStudentInfo(yearMonth, studentName);
+                        sujectStudentInfo.monthStudentInfos.emplace_back(monthStudentInfo);
+                    }
+                    break;
+                }
+            }
+            if(!hasSuject)
+            {
+                SujectStudentInfo sujectStudentInfo(suject, yearMonth, studentName);
+                sujectStudentInfos.emplace_back(sujectStudentInfo);
+            }
+        }
+
+        QString getYearMonth(const QString& dateStr) {
+            QStringList parts = dateStr.split("-");
+            if (parts.size() >= 2) {
+                return parts[0] + "-" + parts[1];
+            }
+            return "";
+        }
+    };
+    using TeacherStudentInfos = vector<TeacherStudentInfo>;
 
     struct ScheduleClassInputInfo
     {
@@ -503,9 +621,7 @@ namespace ClassScheduler
             }
         }
     };
-
     using ScheduleClassResultInfos = vector<ScheduleClassResultInfo>;
-    using ClassInfos = vector<ClassInfo>;
-    using TeacherInfos = vector<TeacherInfo>;
+
     using TableDataCount = std::map<QString, int>; //QString tableName, int dataCount
 } // namespace ClassScheduler

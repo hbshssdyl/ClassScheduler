@@ -27,19 +27,30 @@ void SearchTeacherInfoController::refreshSearchTeacherInfo()
         mTeacherInfosFromDB = mDataManager->getTeacherInfosFromDB();
     }
 
+    if(mTeacherStudentInfosFromDB.size() == 0)
+    {
+        mTeacherStudentInfosFromDB = mDataManager->getTeacherStudentInfosFromDB();
+    }
+
     if(mTeacherInfosFromDB.size() == 0)
     {
-        cout << "Fail to get class infos from DB" << endl;
+        cout << "Fail to get teacher infos from DB" << endl;
         return;
     }
 
-    updateTeacherInfosList(mTeacherInfosFromDB);
+    if(mTeacherStudentInfosFromDB.size() == 0)
+    {
+        cout << "Fail to get seacher student infos from DB" << endl;
+        //return;
+    }
+
+    updateTeacherInfosList(mTeacherInfosFromDB, mTeacherStudentInfosFromDB);
 }
 
-void SearchTeacherInfoController::updateTeacherInfosList(TeacherInfos& infos)
+void SearchTeacherInfoController::updateTeacherInfosList(TeacherInfos& teacherInfos, TeacherStudentInfos& teacherStudentInfos)
 {
     QVariantMap newTeacherInfoMap;
-    CUtils::updateTeacherInfoList(newTeacherInfoMap, infos);
+    CUtils::updateTeacherInfoList(newTeacherInfoMap, teacherInfos, teacherStudentInfos);
 
     if (mTeacherInfoMap != newTeacherInfoMap)
     {
@@ -61,7 +72,7 @@ void SearchTeacherInfoController::onSearchTriggered(QString searchString)
         CUtils::doSearchTeacherInfos(mTeacherInfosFromDB, infos, searchString);
     }
 
-    updateTeacherInfosList(infos);
+    //updateTeacherInfosList(infos);
 }
 
 

@@ -110,12 +110,11 @@ void CUtils::doSearchClassInfos(ClassInfos& allInfos, ClassInfos& searchInfos, Q
 }
 
 //For SearchTeacherInfoController.cpp
-void CUtils::updateTeacherInfoList(QVariantMap& data, TeacherInfos& teacherInfos)
+void CUtils::updateTeacherInfoList(QVariantMap& data, TeacherInfos& teacherBasicInfos, TeacherStudentInfos& teacherStudentInfos)
 {
     QVariantList teacherInfoHeader;
     QVariantList teacherInfoList;
-    QVariantList teacherStudentCounts;
-    int id = 1;
+    QVariantList sujectStudentInfoList;
 
     teacherInfoHeader.append("序号");
     for(auto header : validTeacherHeader)
@@ -123,12 +122,25 @@ void CUtils::updateTeacherInfoList(QVariantMap& data, TeacherInfos& teacherInfos
         teacherInfoHeader.append(header);
     }
 
-    for(auto& teacherInfo : teacherInfos)
+    int id = 1;
+    for(auto& teacherBasicInfo : teacherBasicInfos)
     {
-        teacherInfoList.append(teacherInfo.toInfosList(QString::number(id++)));
+
+        for(auto& teacherStudentInfo : teacherStudentInfos)
+        {
+            if(teacherBasicInfo.teacherName == teacherStudentInfo.teacherName)
+            {
+                QVariantMap sujectStudentInfo;
+                for(auto& info : teacherStudentInfo.sujectStudentInfos)
+                {
+                    sujectStudentInfo = info.toMapStyle();
+                }
+                sujectStudentInfoList.append(sujectStudentInfo);
+            }
+        }
+        teacherInfoList.append(QVariantMap{ { "basicInfo", teacherBasicInfo.toInfosList(QString::number(id++)) },
+                                            { "studentInfo", sujectStudentInfoList } });
     }
-
-
 
     data.insert("teacherInfoHeader", teacherInfoHeader);
     data.insert("teacherInfoList", teacherInfoList);

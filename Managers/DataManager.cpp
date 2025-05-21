@@ -176,6 +176,7 @@ void DataManager::refreshAllDataFromDB()
 {
     queryDataFromClassInfosTable(mClassInfosFromDB);
     queryDataFromTeacherInfosTable(mTeacherInfosFromDB);
+    generateTeacherStudentInfos();
 }
 
 ClassInfos DataManager::getClassInfosFromDB()
@@ -186,6 +187,11 @@ ClassInfos DataManager::getClassInfosFromDB()
 TeacherInfos DataManager::getTeacherInfosFromDB()
 {
     return mTeacherInfosFromDB;
+}
+
+TeacherStudentInfos DataManager::getTeacherStudentInfosFromDB()
+{
+    return mTeacherStudentInfos;
 }
 
 bool DataManager::saveDataToClassInfosTable(ClassInfos& infos)
@@ -486,6 +492,35 @@ void DataManager::saveData(ClassInfo& info, QString& headerStr, QString& str)
     else if(headerStr == "已收金额") info.gotMoney = str;
     else if(headerStr == "付费方式") info.payType = str;
     else if(headerStr == "收费日期") info.payDate = str;
+}
+
+void DataManager::generateTeacherStudentInfos()
+{
+    for(auto& classInfo : mClassInfosFromDB)
+    {
+        bool isNewTeacher = true;
+        for(auto& info : mTeacherStudentInfos)
+        {
+            if(classInfo.teacherName == info.teacherName)
+            {
+                isNewTeacher = false;
+                info.addInfo(classInfo.suject, classInfo.date, classInfo.studentName);
+                break;
+            }
+        }
+        if(isNewTeacher)
+        {
+            TeacherStudentInfo teacherStudentInfo(classInfo.teacherName, classInfo.suject, classInfo.date, classInfo.studentName);
+            mTeacherStudentInfos.emplace_back(teacherStudentInfo);
+        }
+    }
+    for(auto& teacherStudentInfo : mTeacherStudentInfos)
+    {
+        for(auto& sujectStudentInfo : teacherStudentInfo.sujectStudentInfos)
+        {
+            sujectStudentInfo.sortMonthStudentInfosByYearMonth();
+        }
+    }
 }
 
 bool DataManager::isUsefulHeader(QString header)

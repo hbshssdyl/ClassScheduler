@@ -138,12 +138,23 @@ Rectangle{
                                 titleText: "学生人数"
                             }
                             // X轴：一月到十二月
-                            axisX: BarCategoryAxis {
-                                // min: 1
-                                // max: 12
+                            axisX: CategoryAxis {
+                                min: 1
+                                max: 12
                                 //titleText: "月份"
-                                //labelsPosition: CategoryAxis.AxisLabelsPositionOnValue
-                                categories: ["总数", "投入", "产出", "欠数"];
+                                labelsPosition: CategoryAxis.AxisLabelsPositionOnValue
+                                CategoryRange { label: "一月"; endValue: 1 }
+                                CategoryRange { label: "二月"; endValue: 2 }
+                                CategoryRange { label: "三月"; endValue: 3 }
+                                CategoryRange { label: "四月"; endValue: 4 }
+                                CategoryRange { label: "五月"; endValue: 5 }
+                                CategoryRange { label: "六月"; endValue: 6 }
+                                CategoryRange { label: "七月"; endValue: 7 }
+                                CategoryRange { label: "八月"; endValue: 8 }
+                                CategoryRange { label: "九月"; endValue: 9 }
+                                CategoryRange { label: "十月"; endValue: 10 }
+                                CategoryRange { label: "十一月"; endValue: 11 }
+                                CategoryRange { label: "十二月"; endValue: 12 }
                             }
 
                             Component.onCompleted: {

@@ -8,6 +8,7 @@ import "../JSUtils/MainUtils.js" as MainUtils
 Rectangle {
     id: delegateroot
 
+    property int maxStudentCount
     property int infoHeight: 60
     property int chartHeight: 300
     property int chartCount: modelData.studentInfo.length
@@ -35,7 +36,7 @@ Rectangle {
         Rectangle {
             id: infoRoot
 
-            color: index % 2 == 0 ? "transparent" : "#DDDDDD"
+            color: "transparent"
             radius: 5
 
             Layout.alignment: Qt.AlignTop
@@ -124,7 +125,7 @@ Rectangle {
 
                             axisY: ValuesAxis {
                                 min: 0
-                                max: 10
+                                max: maxStudentCount
                                 tickType: ValuesAxis.TicksFixed
                                 tickInterval: 1
                                 labelFormat: "%d"

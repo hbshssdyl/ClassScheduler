@@ -72,7 +72,7 @@ void SearchTeacherInfoController::onSearchTriggered(QString searchString)
         CUtils::doSearchTeacherInfos(mTeacherInfosFromDB, infos, searchString);
     }
 
-    //updateTeacherInfosList(infos);
+    updateTeacherInfosList(infos, mTeacherStudentInfosFromDB);
 }
 
 

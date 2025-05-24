@@ -71,6 +71,7 @@ Rectangle {
                     delegate: SearchTeacherInfoDelegate {
                         id: delegateItem
 
+                        maxStudentCount: controller.teacherInfoMap.maxStudentCount
                         width: listView.contentWidth
                         rootWidth: root.width
                         z: 1

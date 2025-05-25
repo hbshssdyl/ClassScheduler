@@ -9,7 +9,6 @@ Rectangle {
 
     property var operateMode
     property var rootController
-    anchors.fill: parent
     color: "#f5f5f5"
 
     Rectangle {

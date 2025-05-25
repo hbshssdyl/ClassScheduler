@@ -244,6 +244,16 @@ namespace ClassScheduler
         vector<QString> studentNames;
         int studentCount;
 
+        MonthStudentInfo()
+        {
+        }
+
+        MonthStudentInfo(QString yMonth, int count)
+        {
+            yearMonth = yMonth;
+            studentCount = count;
+        }
+
         MonthStudentInfo(QString yMonth, QString studentName)
         {
             yearMonth = yMonth;
@@ -288,6 +298,58 @@ namespace ClassScheduler
             });
         }
 
+        void fillMissingMonths(const QString& minYearMonth, const QString& maxYearMonth) {
+            MonthStudentInfos result;
+
+            // 检查日期格式是否正确（yyyy-MM）
+            if (minYearMonth.length() != 7 || maxYearMonth.length() != 7 ||
+                minYearMonth[4] != '-' || maxYearMonth[4] != '-') {
+                qWarning() << "Invalid date format! Expected yyyy-MM." << minYearMonth << ", " << maxYearMonth;
+                return;
+            }
+
+            QDate minDate = QDate::fromString(minYearMonth + "-01", "yyyy-MM-dd");
+            QDate maxDate = QDate::fromString(maxYearMonth + "-01", "yyyy-MM-dd");
+
+            // 检查日期是否有效
+            if (!minDate.isValid() || !maxDate.isValid()) {
+                qWarning() << "Invalid date range! minDate:" << minDate << "maxDate:" << maxDate;
+                return;
+            }
+
+            if (minDate > maxDate) {
+                return; // 如果 min > max，直接返回
+            }
+
+            // 将现有数据存入 QMap 以便快速查找
+            QMap<QString, MonthStudentInfo> existingData;
+            for (const auto& info : monthStudentInfos) {
+                existingData[info.yearMonth] = info;
+            }
+
+            // 遍历从 minDate 到 maxDate 的每个月
+            QDate currentDate = minDate;
+            while (currentDate <= maxDate) {
+                QString currentYearMonth = currentDate.toString("yyyy-MM");
+
+                // 如果该月份已有数据，则直接使用；否则补全为 0
+                if (existingData.contains(currentYearMonth)) {
+                    result.push_back(existingData[currentYearMonth]);
+                } else {
+                    result.push_back(MonthStudentInfo{currentYearMonth, 0});
+                }
+
+                QDate nextDate = currentDate.addMonths(1);
+                if (!nextDate.isValid() || nextDate <= currentDate) {
+                    qWarning() << "Failed to move to next month! currentDate:" << currentDate;
+                    break;
+                }
+                currentDate = nextDate;
+            }
+
+            monthStudentInfos = result;
+        }
+
         QVariantMap toMapStyle()
         {
             QStringList monthstudentInfoList;
@@ -295,8 +357,14 @@ namespace ClassScheduler
             {
                 monthstudentInfoList.append(QString::number(info.studentCount));
             }
+            QStringList yearMonthList;
+            for(auto& info : monthStudentInfos)
+            {
+                yearMonthList.append(info.yearMonth);
+            }
             return QVariantMap{ {"suject", suject},
-                                {"monthStudentCounts", monthstudentInfoList} };
+                                {"monthStudentCounts", monthstudentInfoList},
+                                {"yearMonthList", yearMonthList} };
         }
     };
     using SujectStudentInfos = vector<SujectStudentInfo>;
@@ -355,6 +423,30 @@ namespace ClassScheduler
         }
     };
     using TeacherStudentInfos = vector<TeacherStudentInfo>;
+
+    struct TeacherStudentBasicInfo {
+        int maxStudentCount;
+        QString minYearMonth;
+        QString maxYearMonth;
+        TeacherStudentBasicInfo()
+        {
+            maxStudentCount = 0;
+        }
+        void refreshData(const QString& newYearMonth, int studentCount) {
+            if (minYearMonth.isEmpty() || newYearMonth < minYearMonth)
+            {
+                minYearMonth = newYearMonth;
+            }
+            if (maxYearMonth.isEmpty() || newYearMonth > maxYearMonth)
+            {
+                maxYearMonth = newYearMonth;
+            }
+            if(studentCount > maxStudentCount)
+            {
+                maxStudentCount = studentCount;
+            }
+        }
+    };
 
     struct ScheduleClassInputInfo
     {

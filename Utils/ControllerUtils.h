@@ -23,7 +23,7 @@ namespace ClassScheduler
         static void doSearchClassInfos(ClassInfos& allInfos, ClassInfos& searchInfos, QString searchString);
 
         //For SearchTeacherInfoController.cpp
-        static void updateTeacherInfoList(QVariantMap& data, TeacherInfos& teacherInfos, TeacherStudentInfos& teacherStudentInfos);
+        static void updateTeacherInfoList(QVariantMap& data, TeacherInfos& teacherInfos, TeacherStudentInfos& teacherStudentInfos, TeacherStudentBasicInfo& studentBasicInfo);
         static void doSearchTeacherInfos(TeacherInfos& allInfos, TeacherInfos& searchInfos, QString searchString);
 
         //For SearchTeacherInfoController.cpp

@@ -31,6 +31,7 @@ public:
     ClassInfos getClassInfosFromDB();
     TeacherInfos getTeacherInfosFromDB();
     TeacherStudentInfos getTeacherStudentInfosFromDB();
+    TeacherStudentBasicInfo getTeacherStudentBasicInfoFromDB();
 
 private:
     bool isUsefulHeader(QString header);
@@ -54,12 +55,14 @@ private:
 
     //teacherStudentInfos
     void generateTeacherStudentInfos();
+    void generateTeacherStudentBasicInfo();
 
 private:
     QSqlDatabase mDB;
     ClassInfos mClassInfosFromDB;
     TeacherInfos mTeacherInfosFromDB;
     TeacherStudentInfos mTeacherStudentInfos;
+    TeacherStudentBasicInfo mStudentBasicInfo;
     TableDataCount mDataCount;
 
 };

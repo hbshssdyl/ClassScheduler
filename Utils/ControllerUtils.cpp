@@ -110,11 +110,10 @@ void CUtils::doSearchClassInfos(ClassInfos& allInfos, ClassInfos& searchInfos, Q
 }
 
 //For SearchTeacherInfoController.cpp
-void CUtils::updateTeacherInfoList(QVariantMap& data, TeacherInfos& teacherBasicInfos, TeacherStudentInfos& teacherStudentInfos)
+void CUtils::updateTeacherInfoList(QVariantMap& data, TeacherInfos& teacherBasicInfos, TeacherStudentInfos& teacherStudentInfos, TeacherStudentBasicInfo& studentBasicInfo)
 {
     QVariantList teacherInfoHeader;
     QVariantList teacherInfoList;
-    int maxStudentCount = 0;
 
     //update teacherInfoHeader
     teacherInfoHeader.append("序号");
@@ -132,37 +131,23 @@ void CUtils::updateTeacherInfoList(QVariantMap& data, TeacherInfos& teacherBasic
         {
             if(teacherBasicInfo.teacherName == teacherStudentInfo.teacherName)
             {
-                // QVariantMap sujectStudentInfo;
                 for(auto& info : teacherStudentInfo.sujectStudentInfos)
                 {
-                    // sujectStudentInfo = ;
                     sujectStudentInfoList.append(info.toMapStyle());
                 }
-
             }
         }
         teacherInfoList.append(QVariantMap{ { "basicInfo", teacherBasicInfo.toInfosList(QString::number(id++)) },
                                             { "studentInfo", sujectStudentInfoList } });
     }
 
-    //update maxStudentCount
-    for(auto& studentInfo : teacherStudentInfos)
-    {
-        for(auto& sujectStudentInfo : studentInfo.sujectStudentInfos)
-        {
-            for(auto& monthStudentInfo : sujectStudentInfo.monthStudentInfos)
-            {
-                if(monthStudentInfo.studentCount > maxStudentCount)
-                {
-                    maxStudentCount = monthStudentInfo.studentCount;
-                }
-            }
-        }
-    }
-
     data.insert("teacherInfoHeader", teacherInfoHeader);
     data.insert("teacherInfoList", teacherInfoList);
-    data.insert("maxStudentCount", maxStudentCount);
+
+    //update studentBasicInfo
+    data.insert("maxStudentCount", studentBasicInfo.maxStudentCount);
+    data.insert("minYearMonth", studentBasicInfo.minYearMonth);
+    data.insert("maxYearMonth", studentBasicInfo.maxYearMonth);
 }
 
 void CUtils::doSearchTeacherInfos(TeacherInfos& allInfos, TeacherInfos& searchInfos, QString searchString)

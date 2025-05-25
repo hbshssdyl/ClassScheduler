@@ -194,6 +194,11 @@ TeacherStudentInfos DataManager::getTeacherStudentInfosFromDB()
     return mTeacherStudentInfos;
 }
 
+TeacherStudentBasicInfo DataManager::getTeacherStudentBasicInfoFromDB()
+{
+    return mStudentBasicInfo;
+}
+
 bool DataManager::saveDataToClassInfosTable(ClassInfos& infos)
 {
     if(createClassInfosTable())
@@ -494,6 +499,20 @@ void DataManager::saveData(ClassInfo& info, QString& headerStr, QString& str)
     else if(headerStr == "收费日期") info.payDate = str;
 }
 
+void DataManager::generateTeacherStudentBasicInfo()
+{
+    for(auto& studentInfo : mTeacherStudentInfos)
+    {
+        for(auto& sujectStudentInfo : studentInfo.sujectStudentInfos)
+        {
+            for(auto& monthStudentInfo : sujectStudentInfo.monthStudentInfos)
+            {
+                mStudentBasicInfo.refreshData(monthStudentInfo.yearMonth, monthStudentInfo.studentCount);
+            }
+        }
+    }
+}
+
 void DataManager::generateTeacherStudentInfos()
 {
     for(auto& classInfo : mClassInfosFromDB)
@@ -514,11 +533,15 @@ void DataManager::generateTeacherStudentInfos()
             mTeacherStudentInfos.emplace_back(teacherStudentInfo);
         }
     }
+
+    generateTeacherStudentBasicInfo();
+
     for(auto& teacherStudentInfo : mTeacherStudentInfos)
     {
         for(auto& sujectStudentInfo : teacherStudentInfo.sujectStudentInfos)
         {
             sujectStudentInfo.sortMonthStudentInfosByYearMonth();
+            sujectStudentInfo.fillMissingMonths(mStudentBasicInfo.minYearMonth, mStudentBasicInfo.maxYearMonth);
         }
     }
 }

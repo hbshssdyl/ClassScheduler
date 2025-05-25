@@ -15,8 +15,7 @@ Rectangle {
     property int delegateHeight: infoHeight + chartHeight * chartCount
     property int rootWidth
     // 假设这个属性是从 C++ 传入的月份列表
-    property var monthLabels: ["一月", "二月", "三月", "四月", "五月", "六月",
-                             "七月", "八月", "九月", "十月", "十一月", "十二月"]
+    property var monthLabels: modelData.studentInfo.yearMonthList
 
     color: "transparent"
     radius: 5
@@ -134,13 +133,13 @@ Rectangle {
 
                             axisX: CategoryAxis {
                                 min: 1
-                                max: monthLabels.length
+                                max: modelData.yearMonthList.length
                                 labelsPosition: CategoryAxis.AxisLabelsPositionOnValue
 
                                 // 动态创建 CategoryRange
                                 Component.onCompleted: {
-                                    for (var i = 0; i < monthLabels.length; i++) {
-                                        append(monthLabels[i], i + 1);
+                                    for (var i = 0; i < modelData.yearMonthList.length; i++) {
+                                        append(modelData.yearMonthList[i], i + 1);
                                     }
                                 }
                             }

@@ -17,7 +17,7 @@ namespace ClassScheduler
 
     static QString nullString = "无该信息";
     static vector validExcelClassHeader{"日期", "星期", "姓名", "学校", "电话", "年级", "学科", "时间", "老师", "网课or面授", "课时", "金额/小时", "课酬总计", "老师姓名", "老师工资", "已收金额", "付费方式", "收费日期"};
-    static vector validTeacherHeader{"老师姓名", "使用过的昵称", "科目及工资（每小时）", "科目及年级"};
+    static vector validTeacherHeader{"老师姓名", "使用过的昵称", "教过的科目及学生", "科目及工资（每小时）", "科目及年级"};
     static vector allTableNameForDB{"classInfos", "teacherInfos"};
 
     struct ClassInfo
@@ -128,10 +128,12 @@ namespace ClassScheduler
     {
         QString teacherName;
         vector<QString> teacherNickNames;
+        vector<QString> teacherSujectsAndStudents;
         vector<QString> teacherSujectsAndFees;
         vector<QString> teacherSujectsAndGrades;
 
         QString strTeacherNickNames;
+        QString strteacherSujectsAndStudents;
         QString strTeacherSujectsAndFees;
         QString strTeacherSujectsAndGrades;
 
@@ -153,6 +155,7 @@ namespace ClassScheduler
             }
             list.append(teacherName);
             list.append(strTeacherNickNames);
+            list.append(strteacherSujectsAndStudents);
             list.append(strTeacherSujectsAndFees);
             list.append(strTeacherSujectsAndGrades);
             return list;
@@ -161,6 +164,7 @@ namespace ClassScheduler
         void sortInfos()
         {
             sort(teacherNickNames.begin(), teacherNickNames.end());
+            sort(teacherSujectsAndStudents.begin(), teacherSujectsAndStudents.end());
             sort(teacherSujectsAndFees.begin(), teacherSujectsAndFees.end());
             sort(teacherSujectsAndGrades.begin(), teacherSujectsAndGrades.end());
         }
@@ -198,19 +202,39 @@ namespace ClassScheduler
             }
         }
 
+        QString formatSubjects(const std::vector<QString>& input) {
+            std::map<QString, QStringList> subjectScores;
+            for (const QString& item : input) {
+                QStringList parts = item.split('_');
+                if (parts.size() == 2) {
+                    subjectScores[parts[0]].append(parts[1]);
+                }
+            }
+            QStringList result;
+            for (const auto& pair : subjectScores) {
+                result << QString("%1：%2").arg(pair.first, pair.second.join("，"));
+            }
+            return result.join('\n');
+        }
+
         QString getTeacherNickNames()
         {
             return getString(teacherNickNames);
         }
 
+        QString getTeacherSujectsAndStudents()
+        {
+            return formatSubjects(teacherSujectsAndStudents);
+        }
+
         QString getTeacherSujectsAndFees()
         {
-            return getString(teacherSujectsAndFees);
+            return formatSubjects(teacherSujectsAndFees);
         }
 
         QString getTeacherSujectsAndGrades()
         {
-            return getString(teacherSujectsAndGrades);
+            return formatSubjects(teacherSujectsAndGrades);
         }
 
         bool isContains(QString str)
@@ -428,10 +452,12 @@ namespace ClassScheduler
         int maxStudentCount;
         QString minYearMonth;
         QString maxYearMonth;
+
         TeacherStudentBasicInfo()
         {
             maxStudentCount = 0;
         }
+
         void refreshData(const QString& newYearMonth, int studentCount) {
             if (minYearMonth.isEmpty() || newYearMonth < minYearMonth)
             {
@@ -445,6 +471,13 @@ namespace ClassScheduler
             {
                 maxStudentCount = studentCount;
             }
+        }
+
+        void clear()
+        {
+            maxStudentCount = 0;
+            minYearMonth = "";
+            maxYearMonth = "";
         }
     };
 

@@ -26,7 +26,7 @@ public:
     bool createDBConnection();
     void storeAllTableDataCount();
     int getTableDataCount(QString tableName);
-    bool refreshDBDataByFile(QString filePath);
+    bool refreshAllDataFromFile(QString filePath);
     void refreshAllDataFromDB();
     ClassInfos getClassInfosFromDB();
     TeacherInfos getTeacherInfosFromDB();
@@ -36,6 +36,7 @@ public:
 private:
     bool isUsefulHeader(QString header);
     bool hasValidHeaders(Document& doc);
+    void clearAllData();
     void saveData(ClassInfo& info, QString& headerStr, QString& str);
     QVariant readCellValue(QString headerStr, CellPtr cell);
     ClassInfos getClassInfosFromExcelFile(QString filePath);

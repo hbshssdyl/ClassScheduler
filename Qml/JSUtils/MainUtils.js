@@ -71,9 +71,11 @@ function getMinTeacherInfoWidth(index)
             return 60;
         case 2://使用过的昵称
             return 200;
-        case 3://科目及工资（每小时）
+        case 3://教过的科目级学生
+            return 300;
+        case 4://科目及工资（每小时）
             return 200;
-        case 4://科目及年级
+        case 5://科目及年级
             return 200;
         default:
             return 200;

@@ -71,6 +71,7 @@ bool DataManager::createTeacherInfosTable()
                           "id                        INTEGER  PRIMARY KEY   AUTOINCREMENT,"
                           "teacherName               TEXT                   NOT NULL,"
                           "teacherNickNames          TEXT                   NOT NULL,"
+                          "teacherSujectsAndStudents TEXT                   NOT NULL,"
                           "teacherSujectsAndFees     TEXT                   NOT NULL,"
                           "teacherSujectsAndGrades   TEXT"
                           ")");
@@ -116,9 +117,9 @@ bool DataManager::insertDataToTeacherInfosTable(TeacherInfos& infos)
     for(auto& info : infos)
     {
         QSqlQuery query;
-        QString sql = QString("INSERT INTO teacherInfos (teacherName, teacherNickNames, teacherSujectsAndFees, teacherSujectsAndGrades)"
-                              "VALUES ('%1', '%2', '%3', '%4')")
-                          .arg(info.teacherName).arg(info.getTeacherNickNames()).arg(info.getTeacherSujectsAndFees()).arg(info.getTeacherSujectsAndGrades());
+        QString sql = QString("INSERT INTO teacherInfos (teacherName, teacherNickNames, teacherSujectsAndStudents, teacherSujectsAndFees, teacherSujectsAndGrades)"
+                              "VALUES ('%1', '%2', '%3', '%4', '%5')")
+                          .arg(info.teacherName).arg(info.getTeacherNickNames()).arg(info.getTeacherSujectsAndStudents()).arg(info.getTeacherSujectsAndFees()).arg(info.getTeacherSujectsAndGrades());
         bool ret = query.exec(sql);
         if (!ret) {
             cout << "Failed to insert data to teacherInfos: " << query.lastError().text().toStdString() << endl;
@@ -135,28 +136,31 @@ bool DataManager::isTableExist(QString tableName)
     return query.next();;
 }
 
-bool DataManager::refreshDBDataByFile(QString filePath)
+bool DataManager::refreshAllDataFromFile(QString filePath)
 {
-    auto classInfos = getClassInfosFromExcelFile(filePath);
+    clearAllData();
+    mClassInfosFromDB = getClassInfosFromExcelFile(filePath);
+    mTeacherInfosFromDB = getTeacherInfosList(mClassInfosFromDB);
+    generateTeacherStudentInfos();
 
-    if(mDataCount[CLASS_INFOS_TABLE_NAME] > 0)
+    if(isTableExist(CLASS_INFOS_TABLE_NAME))
     {
         cout << "drop table: " << CLASS_INFOS_TABLE_NAME.toStdString() << endl;
         dropTable(CLASS_INFOS_TABLE_NAME);
     }
 
-    if(mDataCount[TEACHER_INFOS_TABLE_NAME] > 0)
+    if(isTableExist(TEACHER_INFOS_TABLE_NAME))
     {
         cout << "drop table: " << TEACHER_INFOS_TABLE_NAME.toStdString() << endl;
         dropTable(TEACHER_INFOS_TABLE_NAME);
     }
 
-    if(!saveDataToClassInfosTable(classInfos))
+    if(!saveDataToClassInfosTable(mClassInfosFromDB))
     {
         return false;
     }
-    auto teacherInfos = getTeacherInfosList(classInfos);
-    if(!saveDataToTeacherInfosTable(teacherInfos))
+
+    if(!saveDataToTeacherInfosTable(mTeacherInfosFromDB))
     {
         return false;
     }
@@ -172,8 +176,17 @@ bool DataManager::refreshDBDataByFile(QString filePath)
     return true;
 }
 
+void DataManager::clearAllData()
+{
+    mClassInfosFromDB.clear();
+    mTeacherInfosFromDB.clear();
+    mTeacherStudentInfos.clear();
+    mStudentBasicInfo.clear();
+}
+
 void DataManager::refreshAllDataFromDB()
 {
+    clearAllData();
     queryDataFromClassInfosTable(mClassInfosFromDB);
     queryDataFromTeacherInfosTable(mTeacherInfosFromDB);
     generateTeacherStudentInfos();
@@ -253,12 +266,14 @@ TeacherInfos DataManager::getTeacherInfosList(ClassInfos& classInfos)
         auto teacherNickName = classInfo.teacherNickName;
         auto teacherSuject = classInfo.suject;
         auto teacherSujectAndFee = teacherSuject + "_" + classInfo.teacherFee;
+        auto teacherSujectAndStudent = teacherSuject + "_" + classInfo.studentName;
         auto teacherSujectAndGrade = teacherSuject + "_" + classInfo.grade;
         for(auto& teacherInfo : teacherInfos)
         {
             if(teacherInfo.teacherName == teacherName)
             {
                 teacherInfo.saveValue(teacherNickName, teacherInfo.teacherNickNames);
+                teacherInfo.saveValue(teacherSujectAndStudent, teacherInfo.teacherSujectsAndStudents);
                 teacherInfo.saveValue(teacherSujectAndFee, teacherInfo.teacherSujectsAndFees);
                 teacherInfo.saveValue(teacherSujectAndGrade, teacherInfo.teacherSujectsAndGrades);
                 break;
@@ -314,6 +329,7 @@ void DataManager::queryDataFromTeacherInfosTable(TeacherInfos& infos)
 
         info.teacherName = query.value("teacherName").toString();
         info.strTeacherNickNames = query.value("teacherNickNames").toString();
+        info.strteacherSujectsAndStudents = query.value("teacherSujectsAndStudents").toString();
         info.strTeacherSujectsAndFees = query.value("teacherSujectsAndFees").toString();
         info.strTeacherSujectsAndGrades = query.value("teacherSujectsAndGrades").toString();
 

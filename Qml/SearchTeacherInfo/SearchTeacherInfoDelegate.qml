@@ -84,6 +84,13 @@ Rectangle {
                                 bold: false
                                 pixelSize: 12
                             }
+
+                            Component.onCompleted: {
+                                if(teacherInfoText.height + 10 > infoHeight)
+                                {
+                                    infoHeight = teacherInfoText.height + 10;
+                                }
+                            }
                         }
                     }
                 }

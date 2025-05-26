@@ -30,7 +30,6 @@ void Controller::initDB()
     {
         mDataManager->createDBConnection();
         mDataManager->storeAllTableDataCount();
-        mDataManager->refreshAllDataFromDB();
         mDataCount = QString::number(mDataManager->getTableDataCount(CLASS_INFOS_TABLE_NAME));
         emit dataCountChanged();
         cout << "initDB, currentDataCount: " << mDataCount.toStdString() << endl;
@@ -134,21 +133,20 @@ void Controller::onFileUploaded(QString filePath)
 
     auto fun = [this] {
         mDataManager->createDBConnection();
-        if(mDataManager->refreshDBDataByFile(mNewDataFilePath))
+        if(!mNewDataFilePath.isEmpty())
         {
-            onOperateModeSelected(OperateMode::WelcomePage);
+            if(mDataManager->refreshAllDataFromFile(mNewDataFilePath))
+            {
+                cout << "Refresh DB data by excel file" << endl;
+            }
         }
+        mDataManager->storeAllTableDataCount();
+        mDataManager->refreshAllDataFromDB();
+        onOperateModeSelected(OperateMode::WelcomePage);
     };
 
-    if(!mNewDataFilePath.isEmpty())
-    {
-        std::thread t1(fun);
-        t1.detach();
-    }
-    else
-    {
-        onOperateModeSelected(OperateMode::WelcomePage);
-    }
+    std::thread t1(fun);
+    t1.detach();
 }
 
 SearchClassInfoController* Controller::getSearchClassInfoController()

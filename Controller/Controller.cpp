@@ -31,6 +31,7 @@ void Controller::initDB()
         mDataManager->createDBConnection();
         mDataManager->storeAllTableDataCount();
         mDataCount = QString::number(mDataManager->getTableDataCount(CLASS_INFOS_TABLE_NAME));
+        mDataManager->closeDBConnection();
         emit dataCountChanged();
         cout << "initDB, currentDataCount: " << mDataCount.toStdString() << endl;
     }
@@ -128,10 +129,17 @@ void Controller::onTryToLogin(QString username, QString password)
 
 void Controller::onFileUploaded(QString filePath)
 {
+    // 确保 mDataManager 有效
+    if (!mDataManager) {
+        qWarning() << "DataManager 为空，无法处理文件：" << filePath;
+        return;
+    }
+
     mNewDataFilePath = QUrl(filePath).toLocalFile();
     cout << "filePath: " << mNewDataFilePath.toStdString() << endl;
 
-    auto fun = [this] {
+    // 使用 QtConcurrent 异步运行长时间任务
+    QFuture<void> future = QtConcurrent::run([this]() {
         mDataManager->createDBConnection();
         if(!mNewDataFilePath.isEmpty())
         {
@@ -142,11 +150,17 @@ void Controller::onFileUploaded(QString filePath)
         }
         mDataManager->storeAllTableDataCount();
         mDataManager->refreshAllDataFromDB();
+        mDataManager->closeDBConnection();
         onOperateModeSelected(OperateMode::WelcomePage);
-    };
+    });
 
-    std::thread t1(fun);
-    t1.detach();
+    // 连接 QFutureWatcher 以处理任务完成
+    connect(&mFutureWatcher, &QFutureWatcher<void>::finished, this, []() {
+        cout << "文件处理完成" << endl;
+    });
+
+    // 设置 future 以监控任务完成
+    mFutureWatcher.setFuture(future);
 }
 
 SearchClassInfoController* Controller::getSearchClassInfoController()

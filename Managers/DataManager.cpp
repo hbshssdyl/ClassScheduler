@@ -3,20 +3,24 @@
 
 using namespace ClassScheduler;
 
-#define OPEN_DATABASE()                                    \
-    mDB = QSqlDatabase::addDatabase("QSQLITE");            \
-    mDB.setDatabaseName("ClassScheduler.db");
-
 DataManager::DataManager() {}
 
 bool DataManager::createDBConnection()
 {
-    OPEN_DATABASE()
-    if (!mDB.open()) {
+    auto db = QSqlDatabase::addDatabase("QSQLITE");
+    db.setDatabaseName("ClassScheduler.db");
+    if (!db.open()) {
         cout << "Failed to connect database." << endl;
         return false;
     }
     return true;
+}
+
+void DataManager::closeDBConnection()
+{
+    QString connectionName = QSqlDatabase::database().connectionName();
+    mDB.close();
+    QSqlDatabase::removeDatabase(connectionName);
 }
 
 int DataManager::getTableDataCount(QString tableName)
@@ -131,7 +135,7 @@ bool DataManager::insertDataToTeacherInfosTable(TeacherInfos& infos)
 
 bool DataManager::isTableExist(QString tableName)
 {
-    QSqlQuery query(mDB);
+    QSqlQuery query;
     query.exec(QString("select * from sqlite_master where type='table' and name='%1'").arg(tableName));
     return query.next();;
 }

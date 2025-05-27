@@ -6,6 +6,8 @@
 #include <QString>
 #include <QVariant>
 #include <QPointer>
+#include <QtConcurrent>
+#include <QFutureWatcher>
 #include <condition_variable>
 
 #include "Managers/DataManager.h"
@@ -66,6 +68,7 @@ private:
 private:
     OperateMode mOperateMode { OperateMode::None };
     DataManagerPtr mDataManager;
+    QFutureWatcher<void> mFutureWatcher; // 跟踪异步任务
     QString mLoadedView { "" };
     bool mShowActions;
     QString mDataCount { "" };

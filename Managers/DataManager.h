@@ -24,6 +24,7 @@ public:
 
 public:
     bool createDBConnection();
+    void closeDBConnection();
     void storeAllTableDataCount();
     int getTableDataCount(QString tableName);
     bool refreshAllDataFromFile(QString filePath);

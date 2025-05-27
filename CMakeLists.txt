@@ -8,6 +8,7 @@ find_package(Qt6 REQUIRED COMPONENTS Quick)
 find_package(Qt6 REQUIRED COMPONENTS Quick QuickControls2 QuickLayouts)
 find_package(Qt6 REQUIRED COMPONENTS Sql)
 find_package(Qt6 REQUIRED COMPONENTS Core Charts)
+find_package(Qt6 REQUIRED COMPONENTS Concurrent)
 
 qt_standard_project_setup(REQUIRES 6.8)
 
@@ -75,6 +76,9 @@ target_link_libraries(appClassScheduler
 )
 target_link_libraries(appClassScheduler
     PRIVATE Qt6::Core Qt6::Charts
+)
+target_link_libraries(appClassScheduler
+    PRIVATE Qt6::Concurrent
 )
 
 include(GNUInstallDirs)

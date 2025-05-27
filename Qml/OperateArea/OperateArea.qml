@@ -26,7 +26,6 @@ Rectangle {
             id: viewLoader
 
             property string sourceUrl: "../" + controller.loadedView + "/" + controller.loadedView + ".qml"
-            //source: controller.loadedView ? controller.loadedView + ".qml" : ""
             source: sourceUrl
             Layout.alignment: Qt.AlignLeft
             Layout.fillWidth: true

@@ -31,8 +31,7 @@ public:
     void refreshAllDataFromDB();
     ClassInfos getClassInfosFromDB();
     TeacherInfos getTeacherInfosFromDB();
-    TeacherStudentInfos getTeacherStudentInfosFromDB();
-    TeacherStudentBasicInfo getTeacherStudentBasicInfoFromDB();
+    StudentInfos getStudentInfosFromDB();
 
 private:
     bool isUsefulHeader(QString header);
@@ -43,13 +42,18 @@ private:
     ClassInfos getClassInfosFromExcelFile(QString filePath);
     bool saveDataToClassInfosTable(ClassInfos& infos);
     bool saveDataToTeacherInfosTable(TeacherInfos& infos);
+    bool saveDataToStudentInfosTable(StudentInfos& infos);
     TeacherInfos getTeacherInfosList(ClassInfos& classInfos);
+    StudentInfos getStudentInfosList(ClassInfos& classInfos);
     bool createClassInfosTable();
     bool createTeacherInfosTable();
+    bool createStudentInfosTable();
     bool insertDataToClassInfosTable(ClassInfos& infos);
     bool insertDataToTeacherInfosTable(TeacherInfos& infos);
+    bool insertDataToStudentInfosTable(StudentInfos& infos);
     void queryDataFromClassInfosTable(ClassInfos& infos);
     void queryDataFromTeacherInfosTable(TeacherInfos& infos);
+    void queryDataFromStudentInfosTable(StudentInfos& infos);
     bool isTableExist(QString tableName);
     void dropTable(QString tableName);
     QString transToChinese(QString englishWeekday);
@@ -63,8 +67,7 @@ private:
     QSqlDatabase mDB;
     ClassInfos mClassInfosFromDB;
     TeacherInfos mTeacherInfosFromDB;
-    TeacherStudentInfos mTeacherStudentInfos;
-    TeacherStudentBasicInfo mStudentBasicInfo;
+    StudentInfos mStudentInfosFromDB;
     TableDataCount mDataCount;
 
 };

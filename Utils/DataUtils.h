@@ -20,6 +20,169 @@ namespace ClassScheduler
     static vector validTeacherHeader{"老师姓名", "使用过的昵称", "教过的科目及学生", "科目及工资（每小时）", "科目及年级"};
     static vector allTableNameForDB{"classInfos", "teacherInfos"};
 
+    struct MonthCountInfo {
+        QString yearMonth;
+        vector<QString> keys;
+        int keyCount;
+
+        MonthCountInfo()
+        {
+        }
+
+        MonthCountInfo(QString yMonth, int count)
+        {
+            yearMonth = yMonth;
+            keyCount = count;
+        }
+
+        MonthCountInfo(QString yMonth, QString key)
+        {
+            yearMonth = yMonth;
+            keys.emplace_back(key);
+            keyCount = 1;
+        }
+
+        void saveKey(QString name)
+        {
+            bool save = true;
+            for(auto& val : keys)
+            {
+                if(name == val)
+                {
+                    save = false;
+                    break;
+                }
+            }
+            if(save)
+            {
+                keys.emplace_back(name);
+                keyCount++;
+            }
+        }
+    };
+    using MonthCountInfos = vector<MonthCountInfo>;
+
+    struct SujectCountInfo {
+        QString suject;
+        MonthCountInfos monthCountInfos;
+
+        SujectCountInfo(QString sujectStr, QString yMonth, QString studentName)
+        {
+            suject = sujectStr;
+            MonthCountInfo monthCountInfo(yMonth, studentName);
+            monthCountInfos.emplace_back(monthCountInfo);
+        }
+
+        void sortMonthStudentInfosByYearMonth() {
+            std::sort(monthCountInfos.begin(), monthCountInfos.end(), [](const MonthCountInfo& a, const MonthCountInfo& b) {
+                return a.yearMonth < b.yearMonth;
+            });
+        }
+
+        void fillMissingMonths(const QString& minYearMonth, const QString& maxYearMonth) {
+            MonthCountInfos result;
+
+            // 检查日期格式是否正确（yyyy-MM）
+            if (minYearMonth.length() != 7 || maxYearMonth.length() != 7 ||
+                minYearMonth[4] != '-' || maxYearMonth[4] != '-') {
+                qWarning() << "Invalid date format! Expected yyyy-MM." << minYearMonth << ", " << maxYearMonth;
+                return;
+            }
+
+            QDate minDate = QDate::fromString(minYearMonth + "-01", "yyyy-MM-dd");
+            QDate maxDate = QDate::fromString(maxYearMonth + "-01", "yyyy-MM-dd");
+
+            // 检查日期是否有效
+            if (!minDate.isValid() || !maxDate.isValid()) {
+                qWarning() << "Invalid date range! minDate:" << minDate << "maxDate:" << maxDate;
+                return;
+            }
+
+            if (minDate > maxDate) {
+                return; // 如果 min > max，直接返回
+            }
+
+            // 将现有数据存入 QMap 以便快速查找
+            QMap<QString, MonthCountInfo> existingData;
+            for (const auto& info : monthCountInfos) {
+                existingData[info.yearMonth] = info;
+            }
+
+            // 遍历从 minDate 到 maxDate 的每个月
+            QDate currentDate = minDate;
+            while (currentDate <= maxDate) {
+                QString currentYearMonth = currentDate.toString("yyyy-MM");
+
+                // 如果该月份已有数据，则直接使用；否则补全为 0
+                if (existingData.contains(currentYearMonth)) {
+                    result.push_back(existingData[currentYearMonth]);
+                } else {
+                    result.push_back(MonthCountInfo{currentYearMonth, 0});
+                }
+
+                QDate nextDate = currentDate.addMonths(1);
+                if (!nextDate.isValid() || nextDate <= currentDate) {
+                    qWarning() << "Failed to move to next month! currentDate:" << currentDate;
+                    break;
+                }
+                currentDate = nextDate;
+            }
+
+            monthCountInfos = result;
+        }
+
+        QVariantMap toMapStyle()
+        {
+            QStringList monthCountList;
+            for(auto& info : monthCountInfos)
+            {
+                monthCountList.append(QString::number(info.keyCount));
+            }
+            QStringList yearMonthList;
+            for(auto& info : monthCountInfos)
+            {
+                yearMonthList.append(info.yearMonth);
+            }
+            return QVariantMap{ {"suject", suject},
+                               {"monthCountList", monthCountList},
+                               {"yearMonthList", yearMonthList} };
+        }
+    };
+    using SujectCountInfos = vector<SujectCountInfo>;
+
+    struct PersonKeyBasicInfo {
+        int maxKeyCount;
+        QString minYearMonth;
+        QString maxYearMonth;
+
+        PersonKeyBasicInfo()
+        {
+            maxKeyCount = 0;
+        }
+
+        void refreshData(const QString& newYearMonth, int keyCount) {
+            if (minYearMonth.isEmpty() || newYearMonth < minYearMonth)
+            {
+                minYearMonth = newYearMonth;
+            }
+            if (maxYearMonth.isEmpty() || newYearMonth > maxYearMonth)
+            {
+                maxYearMonth = newYearMonth;
+            }
+            if(keyCount > maxKeyCount)
+            {
+                maxKeyCount = keyCount;
+            }
+        }
+
+        void clear()
+        {
+            maxKeyCount = 0;
+            minYearMonth = "";
+            maxYearMonth = "";
+        }
+    };
+
     struct ClassInfo
     {
         QString date;
@@ -133,9 +296,12 @@ namespace ClassScheduler
         vector<QString> teacherSujectsAndGrades;
 
         QString strTeacherNickNames;
-        QString strteacherSujectsAndStudents;
+        QString strTeacherSujectsAndStudents;
         QString strTeacherSujectsAndFees;
         QString strTeacherSujectsAndGrades;
+
+        SujectCountInfos sujectStudentCounts;
+        PersonKeyBasicInfo teacherStudentCountBasicInfo;
 
         TeacherInfo()
         {
@@ -144,6 +310,49 @@ namespace ClassScheduler
         TeacherInfo(const QString teacherName)
             : teacherName(teacherName)
         {
+        }
+
+        void addSujectCountInfo(QString suject, QString date, QString studentName)
+        {
+            auto yearMonth = getYearMonth(date);
+
+            bool hasSuject = false;
+            for(auto& sujectCountInfo : sujectStudentCounts)
+            {
+                if(suject == sujectCountInfo.suject)
+                {
+                    hasSuject = true;
+                    bool hasYearMonth = false;
+                    for(auto& monthStudentInfo : sujectCountInfo.monthCountInfos)
+                    {
+                        if(yearMonth == monthStudentInfo.yearMonth)
+                        {
+                            hasYearMonth = true;
+                            monthStudentInfo.saveKey(studentName);
+                            break;
+                        }
+                    }
+                    if(!hasYearMonth)
+                    {
+                        MonthCountInfo monthCountInfo(yearMonth, studentName);
+                        sujectCountInfo.monthCountInfos.emplace_back(monthCountInfo);
+                    }
+                    break;
+                }
+            }
+            if(!hasSuject)
+            {
+                SujectCountInfo sujectStudentCount(suject, yearMonth, studentName);
+                sujectStudentCounts.emplace_back(sujectStudentCount);
+            }
+        }
+
+        QString getYearMonth(const QString& dateStr) {
+            QStringList parts = dateStr.split("-");
+            if (parts.size() >= 2) {
+                return parts[0] + "-" + parts[1];
+            }
+            return "";
         }
 
         QStringList toInfosList(QString id)
@@ -155,7 +364,7 @@ namespace ClassScheduler
             }
             list.append(teacherName);
             list.append(strTeacherNickNames);
-            list.append(strteacherSujectsAndStudents);
+            list.append(strTeacherSujectsAndStudents);
             list.append(strTeacherSujectsAndFees);
             list.append(strTeacherSujectsAndGrades);
             return list;
@@ -263,34 +472,69 @@ namespace ClassScheduler
     };
     using TeacherInfos = vector<TeacherInfo>;
 
-    struct MonthStudentInfo {
-        QString yearMonth;
-        vector<QString> studentNames;
-        int studentCount;
+    struct StudentInfo
+    {
+        QString studentName;
+        vector<QString> studentSchools;
+        vector<QString> studentPhoneNumbers;
+        vector<QString> studentTeachers; // 张三（张三昵称）
+        vector<QString> studentSujectsAndPays; // 物理： 100(张三)，200（李四）
 
-        MonthStudentInfo()
+        QString strStudentSchools;
+        QString strStudentPhoneNumbers;
+        QString strStudentTeachers;
+        QString strStudentSujectsAndPays;
+
+        StudentInfo()
         {
         }
 
-        MonthStudentInfo(QString yMonth, int count)
+        StudentInfo(const QString studentName)
+            : studentName(studentName)
         {
-            yearMonth = yMonth;
-            studentCount = count;
         }
 
-        MonthStudentInfo(QString yMonth, QString studentName)
+        QStringList toInfosList(QString id)
         {
-            yearMonth = yMonth;
-            studentNames.emplace_back(studentName);
-            studentCount = 1;
+            QStringList list;
+            if(!id.isEmpty())
+            {
+                list.append(id);
+            }
+            list.append(studentName);
+            list.append(strStudentSchools);
+            list.append(strStudentPhoneNumbers);
+            list.append(strStudentTeachers);
+            list.append(strStudentSujectsAndPays);
+            return list;
         }
 
-        void saveStudentName(QString name)
+        void sortInfos()
+        {
+        }
+
+        QString getString(vector<QString> stringList)
+        {
+            QString ret = "";
+            bool flag = false;
+            for(auto& str : stringList)
+            {
+                if(flag)
+                {
+                    ret += ", ";
+                }
+                ret += str;
+                flag = true;
+            }
+            return ret;
+        }
+
+        void saveValue(QString value, vector<QString>& values)
         {
             bool save = true;
-            for(auto& val : studentNames)
+            for(auto& val : values)
             {
-                if(name == val)
+                if(value == val)
                 {
                     save = false;
                     break;
@@ -298,188 +542,71 @@ namespace ClassScheduler
             }
             if(save)
             {
-                studentNames.emplace_back(name);
-                studentCount++;
+                values.emplace_back(value);
             }
         }
-    };
-    using MonthStudentInfos = vector<MonthStudentInfo>;
 
-    struct SujectStudentInfo {
-        QString suject;
-        MonthStudentInfos monthStudentInfos;
-
-        SujectStudentInfo(QString sujectStr, QString yMonth, QString studentName)
-        {
-            suject = sujectStr;
-            MonthStudentInfo monthStudentInfo(yMonth, studentName);
-            monthStudentInfos.emplace_back(monthStudentInfo);
-        }
-
-        void sortMonthStudentInfosByYearMonth() {
-            std::sort(monthStudentInfos.begin(), monthStudentInfos.end(), [](const MonthStudentInfo& a, const MonthStudentInfo& b) {
-                return a.yearMonth < b.yearMonth;
-            });
-        }
-
-        void fillMissingMonths(const QString& minYearMonth, const QString& maxYearMonth) {
-            MonthStudentInfos result;
-
-            // 检查日期格式是否正确（yyyy-MM）
-            if (minYearMonth.length() != 7 || maxYearMonth.length() != 7 ||
-                minYearMonth[4] != '-' || maxYearMonth[4] != '-') {
-                qWarning() << "Invalid date format! Expected yyyy-MM." << minYearMonth << ", " << maxYearMonth;
-                return;
-            }
-
-            QDate minDate = QDate::fromString(minYearMonth + "-01", "yyyy-MM-dd");
-            QDate maxDate = QDate::fromString(maxYearMonth + "-01", "yyyy-MM-dd");
-
-            // 检查日期是否有效
-            if (!minDate.isValid() || !maxDate.isValid()) {
-                qWarning() << "Invalid date range! minDate:" << minDate << "maxDate:" << maxDate;
-                return;
-            }
-
-            if (minDate > maxDate) {
-                return; // 如果 min > max，直接返回
-            }
-
-            // 将现有数据存入 QMap 以便快速查找
-            QMap<QString, MonthStudentInfo> existingData;
-            for (const auto& info : monthStudentInfos) {
-                existingData[info.yearMonth] = info;
-            }
-
-            // 遍历从 minDate 到 maxDate 的每个月
-            QDate currentDate = minDate;
-            while (currentDate <= maxDate) {
-                QString currentYearMonth = currentDate.toString("yyyy-MM");
-
-                // 如果该月份已有数据，则直接使用；否则补全为 0
-                if (existingData.contains(currentYearMonth)) {
-                    result.push_back(existingData[currentYearMonth]);
-                } else {
-                    result.push_back(MonthStudentInfo{currentYearMonth, 0});
+        QString getFormatString(const std::vector<QString>& input) {
+            std::map<QString, QStringList> subjectScores;
+            for (const QString& item : input) {
+                QStringList parts = item.split('_');
+                if (parts.size() == 2) {
+                    subjectScores[parts[0]].append(parts[1]);
                 }
-
-                QDate nextDate = currentDate.addMonths(1);
-                if (!nextDate.isValid() || nextDate <= currentDate) {
-                    qWarning() << "Failed to move to next month! currentDate:" << currentDate;
-                    break;
-                }
-                currentDate = nextDate;
             }
-
-            monthStudentInfos = result;
+            QStringList result;
+            for (const auto& pair : subjectScores) {
+                result << QString("%1：%2").arg(pair.first, pair.second.join("，"));
+            }
+            return result.join('\n');
         }
 
-        QVariantMap toMapStyle()
+        QString getStudentSchools()
         {
-            QStringList monthstudentInfoList;
-            for(auto& info : monthStudentInfos)
-            {
-                monthstudentInfoList.append(QString::number(info.studentCount));
-            }
-            QStringList yearMonthList;
-            for(auto& info : monthStudentInfos)
-            {
-                yearMonthList.append(info.yearMonth);
-            }
-            return QVariantMap{ {"suject", suject},
-                                {"monthStudentCounts", monthstudentInfoList},
-                                {"yearMonthList", yearMonthList} };
-        }
-    };
-    using SujectStudentInfos = vector<SujectStudentInfo>;
-
-    struct TeacherStudentInfo {
-        QString teacherName;
-        SujectStudentInfos sujectStudentInfos;
-
-        TeacherStudentInfo(QString tName, QString suject, QString date, QString studentName)
-        {
-            teacherName = tName;
-            addInfo(suject, date, studentName);
+            return getString(studentSchools);
         }
 
-        void addInfo(QString suject, QString date, QString studentName)
+        QString getStudentPhoneNumbers()
         {
-            auto yearMonth = getYearMonth(date);
+            return getString(studentPhoneNumbers);
+        }
 
-            bool hasSuject = false;
-            for(auto& sujectStudentInfo : sujectStudentInfos)
-            {
-                if(suject == sujectStudentInfo.suject)
+        QString getStudentTeachers()
+        {
+            return getString(studentTeachers);
+        }
+
+        QString getStudentSujectsAndPays()
+        {
+            return getFormatString(studentSujectsAndPays);
+        }
+
+        bool isContains(QString str)
+        {
+            if(studentName.contains(str, Qt::CaseSensitive)) return true;
+            if(strStudentSchools.contains(str, Qt::CaseSensitive)) return true;
+            if(strStudentPhoneNumbers.contains(str, Qt::CaseSensitive)) return true;
+            if(strStudentTeachers.contains(str, Qt::CaseSensitive)) return true;
+            if(strStudentSujectsAndPays.contains(str, Qt::CaseSensitive)) return true;
+            return false;
+        }
+
+        bool isAllContains(QString str)
+        {
+            str.replace(QChar(u'，'), QChar(','));
+            QStringList parts = str.split(',');
+            bool result = true;
+            for (const QString& part : parts) {
+                if(!isContains(part))
                 {
-                    hasSuject = true;
-                    bool hasYearMonth = false;
-                    for(auto& monthStudentInfo : sujectStudentInfo.monthStudentInfos)
-                    {
-                        if(yearMonth == monthStudentInfo.yearMonth)
-                        {
-                            hasYearMonth = true;
-                            monthStudentInfo.saveStudentName(studentName);
-                            break;
-                        }
-                    }
-                    if(!hasYearMonth)
-                    {
-                        MonthStudentInfo monthStudentInfo(yearMonth, studentName);
-                        sujectStudentInfo.monthStudentInfos.emplace_back(monthStudentInfo);
-                    }
+                    result = false;
                     break;
                 }
             }
-            if(!hasSuject)
-            {
-                SujectStudentInfo sujectStudentInfo(suject, yearMonth, studentName);
-                sujectStudentInfos.emplace_back(sujectStudentInfo);
-            }
-        }
-
-        QString getYearMonth(const QString& dateStr) {
-            QStringList parts = dateStr.split("-");
-            if (parts.size() >= 2) {
-                return parts[0] + "-" + parts[1];
-            }
-            return "";
+            return result;
         }
     };
-    using TeacherStudentInfos = vector<TeacherStudentInfo>;
-
-    struct TeacherStudentBasicInfo {
-        int maxStudentCount;
-        QString minYearMonth;
-        QString maxYearMonth;
-
-        TeacherStudentBasicInfo()
-        {
-            maxStudentCount = 0;
-        }
-
-        void refreshData(const QString& newYearMonth, int studentCount) {
-            if (minYearMonth.isEmpty() || newYearMonth < minYearMonth)
-            {
-                minYearMonth = newYearMonth;
-            }
-            if (maxYearMonth.isEmpty() || newYearMonth > maxYearMonth)
-            {
-                maxYearMonth = newYearMonth;
-            }
-            if(studentCount > maxStudentCount)
-            {
-                maxStudentCount = studentCount;
-            }
-        }
-
-        void clear()
-        {
-            maxStudentCount = 0;
-            minYearMonth = "";
-            maxYearMonth = "";
-        }
-    };
+    using StudentInfos = vector<StudentInfo>;
 
     struct ScheduleClassInputInfo
     {

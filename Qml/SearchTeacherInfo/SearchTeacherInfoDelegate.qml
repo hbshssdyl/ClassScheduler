@@ -152,8 +152,8 @@ Rectangle {
                             }
 
                             Component.onCompleted: {
-                                for (let i = 0; i < modelData.monthStudentCounts.length; ++i) {
-                                    let item = modelData.monthStudentCounts[i];
+                                for (let i = 0; i < modelData.monthCountList.length; ++i) {
+                                    let item = modelData.monthCountList[i];
                                     series.append(i + 1, item);
                                 }
                             }

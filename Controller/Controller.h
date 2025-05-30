@@ -34,9 +34,9 @@ public:
         WelcomePage,
         SearchClassInfo,
         SearchTeacherInfo,
+        SearchStudentInfo,
         ScheduleClass,
-        CalcOneToOneMoney,
-        CalcClassMoney
+        TeacherEvaluation
     };
     Q_ENUM(OperateMode)
     using OperateModes = std::vector<OperateMode>;

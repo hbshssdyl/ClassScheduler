@@ -77,7 +77,25 @@ bool DataManager::createTeacherInfosTable()
                           "teacherNickNames          TEXT                   NOT NULL,"
                           "teacherSujectsAndStudents TEXT                   NOT NULL,"
                           "teacherSujectsAndFees     TEXT                   NOT NULL,"
-                          "teacherSujectsAndGrades   TEXT"
+                          "teacherSujectsAndGrades   TEXT                   NOT NULL"
+                          ")");
+    if (!ret) {
+        cout << "Failed to create table: " << query.lastError().text().toStdString() << endl;
+        return false;
+    }
+    return true;
+}
+
+bool DataManager::createStudentInfosTable()
+{
+    QSqlQuery query;
+    bool ret = query.exec("CREATE TABLE studentInfos("
+                          "id                        INTEGER  PRIMARY KEY   AUTOINCREMENT,"
+                          "studentName               TEXT                   NOT NULL,"
+                          "studentSchools            TEXT                   NOT NULL,"
+                          "studentPhoneNumbers       TEXT                   NOT NULL,"
+                          "studentTeachers           TEXT                   NOT NULL,"
+                          "studentSujectsAndPays     TEXT                   NOT NULL"
                           ")");
     if (!ret) {
         cout << "Failed to create table: " << query.lastError().text().toStdString() << endl;
@@ -133,6 +151,23 @@ bool DataManager::insertDataToTeacherInfosTable(TeacherInfos& infos)
     return true;
 }
 
+bool DataManager::insertDataToStudentInfosTable(StudentInfos& infos)
+{
+    for(auto& info : infos)
+    {
+        QSqlQuery query;
+        QString sql = QString("INSERT INTO studentInfos (studentName, studentSchools, studentPhoneNumbers, studentTeachers, studentSujectsAndPays)"
+                              "VALUES ('%1', '%2', '%3', '%4', '%5')")
+                          .arg(info.studentName).arg(info.getStudentSchools()).arg(info.getStudentPhoneNumbers()).arg(info.getStudentTeachers()).arg(info.getStudentSujectsAndPays());
+        bool ret = query.exec(sql);
+        if (!ret) {
+            cout << "Failed to insert data to teacherInfos: " << query.lastError().text().toStdString() << endl;
+            return false;
+        }
+    }
+    return true;
+}
+
 bool DataManager::isTableExist(QString tableName)
 {
     QSqlQuery query;
@@ -145,6 +180,7 @@ bool DataManager::refreshAllDataFromFile(QString filePath)
     clearAllData();
     mClassInfosFromDB = getClassInfosFromExcelFile(filePath);
     mTeacherInfosFromDB = getTeacherInfosList(mClassInfosFromDB);
+    mStudentInfosFromDB = getStudentInfosList(mClassInfosFromDB);
     generateTeacherStudentInfos();
 
     if(isTableExist(CLASS_INFOS_TABLE_NAME))
@@ -161,11 +197,19 @@ bool DataManager::refreshAllDataFromFile(QString filePath)
 
     if(!saveDataToClassInfosTable(mClassInfosFromDB))
     {
+        cout << "Failed to save data to ClassInfos table" << endl;
         return false;
     }
 
     if(!saveDataToTeacherInfosTable(mTeacherInfosFromDB))
     {
+        cout << "Failed to save data to TeacherInfos table" << endl;
+        return false;
+    }
+
+    if(!saveDataToStudentInfosTable(mStudentInfosFromDB))
+    {
+        cout << "Failed to save data to StudentInfos table" << endl;
         return false;
     }
 
@@ -184,8 +228,7 @@ void DataManager::clearAllData()
 {
     mClassInfosFromDB.clear();
     mTeacherInfosFromDB.clear();
-    mTeacherStudentInfos.clear();
-    mStudentBasicInfo.clear();
+    mStudentInfosFromDB.clear();
 }
 
 void DataManager::refreshAllDataFromDB()
@@ -193,7 +236,7 @@ void DataManager::refreshAllDataFromDB()
     clearAllData();
     queryDataFromClassInfosTable(mClassInfosFromDB);
     queryDataFromTeacherInfosTable(mTeacherInfosFromDB);
-    generateTeacherStudentInfos();
+    queryDataFromStudentInfosTable(mStudentInfosFromDB);
 }
 
 ClassInfos DataManager::getClassInfosFromDB()
@@ -206,14 +249,9 @@ TeacherInfos DataManager::getTeacherInfosFromDB()
     return mTeacherInfosFromDB;
 }
 
-TeacherStudentInfos DataManager::getTeacherStudentInfosFromDB()
+StudentInfos DataManager::getStudentInfosFromDB()
 {
-    return mTeacherStudentInfos;
-}
-
-TeacherStudentBasicInfo DataManager::getTeacherStudentBasicInfoFromDB()
-{
-    return mStudentBasicInfo;
+    return mStudentInfosFromDB;
 }
 
 bool DataManager::saveDataToClassInfosTable(ClassInfos& infos)
@@ -233,6 +271,18 @@ bool DataManager::saveDataToTeacherInfosTable(TeacherInfos& infos)
     if(createTeacherInfosTable())
     {
         if(insertDataToTeacherInfosTable(infos))
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool DataManager::saveDataToStudentInfosTable(StudentInfos& infos)
+{
+    if(createStudentInfosTable())
+    {
+        if(insertDataToStudentInfosTable(infos))
         {
             return true;
         }
@@ -292,6 +342,57 @@ TeacherInfos DataManager::getTeacherInfosList(ClassInfos& classInfos)
     return teacherInfos;
 }
 
+StudentInfos DataManager::getStudentInfosList(ClassInfos& classInfos)
+{
+    StudentInfos studentInfos;
+
+    //save studentName
+    for(auto& classInfo : classInfos)
+    {
+        auto studentName = classInfo.studentName;
+        bool save = true;
+        for(auto& studentInfo : studentInfos)
+        {
+            if(studentInfo.studentName == studentName)
+            {
+                save = false;
+                break;
+            }
+        }
+        if(save)
+        {
+            studentInfos.emplace_back(StudentInfo(studentName));
+        }
+    }
+
+    //save studentSchools, studentPhoneNumbers, studentTeachers - 张三（张三昵称）, studentSujectsAndPays - 物理： 100(张三)，200（李四）
+    for(auto& classInfo : classInfos)
+    {
+        auto studentName = classInfo.studentName;
+        auto studentSchool = classInfo.school;
+        auto studentPhoneNumber = classInfo.studentPhoneNubmer;
+        auto studentTeacher = classInfo.teacherName + "（" + classInfo.teacherNickName + "）";
+        auto studentSujectsAndPay = classInfo.suject + "_" + classInfo.studentFee + "（" + classInfo.teacherName + "）";
+        for(auto& studentInfo : studentInfos)
+        {
+            if(studentInfo.studentName == studentName)
+            {
+                studentInfo.saveValue(studentSchool, studentInfo.studentSchools);
+                studentInfo.saveValue(studentPhoneNumber, studentInfo.studentPhoneNumbers);
+                studentInfo.saveValue(studentTeacher, studentInfo.studentTeachers);
+                studentInfo.saveValue(studentSujectsAndPay, studentInfo.studentSujectsAndPays);
+                break;
+            }
+        }
+    }
+    //sort studentInfos
+    for(auto& studentInfo : studentInfos)
+    {
+        studentInfo.sortInfos();
+    }
+    return studentInfos;
+}
+
 void DataManager::queryDataFromClassInfosTable(ClassInfos& infos)
 {
     QSqlQuery query("SELECT * FROM classInfos");
@@ -333,9 +434,27 @@ void DataManager::queryDataFromTeacherInfosTable(TeacherInfos& infos)
 
         info.teacherName = query.value("teacherName").toString();
         info.strTeacherNickNames = query.value("teacherNickNames").toString();
-        info.strteacherSujectsAndStudents = query.value("teacherSujectsAndStudents").toString();
+        info.strTeacherSujectsAndStudents = query.value("teacherSujectsAndStudents").toString();
         info.strTeacherSujectsAndFees = query.value("teacherSujectsAndFees").toString();
         info.strTeacherSujectsAndGrades = query.value("teacherSujectsAndGrades").toString();
+
+        infos.emplace_back(info);
+    }
+    generateTeacherStudentInfos();
+}
+
+void DataManager::queryDataFromStudentInfosTable(StudentInfos& infos)
+{
+    QSqlQuery query("SELECT * FROM studentInfos");
+    int cnt = 1;
+    while (query.next()) {
+        StudentInfo info;
+
+        info.studentName = query.value("studentName").toString();
+        info.strStudentSchools = query.value("studentSchools").toString();
+        info.strStudentPhoneNumbers = query.value("studentPhoneNumbers").toString();
+        info.strStudentPhoneNumbers = query.value("studentPhoneNumbers").toString();
+        info.strStudentSujectsAndPays = query.value("studentSujectsAndPays").toString();
 
         infos.emplace_back(info);
     }
@@ -521,15 +640,16 @@ void DataManager::saveData(ClassInfo& info, QString& headerStr, QString& str)
 
 void DataManager::generateTeacherStudentBasicInfo()
 {
-    for(auto& studentInfo : mTeacherStudentInfos)
+    for(auto& studentInfo : mTeacherInfosFromDB)
     {
-        for(auto& sujectStudentInfo : studentInfo.sujectStudentInfos)
+        for(auto& sujectStudentInfo : studentInfo.sujectStudentCounts)
         {
-            for(auto& monthStudentInfo : sujectStudentInfo.monthStudentInfos)
+            for(auto& monthStudentInfo : sujectStudentInfo.monthCountInfos)
             {
-                mStudentBasicInfo.refreshData(monthStudentInfo.yearMonth, monthStudentInfo.studentCount);
+                studentInfo.teacherStudentCountBasicInfo.refreshData(monthStudentInfo.yearMonth, monthStudentInfo.keyCount);
             }
         }
+        return; //Only need save data to the firstone
     }
 }
 
@@ -538,30 +658,35 @@ void DataManager::generateTeacherStudentInfos()
     for(auto& classInfo : mClassInfosFromDB)
     {
         bool isNewTeacher = true;
-        for(auto& info : mTeacherStudentInfos)
+        for(auto& info : mTeacherInfosFromDB)
         {
             if(classInfo.teacherName == info.teacherName)
             {
                 isNewTeacher = false;
-                info.addInfo(classInfo.suject, classInfo.date, classInfo.studentName);
+                info.addSujectCountInfo(classInfo.suject, classInfo.date, classInfo.studentName);
                 break;
             }
         }
         if(isNewTeacher)
         {
-            TeacherStudentInfo teacherStudentInfo(classInfo.teacherName, classInfo.suject, classInfo.date, classInfo.studentName);
-            mTeacherStudentInfos.emplace_back(teacherStudentInfo);
+            cout << "Error: there should not be a new teacher" << endl;
         }
     }
 
     generateTeacherStudentBasicInfo();
-
-    for(auto& teacherStudentInfo : mTeacherStudentInfos)
+    if(mTeacherInfosFromDB.size() == 0)
     {
-        for(auto& sujectStudentInfo : teacherStudentInfo.sujectStudentInfos)
+        return;
+    }
+
+    auto minYearMonth = mTeacherInfosFromDB[0].teacherStudentCountBasicInfo.minYearMonth;
+    auto maxYearMonth = mTeacherInfosFromDB[0].teacherStudentCountBasicInfo.maxYearMonth;
+    for(auto& info : mTeacherInfosFromDB)
+    {
+        for(auto& sujectStudentCount : info.sujectStudentCounts)
         {
-            sujectStudentInfo.sortMonthStudentInfosByYearMonth();
-            sujectStudentInfo.fillMissingMonths(mStudentBasicInfo.minYearMonth, mStudentBasicInfo.maxYearMonth);
+            sujectStudentCount.sortMonthStudentInfosByYearMonth();
+            sujectStudentCount.fillMissingMonths(minYearMonth, maxYearMonth);
         }
     }
 }

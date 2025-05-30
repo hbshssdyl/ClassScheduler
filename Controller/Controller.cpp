@@ -17,9 +17,9 @@ void Controller::initialize()
     mAllOperateMode.clear();
     mAllOperateMode.emplace_back(OperateMode::SearchClassInfo);
     mAllOperateMode.emplace_back(OperateMode::SearchTeacherInfo);
+    mAllOperateMode.emplace_back(OperateMode::SearchStudentInfo);
     mAllOperateMode.emplace_back(OperateMode::ScheduleClass);
-    mAllOperateMode.emplace_back(OperateMode::CalcOneToOneMoney);
-    mAllOperateMode.emplace_back(OperateMode::CalcClassMoney);
+    mAllOperateMode.emplace_back(OperateMode::TeacherEvaluation);
     onOperateModeSelected(OperateMode::LoginView);
 }
 
@@ -53,12 +53,12 @@ QString Controller::toOperateModeString(OperateMode mode)
         return "SearchClassInfo";
     case OperateMode::SearchTeacherInfo:
         return "SearchTeacherInfo";
+    case OperateMode::SearchStudentInfo:
+        return "SearchStudentInfo";
     case OperateMode::ScheduleClass:
         return "ScheduleClass";
-    case OperateMode::CalcOneToOneMoney:
-        return "CalcOneToOneMoney";
-    case OperateMode::CalcClassMoney:
-        return "CalcClassMoney";
+    case OperateMode::TeacherEvaluation:
+        return "TeacherEvaluation";
     default:
         return "default";
     }
@@ -85,6 +85,8 @@ void Controller::refreshOperateMode(OperateMode mode)
             {
                 mSearchTeacherInfoController->refreshSearchTeacherInfo();
             }
+            mShowActions = true;
+            break;
         }
         case OperateMode::SearchTeacherInfo:
         {
@@ -92,11 +94,13 @@ void Controller::refreshOperateMode(OperateMode mode)
             {
                 mSearchClassInfoController->refreshSearchClassInfo();
             }
+            mShowActions = true;
+            break;
         }
         case OperateMode::WelcomePage:
         case OperateMode::ScheduleClass:
-        case OperateMode::CalcOneToOneMoney:
-        case OperateMode::CalcClassMoney:
+        case OperateMode::SearchStudentInfo:
+        case OperateMode::TeacherEvaluation:
         {
             mShowActions = true;
             break;

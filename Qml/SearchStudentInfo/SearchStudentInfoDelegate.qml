@@ -8,13 +8,13 @@ import "../JSUtils/MainUtils.js" as MainUtils
 Rectangle {
     id: delegateroot
 
-    property int maxStudentCount
+    property int maxClassCount
     property int infoHeight: 60
-    property int chartHeight: 300
-    property int chartCount: modelData.studentInfo.length
+    property int chartHeight: 200
+    property int chartCount: modelData.classInfo.length
     property int delegateHeight: infoHeight + chartHeight * chartCount
     property int rootWidth
-    property var monthLabels: modelData.studentInfo.yearMonthList
+    property var monthLabels: modelData.classInfo.yearMonthList
 
     color: "transparent"
     radius: 5
@@ -47,7 +47,7 @@ Rectangle {
             }
 
             Row {
-                id: teacherInfo
+                id: studentInfo
 
                 Repeater {
                     id: repeater
@@ -55,10 +55,10 @@ Rectangle {
                     model: modelData.basicInfo
 
                     delegate: Rectangle {
-                        id: teacherInfoItem
+                        id: studentInfoItem
 
                         color: "transparent"
-                        width: MainUtils.getTeacherInfoWidth(rootWidth, index, controller.teacherInfoMap.teacherInfoHeader.length)
+                        width: MainUtils.getStudentInfoWidth(rootWidth, index, controller.studentInfoMap.studentInfoHeader.length)
                         height: infoHeight
 
                         border {
@@ -67,7 +67,7 @@ Rectangle {
                         }
 
                         TextEdit {
-                            id: teacherInfoText
+                            id: studentInfoText
 
                             selectByMouse: true
                             readOnly: true
@@ -85,9 +85,9 @@ Rectangle {
                             }
 
                             Component.onCompleted: {
-                                if(teacherInfoText.height + 10 > infoHeight)
+                                if(studentInfoText.height + 10 > infoHeight)
                                 {
-                                    infoHeight = teacherInfoText.height + 10;
+                                    infoHeight = studentInfoText.height + 10;
                                 }
                             }
                         }
@@ -106,7 +106,7 @@ Rectangle {
             Repeater {
                 id: chartViewRepeater
 
-                model: modelData.studentInfo
+                model: modelData.classInfo
 
                 delegate: Rectangle {
                     id: chartRoot
@@ -130,11 +130,12 @@ Rectangle {
 
                             axisY: ValuesAxis {
                                 min: 0
-                                max: maxStudentCount
-                                tickType: ValuesAxis.TicksFixed
-                                tickInterval: 1
+                                max: maxClassCount
+                                //tickType: ValuesAxis.TicksRange  // 使用 TicksRange 模式
+                                tickCount: maxClassCount + 1    // 格子数 = maxClassCount（因为包含 min 和 max）
                                 labelFormat: "%d"
-                                titleText: modelData.suject + "学生人数"
+                                titleText: modelData.suject + "课程节数"
+
                             }
 
                             axisX: CategoryAxis {

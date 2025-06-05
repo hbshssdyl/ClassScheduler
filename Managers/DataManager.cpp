@@ -182,6 +182,7 @@ bool DataManager::refreshAllDataFromFile(QString filePath)
     mTeacherInfosFromDB = getTeacherInfosList(mClassInfosFromDB);
     mStudentInfosFromDB = getStudentInfosList(mClassInfosFromDB);
     generateTeacherStudentInfos();
+    generateStudentClassInfos();
 
     if(isTableExist(CLASS_INFOS_TABLE_NAME))
     {
@@ -193,6 +194,12 @@ bool DataManager::refreshAllDataFromFile(QString filePath)
     {
         cout << "drop table: " << TEACHER_INFOS_TABLE_NAME.toStdString() << endl;
         dropTable(TEACHER_INFOS_TABLE_NAME);
+    }
+
+    if(isTableExist(STUDENT_INFOS_TABLE_NAME))
+    {
+        cout << "drop table: " << STUDENT_INFOS_TABLE_NAME.toStdString() << endl;
+        dropTable(STUDENT_INFOS_TABLE_NAME);
     }
 
     if(!saveDataToClassInfosTable(mClassInfosFromDB))
@@ -214,7 +221,9 @@ bool DataManager::refreshAllDataFromFile(QString filePath)
     }
 
     storeAllTableDataCount();
-    if(getTableDataCount(CLASS_INFOS_TABLE_NAME) == 0 || getTableDataCount(TEACHER_INFOS_TABLE_NAME) == 0)
+    if(getTableDataCount(CLASS_INFOS_TABLE_NAME) == 0 ||
+       getTableDataCount(TEACHER_INFOS_TABLE_NAME) == 0 ||
+       getTableDataCount(STUDENT_INFOS_TABLE_NAME) == 0)
     {
         return false;
     }
@@ -371,7 +380,7 @@ StudentInfos DataManager::getStudentInfosList(ClassInfos& classInfos)
         auto studentName = classInfo.studentName;
         auto studentSchool = classInfo.school;
         auto studentPhoneNumber = classInfo.studentPhoneNubmer;
-        auto studentTeacher = classInfo.teacherName + "（" + classInfo.teacherNickName + "）";
+        auto studentTeacher = classInfo.suject + "_" + classInfo.teacherName + "（" + classInfo.teacherNickName + "）";
         auto studentSujectsAndPay = classInfo.suject + "_" + classInfo.studentFee + "（" + classInfo.teacherName + "）";
         for(auto& studentInfo : studentInfos)
         {
@@ -453,11 +462,12 @@ void DataManager::queryDataFromStudentInfosTable(StudentInfos& infos)
         info.studentName = query.value("studentName").toString();
         info.strStudentSchools = query.value("studentSchools").toString();
         info.strStudentPhoneNumbers = query.value("studentPhoneNumbers").toString();
-        info.strStudentPhoneNumbers = query.value("studentPhoneNumbers").toString();
+        info.strStudentTeachers = query.value("studentTeachers").toString();
         info.strStudentSujectsAndPays = query.value("studentSujectsAndPays").toString();
 
         infos.emplace_back(info);
     }
+    generateStudentClassInfos();
 }
 
 void DataManager::storeAllTableDataCount()
@@ -640,16 +650,15 @@ void DataManager::saveData(ClassInfo& info, QString& headerStr, QString& str)
 
 void DataManager::generateTeacherStudentBasicInfo()
 {
-    for(auto& studentInfo : mTeacherInfosFromDB)
+    for(auto& teacherInfo : mTeacherInfosFromDB)
     {
-        for(auto& sujectStudentInfo : studentInfo.sujectStudentCounts)
+        for(auto& sujectStudentInfo : teacherInfo.sujectStudentCounts)
         {
             for(auto& monthStudentInfo : sujectStudentInfo.monthCountInfos)
             {
-                studentInfo.teacherStudentCountBasicInfo.refreshData(monthStudentInfo.yearMonth, monthStudentInfo.keyCount);
+                mTeacherInfosFromDB[0].teacherStudentCountBasicInfo.refreshData(monthStudentInfo.yearMonth, monthStudentInfo.keyCount);
             }
         }
-        return; //Only need save data to the firstone
     }
 }
 
@@ -687,6 +696,58 @@ void DataManager::generateTeacherStudentInfos()
         {
             sujectStudentCount.sortMonthStudentInfosByYearMonth();
             sujectStudentCount.fillMissingMonths(minYearMonth, maxYearMonth);
+        }
+    }
+}
+
+void DataManager::generateStudentClassBasicInfo()
+{
+    for(auto& studentInfo : mStudentInfosFromDB)
+    {
+        for(auto& sujectClassInfo : studentInfo.sujectClassCounts)
+        {
+            for(auto& monthClassInfo : sujectClassInfo.monthCountInfos)
+            {
+                mStudentInfosFromDB[0].studentClassCountBasicInfo.refreshData(monthClassInfo.yearMonth, monthClassInfo.keyCount);
+            }
+        }
+    }
+}
+
+void DataManager::generateStudentClassInfos()
+{
+    for(auto& classInfo : mClassInfosFromDB)
+    {
+        bool isNewStudent = true;
+        for(auto& info : mStudentInfosFromDB)
+        {
+            if(classInfo.studentName == info.studentName)
+            {
+                isNewStudent = false;
+                info.addSujectCountInfo(classInfo.suject, classInfo.date, classInfo.grade);
+                break;
+            }
+        }
+        if(isNewStudent)
+        {
+            cout << "Error: there should not be a new student" << endl;
+        }
+    }
+
+    generateStudentClassBasicInfo();
+    if(mStudentInfosFromDB.size() == 0)
+    {
+        return;
+    }
+
+    auto minYearMonth = mStudentInfosFromDB[0].studentClassCountBasicInfo.minYearMonth;
+    auto maxYearMonth = mStudentInfosFromDB[0].studentClassCountBasicInfo.maxYearMonth;
+    for(auto& info : mStudentInfosFromDB)
+    {
+        for(auto& sujectClassCount : info.sujectClassCounts)
+        {
+            sujectClassCount.sortMonthStudentInfosByYearMonth();
+            sujectClassCount.fillMissingMonths(minYearMonth, maxYearMonth);
         }
     }
 }

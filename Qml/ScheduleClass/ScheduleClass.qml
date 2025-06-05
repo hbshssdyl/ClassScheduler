@@ -8,17 +8,36 @@ Rectangle {
     property var operateMode
     property var rootController
     property var controller: rootController.getScheduleClassController()
+    // property int startTimeH: 8
+    // property int startTimeM: 0
+    // property int endTimeH: 23
+    // property int endTimeM: 60
 
-    function generateTimeModel() {
+    function generateTimeModel(isStartTime) {
         var timeList = [];
-        for (var h = 8; h < 23; h++) {
-            for (var m = 0; m < 60; m += 5) {
+        var startTimeH = 8;
+        var startTimeM = 0;
+        var endTimeH = 23;
+        var endTimeM = 60;
+        // if(isStartTime) {
+        //     endTimeH = root.endTimeH;
+        //     endTimeM = root.endTimeM;
+        // }
+        // else{
+        //     startTimeH = root.startTimeH;
+        //     startTimeM = root.startTimeM;
+        // }
+
+        for (var h = startTimeH; h < endTimeH; h++) {
+            for (var m = startTimeM; m < endTimeM; m += 5) {
                 var hour = h < 10 ? "0" + h : h;
                 var minute = m < 10 ? "0" + m : m;
                 timeList.push(hour + ":" + minute);
             }
         }
-        timeList.push("23:00");
+        if(isStartTime) {
+            timeList.push("23:00");
+        }
         return timeList;
     }
 
@@ -124,11 +143,13 @@ Rectangle {
                             id: timeComboBox
 
                             property bool isValid: true
+                            property bool isStartTime: index == 1
 
                             Layout.fillWidth: true
                             model: modelData.options
                             font.pixelSize: 16
                             implicitHeight: 30
+                            clip: true
 
                             background: Rectangle {
                                 color: isValid ? "#ffffff" : "red"
@@ -148,18 +169,32 @@ Rectangle {
 
                             onCurrentIndexChanged:{
                                 timeComboBox.isValid = true;
+                                // var tmp = timeComboBox.currentText.split(":");
+                                // if (index == 1)
+                                // {
+                                //     root.startTimeH = parseInt(tmp[0], 10);
+                                //     root.startTimeM = parseInt(tmp[1], 10);
+                                // }
+                                // else
+                                // {
+                                //     root.endTimeH =  parseInt(tmp[0], 10);
+                                //     root.endTimeM =  parseInt(tmp[1], 10);
+                                // }
                             }
 
                             Component.onCompleted: timeComboBox.currentIndex = -1
+
                         }
                     }
-                }
 
+
+                }
                 Button {
                     id: confirmButton
                     text: "确认排课"
-                    font.pixelSize: 18
+                    font.pixelSize: 16
                     font.bold: true
+                    clip: true
                     Layout.alignment: Qt.AlignHCenter
                     Layout.fillWidth: true
                     background: Rectangle {
@@ -209,60 +244,60 @@ Rectangle {
                     }
                 }
             }
-        }
 
-        Rectangle {
-            Layout.alignment: Qt.AlignLeft
-            Layout.preferredWidth: parent.width / 2 - 10
-            Layout.fillHeight: true
-            Layout.margins: 5
-            color: "#e8f5e9"
-            radius: 5
+            Rectangle {
+                Layout.alignment: Qt.AlignLeft
+                Layout.preferredWidth: parent.width / 2 - 10
+                Layout.fillHeight: true
+                Layout.margins: 5
+                color: "#e8f5e9"
+                radius: 5
 
-            border {
-                color: "#D6D6D6"
-                width: 1
-            }
+                border {
+                    color: "#D6D6D6"
+                    width: 1
+                }
 
-            ListView {
-                anchors.fill: parent
-                anchors.margins: 20
-                spacing: 10
-                clip: true
-                model: controller.scheduleClassResultsList
+                ListView {
+                    anchors.fill: parent
+                    anchors.margins: 20
+                    spacing: 10
+                    clip: true
+                    model: controller.scheduleClassResultsList
 
-                delegate: Item {
-                    width: ListView.view.width
-                    height: contentLayout.implicitHeight + 20
+                    delegate: Item {
+                        width: ListView.view.width
+                        height: contentLayout.implicitHeight + 20
 
-                    Rectangle {
-                        anchors.fill: parent
-                        radius: 10
-                        color: "#ffffff" // White card background
-                        border.color: "#cccccc"
-                        border.width: 1
-
-                        ColumnLayout {
-                            id: contentLayout
-
+                        Rectangle {
                             anchors.fill: parent
-                            anchors.margins: 10
-                            spacing: 5
+                            radius: 10
+                            color: "#ffffff" // White card background
+                            border.color: "#cccccc"
+                            border.width: 1
 
-                            Repeater {
-                                model: modelData
+                            ColumnLayout {
+                                id: contentLayout
 
-                                TextEdit {
+                                anchors.fill: parent
+                                anchors.margins: 10
+                                spacing: 5
 
-                                    selectByMouse: true
-                                    readOnly: true
-                                    text: "<b>" + modelData["label"] + "</b>" + modelData["value"]
-                                    font.pixelSize: 14
-                                    font.bold: false
-                                    textFormat: Text.RichText
-                                    color: "#555555"
-                                    Layout.fillWidth: true
-                                    wrapMode: TextEdit.WordWrap
+                                Repeater {
+                                    model: modelData
+
+                                    TextEdit {
+
+                                        selectByMouse: true
+                                        readOnly: true
+                                        text: "<b>" + modelData["label"] + "</b>" + modelData["value"]
+                                        font.pixelSize: 14
+                                        font.bold: false
+                                        textFormat: Text.RichText
+                                        color: "#555555"
+                                        Layout.fillWidth: true
+                                        wrapMode: TextEdit.WordWrap
+                                    }
                                 }
                             }
                         }
@@ -272,4 +307,3 @@ Rectangle {
         }
     }
 }
-

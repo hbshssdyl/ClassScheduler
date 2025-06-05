@@ -110,9 +110,9 @@ void CUtils::doSearchClassInfos(ClassInfos& allInfos, ClassInfos& searchInfos, Q
 }
 
 //For SearchTeacherInfoController.cpp
-void CUtils::updateTeacherInfoList(QVariantMap& data, TeacherInfos& teacherBasicInfos)
+void CUtils::updateTeacherInfoList(QVariantMap& data, TeacherInfos& teacherInfos)
 {
-    if(teacherBasicInfos.size() == 0)
+    if(teacherInfos.size() == 0)
     {
         return;
     }
@@ -128,14 +128,14 @@ void CUtils::updateTeacherInfoList(QVariantMap& data, TeacherInfos& teacherBasic
 
     //update teacherInfoList
     int id = 1;
-    for(auto& teacherBasicInfo : teacherBasicInfos)
+    for(auto& teacherInfo : teacherInfos)
     {
         QVariantList sujectStudentInfoList;
-        for(auto& info : teacherBasicInfo.sujectStudentCounts)
+        for(auto& info : teacherInfo.sujectStudentCounts)
         {
             sujectStudentInfoList.append(info.toMapStyle());
         }
-        teacherInfoList.append(QVariantMap{ { "basicInfo", teacherBasicInfo.toInfosList(QString::number(id++)) },
+        teacherInfoList.append(QVariantMap{ { "basicInfo", teacherInfo.toInfosList(QString::number(id++)) },
                                             { "studentInfo", sujectStudentInfoList } });
     }
 
@@ -143,9 +143,9 @@ void CUtils::updateTeacherInfoList(QVariantMap& data, TeacherInfos& teacherBasic
     data.insert("teacherInfoList", teacherInfoList);
 
     //update studentBasicInfo
-    data.insert("maxStudentCount", teacherBasicInfos[0].teacherStudentCountBasicInfo.maxKeyCount);
-    data.insert("minYearMonth", teacherBasicInfos[0].teacherStudentCountBasicInfo.minYearMonth);
-    data.insert("maxYearMonth", teacherBasicInfos[0].teacherStudentCountBasicInfo.maxYearMonth);
+    data.insert("maxStudentCount", teacherInfos[0].teacherStudentCountBasicInfo.maxKeyCount);
+    data.insert("minYearMonth", teacherInfos[0].teacherStudentCountBasicInfo.minYearMonth);
+    data.insert("maxYearMonth", teacherInfos[0].teacherStudentCountBasicInfo.maxYearMonth);
 }
 
 void CUtils::doSearchTeacherInfos(TeacherInfos& allInfos, TeacherInfos& searchInfos, QString searchString)
@@ -159,45 +159,43 @@ void CUtils::doSearchTeacherInfos(TeacherInfos& allInfos, TeacherInfos& searchIn
     }
 }
 
-//For SearchStudentInfoTeacherInfoController.cpp
-void CUtils::updateStudentInfoList(QVariantMap& data, StudentInfos& teacherBasicInfos/*, TeacherStudentInfos& teacherStudentInfos, TeacherStudentBasicInfo& studentBasicInfo*/)
+//For SearchStudentInfoController.cpp
+void CUtils::updateStudentInfoList(QVariantMap& data, StudentInfos& studentInfos)
 {
-    // QVariantList teacherInfoHeader;
-    // QVariantList teacherInfoList;
+    if(studentInfos.size() == 0)
+    {
+        return;
+    }
+    QVariantList studentInfoHeader;
+    QVariantList studentInfoList;
 
-    // //update teacherInfoHeader
-    // teacherInfoHeader.append("序号");
-    // for(auto header : validTeacherHeader)
-    // {
-    //     teacherInfoHeader.append(header);
-    // }
+    //update studentInfoHeader
+    studentInfoHeader.append("序号");
+    for(auto header : validStudentHeader)
+    {
+        studentInfoHeader.append(header);
+    }
 
-    // //update teacherInfoList
-    // int id = 1;
-    // for(auto& teacherBasicInfo : teacherBasicInfos)
-    // {
-    //     QVariantList sujectStudentInfoList;
-    //     for(auto& teacherStudentInfo : teacherStudentInfos)
-    //     {
-    //         if(teacherBasicInfo.teacherName == teacherStudentInfo.teacherName)
-    //         {
-    //             for(auto& info : teacherStudentInfo.sujectStudentInfos)
-    //             {
-    //                 sujectStudentInfoList.append(info.toMapStyle());
-    //             }
-    //         }
-    //     }
-    //     teacherInfoList.append(QVariantMap{ { "basicInfo", teacherBasicInfo.toInfosList(QString::number(id++)) },
-    //                                        { "studentInfo", sujectStudentInfoList } });
-    // }
+    //update studentInfoList
+    int id = 1;
+    for(auto& studentInfo : studentInfos)
+    {
+        QVariantList sujectClassInfoList;
+        for(auto& info : studentInfo.sujectClassCounts)
+        {
+            sujectClassInfoList.append(info.toMapStyle());
+        }
+        studentInfoList.append(QVariantMap{ { "basicInfo", studentInfo.toInfosList(QString::number(id++)) },
+                                            { "classInfo", sujectClassInfoList } });
+    }
 
-    // data.insert("teacherInfoHeader", teacherInfoHeader);
-    // data.insert("teacherInfoList", teacherInfoList);
+    data.insert("studentInfoHeader", studentInfoHeader);
+    data.insert("studentInfoList", studentInfoList);
 
-    // //update studentBasicInfo
-    // data.insert("maxStudentCount", studentBasicInfo.maxStudentCount);
-    // data.insert("minYearMonth", studentBasicInfo.minYearMonth);
-    // data.insert("maxYearMonth", studentBasicInfo.maxYearMonth);
+    //update studentBasicInfo
+    data.insert("maxClassCount", studentInfos[0].studentClassCountBasicInfo.maxKeyCount);
+    data.insert("minYearMonth", studentInfos[0].studentClassCountBasicInfo.minYearMonth);
+    data.insert("maxYearMonth", studentInfos[0].studentClassCountBasicInfo.maxYearMonth);
 }
 
 void CUtils::doSearchStudentInfos(StudentInfos& allInfos, StudentInfos& searchInfos, QString searchString)

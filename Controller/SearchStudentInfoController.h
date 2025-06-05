@@ -34,9 +34,6 @@ private:
 private:
     QVariantMap mStudentInfoMap;
     StudentInfos mStudentInfosFromDB;
-    // TeacherStudentInfos mTeacherStudentInfosFromDB;
-    // TeacherStudentBasicInfo mTeacherStudentBasicInfoFromDB;
     DataManagerPtr mDataManager;
-
 };
 

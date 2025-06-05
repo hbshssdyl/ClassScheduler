@@ -63,6 +63,10 @@ private:
     void generateTeacherStudentInfos();
     void generateTeacherStudentBasicInfo();
 
+    //studentClassInfos
+    void generateStudentClassInfos();
+    void generateStudentClassBasicInfo();
+
 private:
     QSqlDatabase mDB;
     ClassInfos mClassInfosFromDB;

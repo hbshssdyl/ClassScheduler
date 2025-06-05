@@ -14,11 +14,13 @@ namespace ClassScheduler
 {
     static const QString CLASS_INFOS_TABLE_NAME = "classInfos";
     static const QString TEACHER_INFOS_TABLE_NAME = "teacherInfos";
+    static const QString STUDENT_INFOS_TABLE_NAME = "studentInfos";
 
     static QString nullString = "无该信息";
     static vector validExcelClassHeader{"日期", "星期", "姓名", "学校", "电话", "年级", "学科", "时间", "老师", "网课or面授", "课时", "金额/小时", "课酬总计", "老师姓名", "老师工资", "已收金额", "付费方式", "收费日期"};
     static vector validTeacherHeader{"老师姓名", "使用过的昵称", "教过的科目及学生", "科目及工资（每小时）", "科目及年级"};
-    static vector allTableNameForDB{"classInfos", "teacherInfos"};
+    static vector validStudentHeader{"学生姓名", "就读学校", "手机号", "教过该生的老师", "科目及费用（每小时）"};
+    static vector allTableNameForDB{"classInfos", "teacherInfos", "studentInfos"};
 
     struct MonthCountInfo {
         QString yearMonth;
@@ -485,6 +487,9 @@ namespace ClassScheduler
         QString strStudentTeachers;
         QString strStudentSujectsAndPays;
 
+        SujectCountInfos sujectClassCounts;
+        PersonKeyBasicInfo studentClassCountBasicInfo;
+
         StudentInfo()
         {
         }
@@ -573,7 +578,7 @@ namespace ClassScheduler
 
         QString getStudentTeachers()
         {
-            return getString(studentTeachers);
+            return getFormatString(studentTeachers);
         }
 
         QString getStudentSujectsAndPays()
@@ -604,6 +609,50 @@ namespace ClassScheduler
                 }
             }
             return result;
+        }
+
+        void addSujectCountInfo(QString suject, QString date, QString grade)
+        {
+            auto className = grade + "_" + suject;
+            auto yearMonth = getYearMonth(date);
+
+            bool hasSuject = false;
+            for(auto& sujectCountInfo : sujectClassCounts)
+            {
+                if(suject == sujectCountInfo.suject)
+                {
+                    hasSuject = true;
+                    bool hasYearMonth = false;
+                    for(auto& monthStudentInfo : sujectCountInfo.monthCountInfos)
+                    {
+                        if(yearMonth == monthStudentInfo.yearMonth)
+                        {
+                            hasYearMonth = true;
+                            monthStudentInfo.saveKey(className);
+                            break;
+                        }
+                    }
+                    if(!hasYearMonth)
+                    {
+                        MonthCountInfo monthCountInfo(yearMonth, className);
+                        sujectCountInfo.monthCountInfos.emplace_back(monthCountInfo);
+                    }
+                    break;
+                }
+            }
+            if(!hasSuject)
+            {
+                SujectCountInfo sujectClassCount(suject, yearMonth, className);
+                sujectClassCounts.emplace_back(sujectClassCount);
+            }
+        }
+
+        QString getYearMonth(const QString& dateStr) {
+            QStringList parts = dateStr.split("-");
+            if (parts.size() >= 2) {
+                return parts[0] + "-" + parts[1];
+            }
+            return "";
         }
     };
     using StudentInfos = vector<StudentInfo>;

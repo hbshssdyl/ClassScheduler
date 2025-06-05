@@ -96,3 +96,39 @@ function getTeacherInfoWidth(windowWidth, index, count){
     }
     return getMinTeacherInfoWidth(index);
 }
+
+function getMinStudentInfoWidth(index)
+{
+    switch(index)
+    {
+        case 0://序号
+            return 40;
+        case 1://学生姓名
+            return 60;
+        case 2://就读学校
+            return 150;
+        case 3://手机号
+            return 150;
+        case 4://教过该生的老师
+            return 250;
+        case 5://科目及费用
+            return 250;
+        default:
+            return 200;
+    }
+}
+
+function getStudentInfoWidth(windowWidth, index, count){
+    //"学生姓名", "就读学校", "手机号", "教过该生的老师", "科目及费用"
+    var sum = 0;
+    for(var i=0; i<count; i++)
+    {
+        sum += getMinStudentInfoWidth(i);
+    }
+
+    if(windowWidth > sum)
+    {
+        return getMinStudentInfoWidth(index) + (windowWidth - sum) / count;
+    }
+    return getMinStudentInfoWidth(index);
+}

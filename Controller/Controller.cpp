@@ -152,8 +152,9 @@ void Controller::onFileUploaded(QString filePath)
                 cout << "Refresh DB data by excel file" << endl;
             }
         }
-        mDataManager->storeAllTableDataCount();
-        mDataManager->refreshAllDataFromDB();
+        else{
+            mDataManager->refreshAllDataFromDB();
+        }
         mDataManager->closeDBConnection();
         onOperateModeSelected(OperateMode::WelcomePage);
     });
@@ -183,6 +184,15 @@ SearchTeacherInfoController* Controller::getSearchTeacherInfoController()
         mSearchTeacherInfoController = new SearchTeacherInfoController(mDataManager, this);
     }
     return mSearchTeacherInfoController;
+}
+
+SearchStudentInfoController* Controller::getSearchStudentInfoController()
+{
+    if (!mSearchStudentInfoController)
+    {
+        mSearchStudentInfoController = new SearchStudentInfoController(mDataManager, this);
+    }
+    return mSearchStudentInfoController;
 }
 
 ScheduleClassController* Controller::getScheduleClassController()

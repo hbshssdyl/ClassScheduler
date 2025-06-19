@@ -244,60 +244,59 @@ Rectangle {
                     }
                 }
             }
+        }
+        Rectangle {
+            Layout.alignment: Qt.AlignLeft
+            Layout.preferredWidth: parent.width / 2 - 10
+            Layout.fillHeight: true
+            Layout.margins: 5
+            color: "#e8f5e9"
+            radius: 5
 
-            Rectangle {
-                Layout.alignment: Qt.AlignLeft
-                Layout.preferredWidth: parent.width / 2 - 10
-                Layout.fillHeight: true
-                Layout.margins: 5
-                color: "#e8f5e9"
-                radius: 5
+            border {
+                color: "#D6D6D6"
+                width: 1
+            }
 
-                border {
-                    color: "#D6D6D6"
-                    width: 1
-                }
+            ListView {
+                anchors.fill: parent
+                anchors.margins: 20
+                spacing: 10
+                clip: true
+                model: controller.scheduleClassResultsList
 
-                ListView {
-                    anchors.fill: parent
-                    anchors.margins: 20
-                    spacing: 10
-                    clip: true
-                    model: controller.scheduleClassResultsList
+                delegate: Item {
+                    width: ListView.view.width
+                    height: contentLayout.implicitHeight + 20
 
-                    delegate: Item {
-                        width: ListView.view.width
-                        height: contentLayout.implicitHeight + 20
+                    Rectangle {
+                        anchors.fill: parent
+                        radius: 10
+                        color: "#ffffff" // White card background
+                        border.color: "#cccccc"
+                        border.width: 1
 
-                        Rectangle {
+                        ColumnLayout {
+                            id: contentLayout
+
                             anchors.fill: parent
-                            radius: 10
-                            color: "#ffffff" // White card background
-                            border.color: "#cccccc"
-                            border.width: 1
+                            anchors.margins: 10
+                            spacing: 5
 
-                            ColumnLayout {
-                                id: contentLayout
+                            Repeater {
+                                model: modelData
 
-                                anchors.fill: parent
-                                anchors.margins: 10
-                                spacing: 5
+                                TextEdit {
 
-                                Repeater {
-                                    model: modelData
-
-                                    TextEdit {
-
-                                        selectByMouse: true
-                                        readOnly: true
-                                        text: "<b>" + modelData["label"] + "</b>" + modelData["value"]
-                                        font.pixelSize: 14
-                                        font.bold: false
-                                        textFormat: Text.RichText
-                                        color: "#555555"
-                                        Layout.fillWidth: true
-                                        wrapMode: TextEdit.WordWrap
-                                    }
+                                    selectByMouse: true
+                                    readOnly: true
+                                    text: "<b>" + modelData["label"] + "</b>" + modelData["value"]
+                                    font.pixelSize: 14
+                                    font.bold: false
+                                    textFormat: Text.RichText
+                                    color: "#555555"
+                                    Layout.fillWidth: true
+                                    wrapMode: TextEdit.WordWrap
                                 }
                             }
                         }
@@ -305,5 +304,6 @@ Rectangle {
                 }
             }
         }
+
     }
 }

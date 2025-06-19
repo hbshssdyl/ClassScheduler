@@ -254,9 +254,30 @@ bool CUtils::isTimeOverlap(const QString& timeRange1, const QString& timeRange2)
 void CUtils::updateScheduleClassResultsList(QList<QList<QVariantMap>>& data, ScheduleClassInputInfo& inputInfos, ClassInfos& classInfosList)
 {
     map<QString, bool> isValidTeacher;
+    map<QString, bool> isValidTeacherSuject;
 
+    // 如果当前老师从来没有教过输入的科目，则默认该老师不可能被安排新课
     for(auto& classInfo : classInfosList)
     {
+        if(isValidTeacherSuject.count(classInfo.teacherName) == 1)
+        {
+            if(isValidTeacherSuject[classInfo.teacherName])
+            {
+                continue;
+            }
+        }
+
+        isValidTeacherSuject[classInfo.teacherName] = false;
+        if(classInfo.suject == inputInfos.suject)
+        {
+            isValidTeacherSuject[classInfo.teacherName] = true;
+        }
+    }
+
+    // 如果当前老师当月在输入的时间上有课的话，就认为该老师不可能被安排新课
+    for(auto& classInfo : classInfosList)
+    {
+
         if(!isCurrentMonth(classInfo.date))
         {
             continue;
@@ -270,16 +291,13 @@ void CUtils::updateScheduleClassResultsList(QList<QList<QVariantMap>>& data, Sch
             }
         }
 
-        if(classInfo.suject == inputInfos.suject)
+        isValidTeacher[classInfo.teacherName] = isValidTeacherSuject[classInfo.teacherName];
+        if(classInfo.weekend == inputInfos.week)
         {
-            isValidTeacher[classInfo.teacherName] = true;
-            if(classInfo.weekend == inputInfos.week)
+            if(isTimeOverlap(classInfo.time, inputInfos.timeRange))
             {
-                if(isTimeOverlap(classInfo.time, inputInfos.timeRange))
-                {
-                    cout << "TimeOverlap: classInfo.time: " << classInfo.time.toStdString() << ", inputInfos.timeRange: " << inputInfos.timeRange.toStdString() << endl;
-                    isValidTeacher[classInfo.teacherName] = false;
-                }
+                cout << "TimeOverlap: classInfo.time: " << classInfo.time.toStdString() << ", inputInfos.timeRange: " << inputInfos.timeRange.toStdString() << endl;
+                isValidTeacher[classInfo.teacherName] = false;
             }
         }
     }
@@ -292,7 +310,7 @@ void CUtils::updateScheduleClassResultsList(QList<QList<QVariantMap>>& data, Sch
             continue;
         }
 
-        if(isValidTeacher[classInfo.teacherName] && inputInfos.suject == classInfo.suject)
+        if(isValidTeacher[classInfo.teacherName])
         {
             bool isNewTeacher = true;
             for(auto& result : resultInfoList)

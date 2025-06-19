@@ -101,7 +101,7 @@ Rectangle {
 
             Layout.alignment: Qt.AlignTop
             Layout.fillWidth: true
-            Layout.preferredHeight: chartHeight * 3
+            Layout.preferredHeight: chartHeight * chartCount
 
             Repeater {
                 id: chartViewRepeater

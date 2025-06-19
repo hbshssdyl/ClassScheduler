@@ -20,11 +20,12 @@ void ScheduleClassController::initialize()
 void ScheduleClassController::onRequiredInfosReceived(QVariantList requiredInfosList)
 {
     //科目，年级，星期，开始时间，结束时间
+    // requiredInfosList.clear();
     // requiredInfosList.append("物理");
     // requiredInfosList.append("高三");
     // requiredInfosList.append("星期六");
-    // requiredInfosList.append("08：00");
-    // requiredInfosList.append("10：00");
+    // requiredInfosList.append("15：00");
+    // requiredInfosList.append("17：00");
     if (mRequiredInfosList == requiredInfosList)
     {
         return;

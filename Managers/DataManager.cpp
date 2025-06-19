@@ -672,6 +672,7 @@ void DataManager::generateTeacherStudentInfos()
             if(classInfo.teacherName == info.teacherName)
             {
                 isNewTeacher = false;
+                info.addSujectCountInfo("总", classInfo.date, classInfo.suject + "_" + classInfo.studentName);
                 info.addSujectCountInfo(classInfo.suject, classInfo.date, classInfo.studentName);
                 break;
             }
@@ -708,6 +709,8 @@ void DataManager::generateStudentClassBasicInfo()
         {
             for(auto& monthClassInfo : sujectClassInfo.monthCountInfos)
             {
+                //cout << mStudentInfosFromDB[0].studentClassCountBasicInfo.minYearMonth.toStdString() << " " << mStudentInfosFromDB[0].studentClassCountBasicInfo.maxYearMonth.toStdString() << endl;
+                //cout << monthClassInfo.yearMonth.toStdString()  << studentInfo.studentName.toStdString() << endl;
                 mStudentInfosFromDB[0].studentClassCountBasicInfo.refreshData(monthClassInfo.yearMonth, monthClassInfo.keyCount);
             }
         }
@@ -724,8 +727,9 @@ void DataManager::generateStudentClassInfos()
             if(classInfo.studentName == info.studentName)
             {
                 isNewStudent = false;
+                info.addSujectCountInfo("总", classInfo.date, classInfo.suject + "_" + classInfo.grade);
                 info.addSujectCountInfo(classInfo.suject, classInfo.date, classInfo.grade);
-                break;
+               break;
             }
         }
         if(isNewStudent)

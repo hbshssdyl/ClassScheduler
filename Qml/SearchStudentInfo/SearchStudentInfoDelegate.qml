@@ -10,7 +10,7 @@ Rectangle {
 
     property int maxClassCount
     property int infoHeight: 60
-    property int chartHeight: 200
+    property int chartHeight: 300
     property int chartCount: modelData.classInfo.length
     property int delegateHeight: infoHeight + chartHeight * chartCount
     property int rootWidth
@@ -131,11 +131,10 @@ Rectangle {
                             axisY: ValuesAxis {
                                 min: 0
                                 max: maxClassCount
-                                //tickType: ValuesAxis.TicksRange  // 使用 TicksRange 模式
-                                tickCount: maxClassCount + 1    // 格子数 = maxClassCount（因为包含 min 和 max）
+                                tickType: ValuesAxis.TicksFixed
+                                tickInterval: 1
                                 labelFormat: "%d"
                                 titleText: modelData.suject + "课程节数"
-
                             }
 
                             axisX: CategoryAxis {

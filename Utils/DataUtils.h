@@ -68,10 +68,10 @@ namespace ClassScheduler
         QString suject;
         MonthCountInfos monthCountInfos;
 
-        SujectCountInfo(QString sujectStr, QString yMonth, QString studentName)
+        SujectCountInfo(QString sujectStr, QString yMonth, QString keyName)
         {
             suject = sujectStr;
-            MonthCountInfo monthCountInfo(yMonth, studentName);
+            MonthCountInfo monthCountInfo(yMonth, keyName);
             monthCountInfos.emplace_back(monthCountInfo);
         }
 
@@ -163,14 +163,18 @@ namespace ClassScheduler
         }
 
         void refreshData(const QString& newYearMonth, int keyCount) {
-            if (minYearMonth.isEmpty() || newYearMonth < minYearMonth)
+            if(!newYearMonth.isEmpty())
             {
-                minYearMonth = newYearMonth;
+                if (minYearMonth.isEmpty() || newYearMonth < minYearMonth)
+                {
+                    minYearMonth = newYearMonth;
+                }
+                if (maxYearMonth.isEmpty() || newYearMonth > maxYearMonth)
+                {
+                    maxYearMonth = newYearMonth;
+                }
             }
-            if (maxYearMonth.isEmpty() || newYearMonth > maxYearMonth)
-            {
-                maxYearMonth = newYearMonth;
-            }
+
             if(keyCount > maxKeyCount)
             {
                 maxKeyCount = keyCount;
@@ -613,7 +617,7 @@ namespace ClassScheduler
 
         void addSujectCountInfo(QString suject, QString date, QString grade)
         {
-            auto className = grade + "_" + suject;
+            auto className = grade;
             auto yearMonth = getYearMonth(date);
 
             bool hasSuject = false;

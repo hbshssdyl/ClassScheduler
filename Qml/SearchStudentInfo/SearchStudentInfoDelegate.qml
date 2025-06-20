@@ -8,17 +8,22 @@ import "../JSUtils/MainUtils.js" as MainUtils
 Rectangle {
     id: delegateroot
 
+    property int rootWidth
+    property var monthLabels: modelData.classInfo.yearMonthList
     property int maxClassCount
     property int infoHeight: 60
     property int chartHeight: 300
-    property int chartCount: modelData.classInfo.length
-    property int delegateHeight: infoHeight + chartHeight * chartCount
-    property int rootWidth
-    property var monthLabels: modelData.classInfo.yearMonthList
+    property int toolHeight: 50
+    property int chartMaxCount: modelData.classInfo.length
+    property int chartCount: 1
+    property int delegateHeight: infoHeight + toolHeight + chartHeight * chartCount
+
 
     color: "transparent"
     radius: 5
     height: delegateHeight
+
+    // signal tryForceLayout()
 
     border {
         color: ColorUtils.getActionItemBorderColor()
@@ -95,65 +100,139 @@ Rectangle {
                 }
             }
         }
-        Column {
-            id: chartViewColumn
-            spacing: 0
+        Item {
+            id: advancedInfoItem
 
             Layout.alignment: Qt.AlignTop
             Layout.fillWidth: true
-            Layout.preferredHeight: chartHeight * chartCount
+            Layout.preferredHeight: toolHeight + chartHeight * chartCount
 
-            Repeater {
-                id: chartViewRepeater
+            ColumnLayout {
+                anchors.fill: parent
+                spacing: 0
 
-                model: modelData.classInfo
+                Row {
+                    id: advancedToolsItem
 
-                delegate: Rectangle {
-                    id: chartRoot
+                    Layout.fillWidth: true
+                    Layout.alignment: Qt.AlignTop
+                    Layout.preferredHeight: toolHeight
 
-                    color: "transparent"
-                    radius: 5
-                    height: chartHeight
-                    width: parent.width
+                    Repeater {
+                        id: advancedToolsRepeater
 
-                    ChartView {
-                        anchors.fill: parent
-                        legend.visible: false
-                        antialiasing: true
+                        anchors.centerIn: parent
 
-                        LineSeries {
-                            id: series
-                            pointLabelsVisible: true
-                            pointLabelsFont.pixelSize: 15
-                            pointLabelsFormat: "@yPoint"
-                            pointLabelsClipping: false  // 允许标签超出图表区域
+                        model: [
+                            { "key": "显示总课程数", "state": true,  "index": 0 },
+                            { "key": "显示各科课程数", "state": false, "index": 1 },
+                            { "key": "显示成绩曲线", "state": false, "index": 2 }
+                        ]
 
-                            axisY: ValuesAxis {
-                                min: 0
-                                max: maxClassCount
-                                tickType: ValuesAxis.TicksFixed
-                                tickInterval: 1
-                                labelFormat: "%d"
-                                titleText: modelData.suject + "课程节数"
-                            }
+                        delegate: Rectangle {
+                            id: toolItemBg
 
-                            axisX: CategoryAxis {
-                                min: 1
-                                max: modelData.yearMonthList.length
-                                labelsPosition: CategoryAxis.AxisLabelsPositionOnValue
+                            width: MainUtils.getToolsItemWidth(rootWidth, index, advancedToolsRepeater.model.length)
+                            height: toolHeight
+                            // radius: 8
+                            color: "#F5F5F5"
+                            border.color: "#E0E0E0"
+                            border.width: 1
 
-                                // 动态创建 CategoryRange
-                                Component.onCompleted: {
-                                    for (var i = 0; i < modelData.yearMonthList.length; i++) {
-                                        append(modelData.yearMonthList[i], i + 1);
+                            Switch {
+                                id: toolItem
+
+                                anchors.centerIn: parent
+                                text: modelData.key
+                                checked: modelData.state
+                                onClicked: {
+                                    let data = modelData;
+                                    let root = delegateroot;
+
+                                    advancedToolsRepeater.model[data.index].state = checked;
+
+                                    var cnt = 1;
+                                    if (data.index === 0) {
+                                        cnt = root.chartMaxCount - 1;
                                     }
+
+                                    if (checked)
+                                        root.chartCount += cnt;
+                                    else
+                                        root.chartCount -= cnt;
+
+                                    // root.tryForceLayout();
                                 }
                             }
+                        }
+                    }
+                }
 
-                            Component.onCompleted: {
-                                for (let i = 0; i < modelData.monthCountList.length; ++i) {
-                                    let item = modelData.monthCountList[i];
-                                    series.append(i + 1, item);
+                Column {
+                    id: chartViewColumn
+
+                    Layout.alignment: Qt.AlignTop
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    spacing: 0
+                    visible: delegateroot.chartCount > 0
+
+                    Repeater {
+                        id: chartViewRepeater
+                        model: modelData.classInfo
+
+                        delegate: Rectangle {
+                            id: chartRoot
+
+                            color: "transparent"
+                            radius: 5
+                            height: chartHeight
+                            width: parent.width
+
+                            visible: {
+                                if (index === 0) return advancedToolsRepeater.model[0].state;
+                                else return advancedToolsRepeater.model[1].state;
+                            }
+
+                            ChartView {
+                                anchors.fill: parent
+                                legend.visible: false
+                                antialiasing: true
+
+                                LineSeries {
+                                    id: series
+                                    pointLabelsVisible: true
+                                    pointLabelsFont.pixelSize: 15
+                                    pointLabelsFormat: "@yPoint"
+                                    pointLabelsClipping: false
+
+                                    Component.onCompleted: {
+                                        for (let i = 0; i < modelData.monthCountList.length; ++i) {
+                                            let item = modelData.monthCountList[i];
+                                            series.append(i + 1, item);
+                                        }
+                                    }
+
+                                    axisY: ValuesAxis {
+                                        min: 0
+                                        max: maxClassCount
+                                        tickType: ValuesAxis.TicksFixed
+                                        tickInterval: 1
+                                        labelFormat: "%d"
+                                        titleText: modelData.suject + "课程节数"
+                                    }
+
+                                    axisX: CategoryAxis {
+                                        min: 1
+                                        max: modelData.yearMonthList.length
+                                        labelsPosition: CategoryAxis.AxisLabelsPositionOnValue
+
+                                        Component.onCompleted: {
+                                            for (var i = 0; i < modelData.yearMonthList.length; i++) {
+                                                append(modelData.yearMonthList[i], i + 1);
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -161,5 +240,6 @@ Rectangle {
                 }
             }
         }
+
     }
 }

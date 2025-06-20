@@ -132,3 +132,33 @@ function getStudentInfoWidth(windowWidth, index, count){
     }
     return getMinStudentInfoWidth(index);
 }
+
+function getMinToolsWidth(index)
+{
+    switch(index)
+    {
+        case 0://显示总课程数
+            return 152;
+        case 1://显示各科课程数
+            return 140;
+        case 2://显示成绩曲线
+            return 140;
+        default:
+            return 150;
+    }
+}
+
+function getToolsItemWidth(windowWidth, index, count){
+
+    var sum = 0;
+    for(var i=0; i<count; i++)
+    {
+        sum += getMinToolsWidth(i);
+    }
+
+    if(windowWidth > sum)
+    {
+        return getMinToolsWidth(index) + (windowWidth - sum) / count;
+    }
+    return getMinToolsWidth(index);
+}

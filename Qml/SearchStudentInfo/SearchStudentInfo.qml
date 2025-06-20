@@ -68,6 +68,9 @@ Rectangle {
                     header: headerView
                     headerPositioning: ListView.OverlayHeader
 
+                    // reuseItems: false
+                    // cacheBuffer: 1000
+
                     delegate: SearchStudentInfoDelegate {
                         id: delegateItem
 
@@ -75,6 +78,8 @@ Rectangle {
                         width: listView.contentWidth
                         rootWidth: root.width
                         z: 1
+
+                        // onTryForceLayout: listView.forceLayout()
                     }
 
                 }

@@ -31,10 +31,21 @@ void Controller::initDB()
         mDataManager->createDBConnection();
         mDataManager->storeAllTableDataCount();
         mDataCount = QString::number(mDataManager->getTableDataCount(CLASS_INFOS_TABLE_NAME));
+        refreshAppSettings();
         mDataManager->closeDBConnection();
         emit dataCountChanged();
         cout << "initDB, currentDataCount: " << mDataCount.toStdString() << endl;
     }
+}
+
+void Controller::refreshAppSettings()
+{
+    auto appSettings = mDataManager->getAppSettingsFromDB();
+    for(auto& setting : appSettings)
+    {
+        mAppSettings[setting.key] = setting.value;
+    }
+    emit appSettingsChanged();
 }
 
 QString Controller::toOperateModeString(OperateMode mode)

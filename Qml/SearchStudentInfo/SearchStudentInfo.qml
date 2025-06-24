@@ -78,8 +78,6 @@ Rectangle {
                         width: listView.contentWidth
                         rootWidth: root.width
                         z: 1
-
-                        // onTryForceLayout: listView.forceLayout()
                     }
 
                 }

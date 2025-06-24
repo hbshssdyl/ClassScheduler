@@ -26,6 +26,7 @@ public:
     Q_PROPERTY(QString loadedView MEMBER mLoadedView NOTIFY operateModeChanged)
     Q_PROPERTY(QString dataCount MEMBER mDataCount NOTIFY dataCountChanged)
     Q_PROPERTY(QVariantList actionItemsList MEMBER mActionItemsList NOTIFY actionItemsListChanged)
+    Q_PROPERTY(QVariantMap appSettings MEMBER mAppSettings NOTIFY appSettingsChanged)
 
     enum class OperateMode
     {
@@ -60,30 +61,35 @@ signals:
     void operateModeChanged();
     void dataCountChanged();
     void actionItemsListChanged();
+    void appSettingsChanged();
 
 private:
     QString toOperateModeString(OperateMode mode);
     void refreshOperateMode(OperateMode mode);
     void getClassInfosByExcelFile(QString filePath);
     void initDB();
+    void refreshAppSettings();
 
 private:
     OperateMode mOperateMode { OperateMode::None };
     DataManagerPtr mDataManager;
-    QFutureWatcher<void> mFutureWatcher; // 跟踪异步任务
+
+    QString mNewDataFilePath { "" };
+
     QString mLoadedView { "" };
     bool mShowActions;
     QString mDataCount { "" };
-    QString mNewDataFilePath { "" };
     QVariantList mActionItemsList;
     OperateModes mAllOperateMode;
+    QVariantMap mAppSettings;
+
     QPointer<SearchClassInfoController> mSearchClassInfoController;
     QPointer<SearchTeacherInfoController> mSearchTeacherInfoController;
     QPointer<SearchStudentInfoController> mSearchStudentInfoController;
     QPointer<ScheduleClassController> mScheduleClassController;
 
+    QFutureWatcher<void> mFutureWatcher; // 跟踪异步任务
     std::mutex mClassInfosMutex;
     std::condition_variable mClassInfosCondition;
-
 };
 

@@ -34,6 +34,7 @@ private:
 private:
     QVariantMap mStudentInfoMap;
     StudentInfos mStudentInfosFromDB;
+    AppSettings mAppSettings;
     DataManagerPtr mDataManager;
 };
 

@@ -16,6 +16,20 @@ bool DataManager::createDBConnection()
     return true;
 }
 
+bool DataManager::init()
+{
+    bool ret = true;
+
+    if(!isTableExist(APP_TOGGLE_INFOS_TABLE_NAME))
+    {
+        ret &= createAppSettingsTable();
+        ret &= initializeAppSettings();
+    }
+
+    cout << "DataManager init: " << ret << endl;
+    return ret;
+}
+
 void DataManager::closeDBConnection()
 {
     QString connectionName = QSqlDatabase::database().connectionName();
@@ -101,6 +115,75 @@ bool DataManager::createStudentInfosTable()
         cout << "Failed to create table: " << query.lastError().text().toStdString() << endl;
         return false;
     }
+    return true;
+}
+
+bool DataManager::createAppSettingsTable()
+{
+    QSqlQuery query;
+    QString createSql =
+        "CREATE TABLE IF NOT EXISTS settings ("
+        "key TEXT PRIMARY KEY,"
+        "value INTEGER NOT NULL)";
+
+    if (!query.exec(createSql)) {
+        qWarning() << "Failed to create settings table:" << query.lastError().text();
+        return false;
+    }
+
+    return true;
+}
+
+bool DataManager::initializeAppSettings()
+{
+    QSqlQuery query;
+
+    query.prepare("INSERT OR REPLACE INTO settings (key, value) VALUES (:key, :value)");
+
+    for (const auto& setting : initialAppSettings) {
+        query.bindValue(":key", setting.key);
+        query.bindValue(":value", setting.value ? 1 : 0);
+        if (!query.exec()) {
+            qWarning() << "Failed to insert setting:" << setting.key << query.lastError().text();
+            return false;
+        }
+    }
+
+    return true;
+}
+
+bool DataManager::setAppSetting(const QString& key, bool value)
+{
+    QSqlQuery query;
+    query.prepare("INSERT OR REPLACE INTO settings (key, value) VALUES (:key, :value)");
+    query.bindValue(":key", key);
+    query.bindValue(":value", value ? 1 : 0);
+
+    if (!query.exec()) {
+        qWarning() << "Failed to update setting:" << query.lastError().text();
+        return false;
+    }
+
+    return true;
+}
+
+bool DataManager::loadAllSettings()
+{
+    mAppSettings.clear();
+
+    QSqlQuery query("SELECT key, value FROM settings");
+    if (!query.exec()) {
+        qWarning() << "Failed to load settings:" << query.lastError().text();
+        return false;
+    }
+
+    while (query.next()) {
+        Setting s;
+        s.key = query.value(0).toString();
+        s.value = query.value(1).toInt() != 0;  // 1 = true, 0 = false
+        mAppSettings.push_back(s);
+    }
+
     return true;
 }
 
@@ -261,6 +344,11 @@ TeacherInfos DataManager::getTeacherInfosFromDB()
 StudentInfos DataManager::getStudentInfosFromDB()
 {
     return mStudentInfosFromDB;
+}
+
+AppSettings DataManager::getAppSettingsFromDB()
+{
+    return mAppSettings;
 }
 
 bool DataManager::saveDataToClassInfosTable(ClassInfos& infos)
@@ -705,12 +793,12 @@ void DataManager::generateStudentClassBasicInfo()
 {
     for(auto& studentInfo : mStudentInfosFromDB)
     {
+        studentInfo.studentClassCountBasicInfo.showTotal = true;
+        studentInfo.studentClassCountBasicInfo.showTotal = true;
         for(auto& sujectClassInfo : studentInfo.sujectClassCounts)
         {
             for(auto& monthClassInfo : sujectClassInfo.monthCountInfos)
             {
-                //cout << mStudentInfosFromDB[0].studentClassCountBasicInfo.minYearMonth.toStdString() << " " << mStudentInfosFromDB[0].studentClassCountBasicInfo.maxYearMonth.toStdString() << endl;
-                //cout << monthClassInfo.yearMonth.toStdString()  << studentInfo.studentName.toStdString() << endl;
                 mStudentInfosFromDB[0].studentClassCountBasicInfo.refreshData(monthClassInfo.yearMonth, monthClassInfo.keyCount);
             }
         }

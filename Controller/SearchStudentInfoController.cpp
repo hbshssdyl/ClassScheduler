@@ -25,6 +25,7 @@ void SearchStudentInfoController::refreshSearchStudentInfo()
     if(mStudentInfosFromDB.size() == 0)
     {
         mStudentInfosFromDB = mDataManager->getStudentInfosFromDB();
+        mAppSettings = mDataManager->getAppSettingsFromDB();
     }
 
     if(mStudentInfosFromDB.size() == 0)

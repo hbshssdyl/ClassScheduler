@@ -23,8 +23,6 @@ Rectangle {
     radius: 5
     height: delegateHeight
 
-    // signal tryForceLayout()
-
     border {
         color: ColorUtils.getActionItemBorderColor()
         width: 1
@@ -151,8 +149,11 @@ Rectangle {
 
                                     advancedToolsRepeater.model[data.index].state = checked;
 
-                                    var cnt = 1;
+                                    var cnt = 0;
                                     if (data.index === 0) {
+                                        cnt = 1;
+                                    }
+                                    else if (data.index === 1){
                                         cnt = root.chartMaxCount - 1;
                                     }
 
@@ -160,8 +161,6 @@ Rectangle {
                                         root.chartCount += cnt;
                                     else
                                         root.chartCount -= cnt;
-
-                                    // root.tryForceLayout();
                                 }
                             }
                         }

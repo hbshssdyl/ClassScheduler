@@ -15,12 +15,25 @@ namespace ClassScheduler
     static const QString CLASS_INFOS_TABLE_NAME = "classInfos";
     static const QString TEACHER_INFOS_TABLE_NAME = "teacherInfos";
     static const QString STUDENT_INFOS_TABLE_NAME = "studentInfos";
+    static const QString APP_TOGGLE_INFOS_TABLE_NAME = "toggleInfos";
 
     static QString nullString = "无该信息";
     static vector validExcelClassHeader{"日期", "星期", "姓名", "学校", "电话", "年级", "学科", "时间", "老师", "网课or面授", "课时", "金额/小时", "课酬总计", "老师姓名", "老师工资", "已收金额", "付费方式", "收费日期"};
     static vector validTeacherHeader{"老师姓名", "使用过的昵称", "教过的科目及学生", "科目及工资（每小时）", "科目及年级"};
     static vector validStudentHeader{"学生姓名", "就读学校", "手机号", "教过该生的老师", "科目及费用（每小时）"};
     static vector allTableNameForDB{"classInfos", "teacherInfos", "studentInfos"};
+
+    struct Setting {
+        QString key;
+        bool value;
+    };
+    static QVector<Setting> initialAppSettings = {
+        { "showStudentAllClass",      true  },
+        { "showStudentSujectClass",   false },
+        { "showStudentSujectScore",   false },
+        { "showTeacherAllStudent",    true  },
+        { "showTeacherSujectStudent", false }
+    };
 
     struct MonthCountInfo {
         QString yearMonth;
@@ -152,14 +165,19 @@ namespace ClassScheduler
     };
     using SujectCountInfos = vector<SujectCountInfo>;
 
-    struct PersonKeyBasicInfo {
-        int maxKeyCount;
-        QString minYearMonth;
-        QString maxYearMonth;
+    struct DataBasicInfo {
+        //学生课程（教师所教学生）数量曲线图基础信息
+        int maxKeyCount;//所有课程或学生数量中各月份中的最大值
+        QString minYearMonth;//横轴的最小月份
+        QString maxYearMonth;//横轴的最大月份
+        bool showTotal;//显示总数的曲线图
+        bool showEvery;//显示各科目的key数量曲线图
 
-        PersonKeyBasicInfo()
+        DataBasicInfo()
         {
             maxKeyCount = 0;
+            showTotal = false;
+            showEvery = false;
         }
 
         void refreshData(const QString& newYearMonth, int keyCount) {
@@ -307,7 +325,7 @@ namespace ClassScheduler
         QString strTeacherSujectsAndGrades;
 
         SujectCountInfos sujectStudentCounts;
-        PersonKeyBasicInfo teacherStudentCountBasicInfo;
+        DataBasicInfo teacherStudentCountBasicInfo;
 
         TeacherInfo()
         {
@@ -492,7 +510,7 @@ namespace ClassScheduler
         QString strStudentSujectsAndPays;
 
         SujectCountInfos sujectClassCounts;
-        PersonKeyBasicInfo studentClassCountBasicInfo;
+        DataBasicInfo studentClassCountBasicInfo;
 
         StudentInfo()
         {
@@ -929,4 +947,5 @@ namespace ClassScheduler
     using ScheduleClassResultInfos = vector<ScheduleClassResultInfo>;
 
     using TableDataCount = std::map<QString, int>; //QString tableName, int dataCount
+    using AppSettings = vector<Setting>;
 } // namespace ClassScheduler

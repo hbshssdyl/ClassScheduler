@@ -20,25 +20,24 @@ Rectangle {
 
 
     color: "transparent"
-    radius: 5
     height: delegateHeight
 
     border {
-        color: ColorUtils.getActionItemBorderColor()
-        width: 1
+        color: "#33CCCC"
+        width: 3
     }
 
     ColumnLayout {
         id: rootLayout
 
         anchors.fill: parent
+        anchors.margins: 5
         spacing: 0
 
         Rectangle {
             id: infoRoot
 
             color: "transparent"
-            radius: 5
 
             Layout.alignment: Qt.AlignTop
             Layout.fillWidth: true

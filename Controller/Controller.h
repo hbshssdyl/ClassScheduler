@@ -23,6 +23,7 @@ class Controller : public QObject {
 public:
     Q_PROPERTY(OperateMode operateMode MEMBER mOperateMode NOTIFY operateModeChanged)
     Q_PROPERTY(bool showActions MEMBER mShowActions NOTIFY operateModeChanged)
+    Q_PROPERTY(bool showUserInfo MEMBER mShowUserInfo NOTIFY operateModeChanged)
     Q_PROPERTY(QString loadedView MEMBER mLoadedView NOTIFY operateModeChanged)
     Q_PROPERTY(QString dataCount MEMBER mDataCount NOTIFY dataCountChanged)
     Q_PROPERTY(QVariantList actionItemsList MEMBER mActionItemsList NOTIFY actionItemsListChanged)
@@ -78,6 +79,7 @@ private:
 
     QString mLoadedView { "" };
     bool mShowActions;
+    bool mShowUserInfo;
     QString mDataCount { "" };
     QVariantList mActionItemsList;
     OperateModes mAllOperateMode;

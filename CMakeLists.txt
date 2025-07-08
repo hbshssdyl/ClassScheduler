@@ -56,6 +56,7 @@ qt_add_qml_module(appClassScheduler
     QML_FILES Qml/SearchStudentInfo/SearchStudentInfoDelegate.qml
 
     RESOURCES Resource/Avatar-self.jpg
+    QML_FILES Qml/UserInfo/UserInfo.qml
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.

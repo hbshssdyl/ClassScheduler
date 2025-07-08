@@ -6,8 +6,8 @@ import Controller 1.0
 import ClassScheduler 1.0
 
 Window {
-    width: 640
-    height: 480
+    width: 1000
+    height: 618
     visible: true
     title: qsTr("天明书院信息管理系统")
 
@@ -25,30 +25,50 @@ Window {
         id: columnLayout
 
         anchors.fill: parent
-        spacing: 0
 
-        ActionItems {
-            id: actionItems
+        UserInfo {
+            id: userInfo
 
-            controller: controller
-            visible: controller.showActions
+            visible: controller.showUserInfo
             Layout.alignment: Qt.AlignTop
             Layout.preferredHeight: 50
             Layout.fillWidth: true
-            Layout.topMargin: 12
             Layout.leftMargin: 12
             Layout.rightMargin: 12
         }
 
-        OperateArea{
-            id: operateArea
+        RowLayout {
+            id: rowLayout
 
-            controller: controller
             Layout.fillWidth: true
             Layout.fillHeight: true
-            Layout.margins: 12
+            spacing: 0
+
+            ActionItems {
+                id: actionItems
+
+                controller: controller
+                visible: controller.showActions
+                Layout.alignment: Qt.AlignTop
+                Layout.preferredWidth: 100
+                Layout.fillHeight: true
+                Layout.leftMargin: 12
+                Layout.bottomMargin: 12
+            }
+
+            OperateArea{
+                id: operateArea
+
+                controller: controller
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                Layout.leftMargin: 12
+                Layout.bottomMargin: 12
+                Layout.rightMargin: 12
+            }
 
         }
-
     }
+
+
 }

@@ -80,6 +80,7 @@ void Controller::refreshOperateMode(OperateMode mode)
 {
     mOperateMode = mode;
     mLoadedView = toOperateModeString(mode);
+    mShowUserInfo = true;
     switch (mode)
     {
         case OperateMode::None:
@@ -87,6 +88,7 @@ void Controller::refreshOperateMode(OperateMode mode)
         case OperateMode::FileView:
         {
             mShowActions = false;
+            mShowUserInfo = false;
             break;
         }
 

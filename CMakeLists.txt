@@ -57,6 +57,12 @@ qt_add_qml_module(appClassScheduler
 
     RESOURCES Resource/Avatar-self.jpg
     RESOURCES Resource/Banner.jpg
+    RESOURCES Resource/QA.svg
+    RESOURCES Resource/folder.svg
+    RESOURCES Resource/phone.svg
+    RESOURCES Resource/study.svg
+    RESOURCES Resource/tag.svg
+    RESOURCES Resource/user.svg
     QML_FILES Qml/UserInfo/UserInfo.qml
 )
 

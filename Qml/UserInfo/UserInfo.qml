@@ -9,7 +9,7 @@ Rectangle {
     property var controller
 
     color: ColorUtils.getOperateAreaBackgroundColor()
-    radius: 5
+    // radius: 5
     // 圆形头像 - 使用简单裁剪方法
     Rectangle {
         id: avatar
@@ -30,15 +30,6 @@ Rectangle {
                     source = "qrc:/qt/qml/ClassScheduler/Resource/Banner.jpg";
                 }
             }
-        }
-
-        // 圆形边框
-        Rectangle {
-            anchors.fill: parent
-            radius: width / 2
-            color: "transparent"
-            border.color: "#888"
-            border.width: 1
         }
 
         // 点击区域

@@ -50,7 +50,7 @@ Window {
                 controller: controller
                 visible: controller.showActions
                 Layout.alignment: Qt.AlignTop
-                Layout.preferredWidth: 100
+                Layout.preferredWidth: 70
                 Layout.fillHeight: true
                 Layout.leftMargin: 12
                 Layout.bottomMargin: 12

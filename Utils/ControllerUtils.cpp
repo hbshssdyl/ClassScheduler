@@ -17,15 +17,15 @@ QString toOperateModeString(Controller::OperateMode mode)
     case Controller::OperateMode::WelcomePage:
         return "欢迎使用";
     case Controller::OperateMode::SearchClassInfo:
-        return "查询课程信息";
+        return "课程信息";
     case Controller::OperateMode::SearchTeacherInfo:
-        return "查询教师信息";
+        return "教师信息";
     case Controller::OperateMode::SearchStudentInfo:
-        return "查询学生信息";
+        return "学生信息";
     case Controller::OperateMode::ScheduleClass:
         return "排课";
     case Controller::OperateMode::TeacherEvaluation:
-        return "老师评价系统";
+        return "老师评价";
     default:
         return "default";
     }

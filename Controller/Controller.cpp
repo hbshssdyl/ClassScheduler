@@ -142,6 +142,8 @@ void Controller::onOperateModeSelected(OperateMode mode)
 void Controller::onTryToLogin(QString username, QString password)
 {
     onOperateModeSelected(OperateMode::FileView);
+    auto userInfo = mDataManager->getUserInfoFromDB();
+
 }
 
 void Controller::onFileUploaded(QString filePath)

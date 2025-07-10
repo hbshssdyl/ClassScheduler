@@ -33,6 +33,7 @@ public:
     TeacherInfos getTeacherInfosFromDB();
     StudentInfos getStudentInfosFromDB();
     AppSettings getAppSettingsFromDB();
+    UserInfos getUserInfoFromDB();
 
 private:
     bool init();
@@ -52,7 +53,8 @@ private:
     bool createStudentInfosTable();
     bool createAppSettingsTable();
     bool initializeAppSettings();
-    bool loadAllSettings();
+    bool readAllSettings();
+    bool readAllUserInfos();
     bool setAppSetting(const QString& key, bool value);
     bool insertDataToClassInfosTable(ClassInfos& infos);
     bool insertDataToTeacherInfosTable(TeacherInfos& infos);
@@ -80,6 +82,7 @@ private:
     StudentInfos mStudentInfosFromDB;
     TableDataCount mDataCount;
     AppSettings mAppSettings;
+    UserInfos mUserInfos;
 };
 
 #endif // DATAMANAGER_H

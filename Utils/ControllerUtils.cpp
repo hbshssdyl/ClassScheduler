@@ -29,7 +29,28 @@ QString toOperateModeString(Controller::OperateMode mode)
     default:
         return "default";
     }
+}
 
+QString getIconNameByOperateMode(Controller::OperateMode mode)
+{
+    switch (mode)
+    {
+    case Controller::OperateMode::None:
+    case Controller::OperateMode::WelcomePage:
+        return "";
+    case Controller::OperateMode::SearchClassInfo:
+        return "folder.svg";
+    case Controller::OperateMode::SearchTeacherInfo:
+        return "study.svg";
+    case Controller::OperateMode::SearchStudentInfo:
+        return "user.svg";
+    case Controller::OperateMode::ScheduleClass:
+        return "tag.svg";
+    case Controller::OperateMode::TeacherEvaluation:
+        return "QA.svg";
+    default:
+        return "default";
+    }
 }
 
 QVariantMap getClassListInfo(int id, ClassInfo classInfo)
@@ -71,6 +92,7 @@ void CUtils::updateActionItemsList(QVariantList& data, const Controller::Operate
     for(auto activeItem : actionItems)
     {
         data.append(QVariantMap{ { "actionName", toOperateModeString(activeItem) },
+                                { "actionIcon", getIconNameByOperateMode(activeItem) },
                                 { "OperateMode", static_cast<int>(activeItem) },
                                 { "isSelected", activeItem == selectedMode }});
     }

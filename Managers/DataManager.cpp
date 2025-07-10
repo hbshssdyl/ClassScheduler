@@ -26,6 +26,9 @@ bool DataManager::init()
         ret &= initializeAppSettings();
     }
 
+    readAllSettings();
+    readAllUserInfos();
+
     cout << "DataManager init: " << ret << endl;
     return ret;
 }
@@ -167,7 +170,7 @@ bool DataManager::setAppSetting(const QString& key, bool value)
     return true;
 }
 
-bool DataManager::loadAllSettings()
+bool DataManager::readAllSettings()
 {
     mAppSettings.clear();
 
@@ -185,6 +188,14 @@ bool DataManager::loadAllSettings()
     }
 
     return true;
+}
+
+bool DataManager::readAllUserInfos()
+{
+    mUserInfos.emplace_back(UserInfo("zhuhui", "zh615", UserLevel::Owner));
+    mUserInfos.emplace_back(UserInfo("tingting", "xyt123", UserLevel::RegularUser));
+    mUserInfos.emplace_back(UserInfo("xiaoru", "cmr123", UserLevel::Owner));
+    mUserInfos.emplace_back(UserInfo("Dylan", "dylanadmin", UserLevel::SuperAdmin));
 }
 
 void DataManager::dropTable(QString tableName)
@@ -349,6 +360,11 @@ StudentInfos DataManager::getStudentInfosFromDB()
 AppSettings DataManager::getAppSettingsFromDB()
 {
     return mAppSettings;
+}
+
+UserInfos DataManager::getUserInfoFromDB()
+{
+    return mUserInfos;
 }
 
 bool DataManager::saveDataToClassInfosTable(ClassInfos& infos)

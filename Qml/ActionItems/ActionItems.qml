@@ -22,7 +22,7 @@ Rectangle {
             spacing: 12
 
             delegate: ActionItemDelegate {
-                width: 70
+                width: root.width
                 height: 43
                 onButtonClicked: controller.onOperateModeSelected(mode)
             }

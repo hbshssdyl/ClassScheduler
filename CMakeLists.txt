@@ -64,6 +64,7 @@ qt_add_qml_module(appClassScheduler
     RESOURCES Resource/tag.svg
     RESOURCES Resource/user.svg
     QML_FILES Qml/UserInfo/UserInfo.qml
+    SOURCES Managers/UserManager.h Managers/UserManager.cpp
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.

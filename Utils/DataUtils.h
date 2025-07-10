@@ -23,6 +23,49 @@ namespace ClassScheduler
     static vector validStudentHeader{"学生姓名", "就读学校", "手机号", "教过该生的老师", "科目及费用（每小时）"};
     static vector allTableNameForDB{"classInfos", "teacherInfos", "studentInfos"};
 
+    enum class UserLevel
+    {
+        None = 0,
+        RegularUser,
+        SeniorUser,
+        Manager,
+        Owner,
+        SuperAdmin
+    };
+
+    enum class OperateMode
+    {
+        None,
+        LoginView, //once view
+        FileView,  //once view
+        WelcomePage,
+        SearchClassInfo,
+        SearchTeacherInfo,
+        SearchStudentInfo,
+        ScheduleClass,
+        TeacherEvaluation
+    };
+    using OperateModes = std::vector<OperateMode>;
+
+    struct UserInfo{
+        std::string name;
+        UserLevel level;
+        OperateModes mods;
+    };
+
+    struct LoginInfo{
+        std::string username;
+        std::string password;
+        UserLevel level;
+
+        LoginInfo(std::string name, std::string pwd, UserLevel ulevel)
+        {
+            username = name;
+            password = pwd;
+            level = ulevel;
+        }
+    };
+
     struct Setting {
         QString key;
         bool value;
@@ -948,4 +991,6 @@ namespace ClassScheduler
 
     using TableDataCount = std::map<QString, int>; //QString tableName, int dataCount
     using AppSettings = vector<Setting>;
+
+    using LoginInfos = vector<LoginInfo>;
 } // namespace ClassScheduler

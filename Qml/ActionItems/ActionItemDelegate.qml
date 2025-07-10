@@ -19,15 +19,46 @@ Rectangle{
         width: 1
     }
 
-    Text{
-        id: actionName
+    RowLayout{
+        id: rowLayout
 
-        anchors.centerIn: parent
-        text: modelData.actionName
-        font {
-            bold: false
-            pixelSize: 12
+        anchors.fill: parent
+        spacing: 2
+
+        Image {
+            id: icon
+
+            Layout.preferredHeight: 20
+            Layout.preferredWidth: 20
+            Layout.leftMargin: 5
+            Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
+            fillMode: Image.PreserveAspectCrop
+            source: "qrc:/qt/qml/ClassScheduler/Resource/" + modelData.actionIcon
         }
+
+        Item {
+            id: textItem
+
+            Layout.fillWidth: true
+            Layout.preferredHeight: parent.height
+            Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
+
+            Text {
+                id: actionName
+
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.left: parent.left
+                anchors.leftMargin: 5  // 可选，控制距离
+                text: modelData.actionName
+                font {
+                    bold: false
+                    pixelSize: 12
+                }
+            }
+        }
+
+
+
     }
 
     MouseArea{

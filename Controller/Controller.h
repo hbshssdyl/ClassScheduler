@@ -29,21 +29,6 @@ public:
     Q_PROPERTY(QVariantList actionItemsList MEMBER mActionItemsList NOTIFY actionItemsListChanged)
     Q_PROPERTY(QVariantMap appSettings MEMBER mAppSettings NOTIFY appSettingsChanged)
 
-    enum class OperateMode
-    {
-        None,
-        LoginView, //once view
-        FileView,  //once view
-        WelcomePage,
-        SearchClassInfo,
-        SearchTeacherInfo,
-        SearchStudentInfo,
-        ScheduleClass,
-        TeacherEvaluation
-    };
-    Q_ENUM(OperateMode)
-    using OperateModes = std::vector<OperateMode>;
-
 public:
     explicit Controller(QObject* parent = nullptr);
     void initialize();

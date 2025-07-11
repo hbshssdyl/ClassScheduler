@@ -880,3 +880,68 @@ QVariant DataManager::readCellValue(QString headerStr, CellPtr cell)
     }
     return cell->readValue();
 }
+// excelcomhandler.cpp
+// #include "excelcomhandler.h"
+// #include <QDebug>
+
+// ExcelCOMHandler::ExcelCOMHandler(QObject *parent) : QObject(parent) {}
+
+// ExcelCOMHandler::~ExcelCOMHandler() {
+//     closeExcel();
+// }
+
+// bool ExcelCOMHandler::openProtectedExcel(const QString &filePath, const QString &password)
+// {
+//     try {
+//         // 创建Excel应用对象
+//         m_excel = new QAxObject("Excel.Application");
+//         if(!m_excel) return false;
+
+//         m_excel->setProperty("Visible", false);
+//         m_excel->setProperty("DisplayAlerts", false);
+
+//         // 获取工作簿集合
+//         QAxObject *workbooks = m_excel->querySubObject("Workbooks");
+//         if(!workbooks) {
+//             delete m_excel;
+//             m_excel = nullptr;
+//             return false;
+//         }
+
+//         // 打开带密码的工作簿
+//         QVariant varFilePath(filePath);
+//         QVariant varPassword(password);
+//         m_workbook = workbooks->querySubObject("Open(const QString&, const QVariant&, const QVariant&)",
+//                                                varFilePath,
+//                                                QVariant(false),
+//                                                varPassword);
+
+//         if(!m_workbook) {
+//             qWarning() << "Failed to open workbook with password";
+//             delete workbooks;
+//             delete m_excel;
+//             m_excel = nullptr;
+//             return false;
+//         }
+
+//         return true;
+//     } catch(...) {
+//         qCritical() << "Exception occurred while opening Excel";
+//         return false;
+//     }
+// }
+
+// void ExcelCOMHandler::closeExcel()
+// {
+//     if(m_workbook) {
+//         m_workbook->dynamicCall("Close()");
+//         delete m_workbook;
+//         m_workbook = nullptr;
+//     }
+
+//     if(m_excel) {
+//         m_excel->dynamicCall("Quit()");
+//         delete m_excel;
+//         m_excel = nullptr;
+//     }
+// }

@@ -30,6 +30,7 @@ Window {
             id: userInfo
 
             visible: controller.showUserInfo
+            controller: controller
             Layout.alignment: Qt.AlignTop
             Layout.preferredHeight: 50
             Layout.fillWidth: true

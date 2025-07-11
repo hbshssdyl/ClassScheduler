@@ -1,45 +1,84 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import Qt5Compat.GraphicalEffects
 import "../JSUtils/ColorUtils.js" as ColorUtils
 
 Rectangle {
     id: root
 
     property var controller
+    property string username: "User" // You can bind this to your actual username
 
     color: ColorUtils.getOperateAreaBackgroundColor()
-    // radius: 5
-    // 圆形头像 - 使用简单裁剪方法
+
     Rectangle {
         id: avatar
         anchors.fill: parent
         color: "transparent"
-        clip: true  // 关键属性：启用裁剪
+        clip: true
 
-        // 头像图片
         Image {
             id: avatarImage
             anchors.fill: parent
             fillMode: Image.PreserveAspectCrop
-            source: "qrc:/qt/qml/ClassScheduler/Resource/Banner.jpg"
+            source: "qrc:/qt/qml/ClassScheduler/Resource/Banner-mountain.jpg"
+        }
 
-            onStatusChanged: {
-                if (status === Image.Error) {
-                    console.error("头像加载失败，使用默认头像");
-                    source = "qrc:/qt/qml/ClassScheduler/Resource/Banner.jpg";
+        // Blurred background for the text
+        Rectangle {
+            id: textBackground
+            width: welcomeText.width + 20
+            height: welcomeText.height + 20
+            anchors {
+                left: parent.left
+                leftMargin: 5
+                verticalCenter: parent.verticalCenter
+            }
+            radius: 8
+
+            // Create a blurred background using the image
+            ShaderEffectSource {
+                id: blurSource
+                sourceItem: avatarImage
+                sourceRect: Qt.rect(textBackground.x, textBackground.y, textBackground.width, textBackground.height)
+            }
+
+            FastBlur {
+                anchors.fill: parent
+                source: blurSource
+                radius: 32
+                transparentBorder: true
+            }
+
+            // Semi-transparent overlay
+            Rectangle {
+                anchors.fill: parent
+                color: "#40000000"
+                radius: parent.radius
+            }
+
+            // Welcome text
+            Text {
+                id: welcomeText
+                anchors.centerIn: parent
+                text: "欢迎 " + controller.name
+                color: "white"
+                font {
+                    pixelSize: 14
+                    bold: true
                 }
+                renderType: Text.NativeRendering
+            }
+            MouseArea {
+                anchors.fill: parent
+                onClicked: settingsMenu.open()
             }
         }
 
-        // 点击区域
-        MouseArea {
-            anchors.fill: parent
-            onClicked: settingsMenu.open()
-        }
+
     }
 
-    // 设置菜单
     Menu {
         id: settingsMenu
         width: 200
@@ -59,8 +98,4 @@ Rectangle {
             onTriggered: console.log("退出点击")
         }
     }
-
 }
-
-
-

@@ -16,7 +16,7 @@ namespace ClassScheduler
     {
     public:
         //For Controller.cpp
-        static void updateActionItemsList(QVariantList& data, const Controller::OperateMode& selectedMode, const Controller::OperateModes& actionItems);
+        static void updateActionItemsList(QVariantList& data, const OperateMode& selectedMode, const OperateModes& actionItems);
 
         //For SearchClassInfoController.cpp
         static void updateClassInfoList(QVariantMap& data, ClassInfos& classInfos);

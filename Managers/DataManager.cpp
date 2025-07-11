@@ -13,6 +13,7 @@ bool DataManager::createDBConnection()
         cout << "Failed to connect database." << endl;
         return false;
     }
+    init();
     return true;
 }
 
@@ -192,10 +193,12 @@ bool DataManager::readAllSettings()
 
 bool DataManager::readAllUserInfos()
 {
-    mUserInfos.emplace_back(UserInfo("zhuhui", "zh615", UserLevel::Owner));
-    mUserInfos.emplace_back(UserInfo("tingting", "xyt123", UserLevel::RegularUser));
-    mUserInfos.emplace_back(UserInfo("xiaoru", "cmr123", UserLevel::Owner));
-    mUserInfos.emplace_back(UserInfo("Dylan", "dylanadmin", UserLevel::SuperAdmin));
+    mLoginInfos.emplace_back(LoginInfo("zhuhui", "zh615", UserLevel::Owner));
+    mLoginInfos.emplace_back(LoginInfo("jiajia", "xwj123", UserLevel::Owner));
+    mLoginInfos.emplace_back(LoginInfo("tingting", "xyt123", UserLevel::RegularUser));
+    mLoginInfos.emplace_back(LoginInfo("xiaoru", "cmr123", UserLevel::Owner));
+    mLoginInfos.emplace_back(LoginInfo("Dylan", "dylanadmin", UserLevel::SuperAdmin));
+    return true;
 }
 
 void DataManager::dropTable(QString tableName)
@@ -362,9 +365,9 @@ AppSettings DataManager::getAppSettingsFromDB()
     return mAppSettings;
 }
 
-UserInfos DataManager::getUserInfoFromDB()
+LoginInfos DataManager::getLoginInfoFromDB()
 {
-    return mUserInfos;
+    return mLoginInfos;
 }
 
 bool DataManager::saveDataToClassInfosTable(ClassInfos& infos)

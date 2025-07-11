@@ -33,7 +33,7 @@ public:
     TeacherInfos getTeacherInfosFromDB();
     StudentInfos getStudentInfosFromDB();
     AppSettings getAppSettingsFromDB();
-    UserInfos getUserInfoFromDB();
+    LoginInfos getLoginInfoFromDB();
 
 private:
     bool init();
@@ -82,7 +82,7 @@ private:
     StudentInfos mStudentInfosFromDB;
     TableDataCount mDataCount;
     AppSettings mAppSettings;
-    UserInfos mUserInfos;
+    LoginInfos mLoginInfos;
 };
 
 #endif // DATAMANAGER_H

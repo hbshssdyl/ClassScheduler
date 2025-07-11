@@ -2,51 +2,50 @@
 
 #include "DataUtils.h"
 #include "ControllerUtils.h"
-#include "Controller/Controller.h"
 
 namespace fs = std::filesystem;
 namespace ClassScheduler
 {
 
-QString toOperateModeString(Controller::OperateMode mode)
+QString toOperateModeString(OperateMode mode)
 {
     switch (mode)
     {
-    case Controller::OperateMode::None:
+    case OperateMode::None:
         return "None";
-    case Controller::OperateMode::WelcomePage:
+    case OperateMode::WelcomePage:
         return "欢迎使用";
-    case Controller::OperateMode::SearchClassInfo:
+    case OperateMode::SearchClassInfo:
         return "课程信息";
-    case Controller::OperateMode::SearchTeacherInfo:
+    case OperateMode::SearchTeacherInfo:
         return "教师信息";
-    case Controller::OperateMode::SearchStudentInfo:
+    case OperateMode::SearchStudentInfo:
         return "学生信息";
-    case Controller::OperateMode::ScheduleClass:
+    case OperateMode::ScheduleClass:
         return "排课";
-    case Controller::OperateMode::TeacherEvaluation:
+    case OperateMode::TeacherEvaluation:
         return "老师评价";
     default:
         return "default";
     }
 }
 
-QString getIconNameByOperateMode(Controller::OperateMode mode)
+QString getIconNameByOperateMode(OperateMode mode)
 {
     switch (mode)
     {
-    case Controller::OperateMode::None:
-    case Controller::OperateMode::WelcomePage:
+    case OperateMode::None:
+    case OperateMode::WelcomePage:
         return "";
-    case Controller::OperateMode::SearchClassInfo:
+    case OperateMode::SearchClassInfo:
         return "folder.svg";
-    case Controller::OperateMode::SearchTeacherInfo:
+    case OperateMode::SearchTeacherInfo:
         return "study.svg";
-    case Controller::OperateMode::SearchStudentInfo:
+    case OperateMode::SearchStudentInfo:
         return "user.svg";
-    case Controller::OperateMode::ScheduleClass:
+    case OperateMode::ScheduleClass:
         return "tag.svg";
-    case Controller::OperateMode::TeacherEvaluation:
+    case OperateMode::TeacherEvaluation:
         return "QA.svg";
     default:
         return "default";
@@ -87,7 +86,7 @@ bool isCurrentMonth(const QString& dateStr) {
 }
 
 //For controller.cpp
-void CUtils::updateActionItemsList(QVariantList& data, const Controller::OperateMode& selectedMode, const Controller::OperateModes& actionItems)
+void CUtils::updateActionItemsList(QVariantList& data, const OperateMode& selectedMode, const OperateModes& actionItems)
 {
     for(auto activeItem : actionItems)
     {

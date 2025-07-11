@@ -13,14 +13,15 @@ Controller::Controller(QObject* parent)
 
 void Controller::initialize()
 {
+    initManagers();
     initDB();
-    mAllOperateMode.clear();
-    mAllOperateMode.emplace_back(OperateMode::SearchClassInfo);
-    mAllOperateMode.emplace_back(OperateMode::SearchTeacherInfo);
-    mAllOperateMode.emplace_back(OperateMode::SearchStudentInfo);
-    mAllOperateMode.emplace_back(OperateMode::ScheduleClass);
-    mAllOperateMode.emplace_back(OperateMode::TeacherEvaluation);
     onOperateModeSelected(OperateMode::LoginView);
+}
+
+void Controller::initManagers()
+{
+    mDataManager = std::make_shared<DataManager>();
+    mUserManager = std::make_shared<UserManager>();
 }
 
 void Controller::initDB()
@@ -46,6 +47,15 @@ void Controller::refreshAppSettings()
         mAppSettings[setting.key] = setting.value;
     }
     emit appSettingsChanged();
+}
+
+void Controller::refreshActionItems()
+{
+    mAllOperateMode.clear();
+    for(auto& mod : mUserInfo.mods)
+    {
+        mAllOperateMode.emplace_back(mod);
+    }
 }
 
 QString Controller::toOperateModeString(OperateMode mode)
@@ -141,14 +151,28 @@ void Controller::onOperateModeSelected(OperateMode mode)
 
 void Controller::onTryToLogin(QString username, QString password)
 {
-    onOperateModeSelected(OperateMode::FileView);
-    auto userInfo = mDataManager->getUserInfoFromDB();
+    if(username.isEmpty() || password.isEmpty()) {
+        qWarning() << "用户名或密码为空";
+        return;
+    }
 
+    qDebug() << username << password;
+
+    auto loginInfo = mDataManager->getLoginInfoFromDB();
+    std::string stdUsername = username.toStdString();
+    std::string stdPassword = password.toStdString();
+    mUserInfo = mUserManager->getUserInfoByLoginInfo(stdUsername, stdPassword, loginInfo);
+    if(!mUserInfo.name.empty())
+    {
+        mName = QString::fromStdString(mUserInfo.name);
+        refreshActionItems();
+        emit nameChanged();
+        onOperateModeSelected(OperateMode::FileView);
+    }
 }
 
 void Controller::onFileUploaded(QString filePath)
 {
-    // 确保 mDataManager 有效
     if (!mDataManager) {
         qWarning() << "DataManager 为空，无法处理文件：" << filePath;
         return;

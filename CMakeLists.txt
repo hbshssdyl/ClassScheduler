@@ -56,7 +56,8 @@ qt_add_qml_module(appClassScheduler
     QML_FILES Qml/SearchStudentInfo/SearchStudentInfoDelegate.qml
 
     RESOURCES Resource/Avatar-self.jpg
-    RESOURCES Resource/Banner.jpg
+    RESOURCES Resource/Banner-sky.jpg
+    RESOURCES Resource/Banner-mountain.jpg
     RESOURCES Resource/QA.svg
     RESOURCES Resource/folder.svg
     RESOURCES Resource/phone.svg

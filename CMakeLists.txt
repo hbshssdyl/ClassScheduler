@@ -2,14 +2,19 @@ cmake_minimum_required(VERSION 3.16)
 
 project(ClassScheduler VERSION 0.1 LANGUAGES CXX)
 
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH};C:/PersonalDev/vcpkg/installed/x64-mingw-static")
+set(CMAKE_TOOLCHAIN_FILE "C:/PersonalDev/vcpkg/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
 
-find_package(Qt6 REQUIRED COMPONENTS Quick)
-find_package(Qt6 REQUIRED COMPONENTS Quick QuickControls2 QuickLayouts)
-find_package(Qt6 REQUIRED COMPONENTS Sql)
-find_package(Qt6 REQUIRED COMPONENTS Core Charts)
-find_package(Qt6 REQUIRED COMPONENTS Concurrent)
-find_package(Qt6 REQUIRED COMPONENTS AxContainer)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+set(CMAKE_AUTOUIC ON)
+
+find_package(Qt6 REQUIRED COMPONENTS Quick QuickControls2 QuickLayouts Sql Core Charts Concurrent AxContainer)
+
+find_package(CURL REQUIRED)
+find_package(nlohmann_json CONFIG REQUIRED)
 
 qt_standard_project_setup(REQUIRES 6.8)
 
@@ -67,6 +72,7 @@ qt_add_qml_module(appClassScheduler
     RESOURCES Resource/user.svg
     QML_FILES Qml/UserInfo/UserInfo.qml
     SOURCES Managers/UserManager.h Managers/UserManager.cpp
+    SOURCES Managers/NetworkManager.h Managers/NetworkManager.cpp
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
@@ -80,24 +86,11 @@ set_target_properties(appClassScheduler PROPERTIES
     WIN32_EXECUTABLE TRUE
 )
 
-target_link_libraries(appClassScheduler
-    PRIVATE Qt6::Quick Qt6::QuickControls2
-)
-
-target_link_libraries(appClassScheduler
-    PRIVATE Qt6::Quick
-)
-target_link_libraries(appClassScheduler
-    PRIVATE Qt6::Sql
-)
-target_link_libraries(appClassScheduler
-    PRIVATE Qt6::Core Qt6::Charts
-)
-target_link_libraries(appClassScheduler
-    PRIVATE Qt6::Concurrent
-)
-target_link_libraries(appClassScheduler
-    PRIVATE Qt6::AxContainer
+target_link_libraries(appClassScheduler PRIVATE
+    Qt6::Quick Qt6::QuickControls2 Qt6::QuickLayouts Qt6::Sql Qt6::Core Qt6::Charts Qt6::Concurrent Qt6::AxContainer
+    CURL::libcurl
+    nlohmann_json::nlohmann_json
+    QXlsx::QXlsx
 )
 
 include(GNUInstallDirs)
@@ -114,10 +107,3 @@ target_link_libraries(appClassScheduler PRIVATE QXlsx::QXlsx)
 # # OpenXLSX
 # add_subdirectory(OpenXLSX)
 # target_link_libraries(appClassScheduler PRIVATE OpenXLSX::OpenXLSX)
-
-
-
-
-
-
-

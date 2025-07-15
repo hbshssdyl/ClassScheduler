@@ -22,6 +22,7 @@ void Controller::initManagers()
 {
     mDataManager = std::make_shared<DataManager>();
     mUserManager = std::make_shared<UserManager>();
+    mNetworkManager = std::make_shared<NetworkManager>();
 }
 
 void Controller::initDB()
@@ -155,6 +156,11 @@ void Controller::onTryToLogin(QString username, QString password)
         qWarning() << "用户名或密码为空";
         return;
     }
+
+    mNetworkManager->sendLoginRequest(username.toStdString(), password.toStdString());
+    return;
+
+
 
     qDebug() << username << password;
 

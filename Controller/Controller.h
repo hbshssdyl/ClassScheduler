@@ -11,6 +11,7 @@
 
 #include "Managers/DataManager.h"
 #include "Managers/UserManager.h"
+#include "Managers/NetworkManager.h"
 #include "SearchClassInfoController.h"
 #include "SearchTeacherInfoController.h"
 #include "SearchStudentInfoController.h"
@@ -64,6 +65,7 @@ private:
     OperateMode mOperateMode { OperateMode::None };
     DataManagerPtr mDataManager;
     UserManagerPtr mUserManager;
+    NetworkManagerPtr mNetworkManager;
 
     QString mNewDataFilePath { "" };
     UserInfo mUserInfo;

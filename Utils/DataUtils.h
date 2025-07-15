@@ -8,8 +8,6 @@
 #include <QVariant>
 #include <algorithm>
 
-using namespace std;
-
 namespace ClassScheduler
 {
     static const QString CLASS_INFOS_TABLE_NAME = "classInfos";
@@ -18,10 +16,10 @@ namespace ClassScheduler
     static const QString APP_TOGGLE_INFOS_TABLE_NAME = "toggleInfos";
 
     static QString nullString = "无该信息";
-    static vector validExcelClassHeader{"日期", "星期", "姓名", "学校", "电话", "年级", "学科", "时间", "老师", "网课or面授", "课时", "金额/小时", "课酬总计", "老师姓名", "老师工资", "已收金额", "付费方式", "收费日期"};
-    static vector validTeacherHeader{"老师姓名", "使用过的昵称", "教过的科目及学生", "科目及工资（每小时）", "科目及年级"};
-    static vector validStudentHeader{"学生姓名", "就读学校", "手机号", "教过该生的老师", "科目及费用（每小时）"};
-    static vector allTableNameForDB{"classInfos", "teacherInfos", "studentInfos"};
+    static std::vector validExcelClassHeader{"日期", "星期", "姓名", "学校", "电话", "年级", "学科", "时间", "老师", "网课or面授", "课时", "金额/小时", "课酬总计", "老师姓名", "老师工资", "已收金额", "付费方式", "收费日期"};
+    static std::vector validTeacherHeader{"老师姓名", "使用过的昵称", "教过的科目及学生", "科目及工资（每小时）", "科目及年级"};
+    static std::vector validStudentHeader{"学生姓名", "就读学校", "手机号", "教过该生的老师", "科目及费用（每小时）"};
+    static std::vector allTableNameForDB{"classInfos", "teacherInfos", "studentInfos"};
 
     enum class UserLevel
     {
@@ -80,7 +78,7 @@ namespace ClassScheduler
 
     struct MonthCountInfo {
         QString yearMonth;
-        vector<QString> keys;
+        std::vector<QString> keys;
         int keyCount;
 
         MonthCountInfo()
@@ -118,7 +116,7 @@ namespace ClassScheduler
             }
         }
     };
-    using MonthCountInfos = vector<MonthCountInfo>;
+    using MonthCountInfos = std::vector<MonthCountInfo>;
 
     struct SujectCountInfo {
         QString suject;
@@ -206,7 +204,7 @@ namespace ClassScheduler
                                {"yearMonthList", yearMonthList} };
         }
     };
-    using SujectCountInfos = vector<SujectCountInfo>;
+    using SujectCountInfos = std::vector<SujectCountInfo>;
 
     struct DataBasicInfo {
         //学生课程（教师所教学生）数量曲线图基础信息
@@ -352,15 +350,15 @@ namespace ClassScheduler
             return result;
         }
     };
-    using ClassInfos = vector<ClassInfo>;
+    using ClassInfos = std::vector<ClassInfo>;
 
     struct TeacherInfo
     {
         QString teacherName;
-        vector<QString> teacherNickNames;
-        vector<QString> teacherSujectsAndStudents;
-        vector<QString> teacherSujectsAndFees;
-        vector<QString> teacherSujectsAndGrades;
+        std::vector<QString> teacherNickNames;
+        std::vector<QString> teacherSujectsAndStudents;
+        std::vector<QString> teacherSujectsAndFees;
+        std::vector<QString> teacherSujectsAndGrades;
 
         QString strTeacherNickNames;
         QString strTeacherSujectsAndStudents;
@@ -445,7 +443,7 @@ namespace ClassScheduler
             sort(teacherSujectsAndGrades.begin(), teacherSujectsAndGrades.end());
         }
 
-        QString getString(vector<QString> stringList)
+        QString getString(std::vector<QString> stringList)
         {
             QString ret = "";
             bool flag = false;
@@ -461,7 +459,7 @@ namespace ClassScheduler
             return ret;
         }
 
-        void saveValue(QString value, vector<QString>& values)
+        void saveValue(QString value, std::vector<QString>& values)
         {
             bool save = true;
             for(auto& val : values)
@@ -537,15 +535,15 @@ namespace ClassScheduler
             return result;
         }
     };
-    using TeacherInfos = vector<TeacherInfo>;
+    using TeacherInfos = std::vector<TeacherInfo>;
 
     struct StudentInfo
     {
         QString studentName;
-        vector<QString> studentSchools;
-        vector<QString> studentPhoneNumbers;
-        vector<QString> studentTeachers; // 张三（张三昵称）
-        vector<QString> studentSujectsAndPays; // 物理： 100(张三)，200（李四）
+        std::vector<QString> studentSchools;
+        std::vector<QString> studentPhoneNumbers;
+        std::vector<QString> studentTeachers; // 张三（张三昵称）
+        std::vector<QString> studentSujectsAndPays; // 物理： 100(张三)，200（李四）
 
         QString strStudentSchools;
         QString strStudentPhoneNumbers;
@@ -583,7 +581,7 @@ namespace ClassScheduler
         {
         }
 
-        QString getString(vector<QString> stringList)
+        QString getString(std::vector<QString> stringList)
         {
             QString ret = "";
             bool flag = false;
@@ -599,7 +597,7 @@ namespace ClassScheduler
             return ret;
         }
 
-        void saveValue(QString value, vector<QString>& values)
+        void saveValue(QString value, std::vector<QString>& values)
         {
             bool save = true;
             for(auto& val : values)
@@ -720,7 +718,7 @@ namespace ClassScheduler
             return "";
         }
     };
-    using StudentInfos = vector<StudentInfo>;
+    using StudentInfos = std::vector<StudentInfo>;
 
     struct ScheduleClassInputInfo
     {
@@ -791,12 +789,12 @@ namespace ClassScheduler
     {
         QString teacherName;
         QString week;
-        vector<QString> teacherNickNames;
-        vector<QString> teacherGradeFees;
-        vector<QString> teacherFreeTime;
-        vector<QString> teacherValidFreeTime;
-        vector<QString> teacherWorkTime;
-        vector<QString> teacherValidWorkTime;
+        std::vector<QString> teacherNickNames;
+        std::vector<QString> teacherGradeFees;
+        std::vector<QString> teacherFreeTime;
+        std::vector<QString> teacherValidFreeTime;
+        std::vector<QString> teacherWorkTime;
+        std::vector<QString> teacherValidWorkTime;
         //vector<QString> teacherWorkGrade;
 
         QString strTeacherNickNames;
@@ -822,7 +820,7 @@ namespace ClassScheduler
             //sort(teacherWorkGrade.begin(), teacherWorkGrade.end());
         }
 
-        QString getString(vector<QString> stringList)
+        QString getString(std::vector<QString> stringList)
         {
             QString ret = "";
             bool flag = false;
@@ -970,7 +968,7 @@ namespace ClassScheduler
             }
         }
 
-        void saveValue(QString value, vector<QString>& values, bool removeDuplicate = true)
+        void saveValue(QString value, std::vector<QString>& values, bool removeDuplicate = true)
         {
             bool save = true;
             for(auto& val : values)
@@ -987,10 +985,10 @@ namespace ClassScheduler
             }
         }
     };
-    using ScheduleClassResultInfos = vector<ScheduleClassResultInfo>;
+    using ScheduleClassResultInfos = std::vector<ScheduleClassResultInfo>;
 
     using TableDataCount = std::map<QString, int>; //QString tableName, int dataCount
-    using AppSettings = vector<Setting>;
+    using AppSettings = std::vector<Setting>;
 
-    using LoginInfos = vector<LoginInfo>;
+    using LoginInfos = std::vector<LoginInfo>;
 } // namespace ClassScheduler

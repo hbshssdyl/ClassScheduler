@@ -10,7 +10,7 @@ bool DataManager::createDBConnection()
     auto db = QSqlDatabase::addDatabase("QSQLITE");
     db.setDatabaseName("ClassScheduler.db");
     if (!db.open()) {
-        cout << "Failed to connect database." << endl;
+        std::cout << "Failed to connect database." << std::endl;
         return false;
     }
     init();
@@ -30,7 +30,7 @@ bool DataManager::init()
     readAllSettings();
     readAllUserInfos();
 
-    cout << "DataManager init: " << ret << endl;
+    std::cout << "DataManager init: " << ret << std::endl;
     return ret;
 }
 
@@ -45,12 +45,12 @@ int DataManager::getTableDataCount(QString tableName)
 {
     if(mDataCount.count(tableName) == 1)
     {
-        cout << "table is exist, table name: " << tableName.toStdString() << ", count: " << mDataCount[tableName] << endl;
+        std::cout << "table is exist, table name: " << tableName.toStdString() << ", count: " << mDataCount[tableName] << std::endl;
         return mDataCount[tableName];
     }
     else
     {
-        cout << "table is not exist, table name: " << tableName.toStdString() << endl;
+        std::cout << "table is not exist, table name: " << tableName.toStdString() << std::endl;
     }
     return 0;
 }
@@ -80,7 +80,7 @@ bool DataManager::createClassInfosTable()
                           "payDate            TEXT"
                           ")");
     if (!ret) {
-        cout << "Failed to create table: " << query.lastError().text().toStdString() << endl;
+        std::cout << "Failed to create table: " << query.lastError().text().toStdString() << std::endl;
         return false;
     }
     return true;
@@ -98,7 +98,7 @@ bool DataManager::createTeacherInfosTable()
                           "teacherSujectsAndGrades   TEXT                   NOT NULL"
                           ")");
     if (!ret) {
-        cout << "Failed to create table: " << query.lastError().text().toStdString() << endl;
+        std::cout << "Failed to create table: " << query.lastError().text().toStdString() << std::endl;
         return false;
     }
     return true;
@@ -116,7 +116,7 @@ bool DataManager::createStudentInfosTable()
                           "studentSujectsAndPays     TEXT                   NOT NULL"
                           ")");
     if (!ret) {
-        cout << "Failed to create table: " << query.lastError().text().toStdString() << endl;
+        std::cout << "Failed to create table: " << query.lastError().text().toStdString() << std::endl;
         return false;
     }
     return true;
@@ -206,7 +206,7 @@ void DataManager::dropTable(QString tableName)
     QSqlQuery query;
     bool ret = query.exec(QString("DROP TABLE '%1'").arg(tableName));
     if (!ret) {
-        cout << "Failed to drop table: " << query.lastError().text().toStdString() << endl;
+        std::cout << "Failed to drop table: " << query.lastError().text().toStdString() << std::endl;
     }
 }
 
@@ -224,7 +224,7 @@ bool DataManager::insertDataToClassInfosTable(ClassInfos& infos)
                           .arg(info.studentTotalFee).arg(info.teacherName).arg(info.teacherFee).arg(info.gotMoney).arg(info.payType).arg(info.payDate);
         bool ret = query.exec(sql);
         if (!ret) {
-            cout << "Failed to insert data to classInfos: " << query.lastError().text().toStdString() << endl;
+            std::cout << "Failed to insert data to classInfos: " << query.lastError().text().toStdString() << std::endl;
             return false;
         }
     }
@@ -241,7 +241,7 @@ bool DataManager::insertDataToTeacherInfosTable(TeacherInfos& infos)
                           .arg(info.teacherName).arg(info.getTeacherNickNames()).arg(info.getTeacherSujectsAndStudents()).arg(info.getTeacherSujectsAndFees()).arg(info.getTeacherSujectsAndGrades());
         bool ret = query.exec(sql);
         if (!ret) {
-            cout << "Failed to insert data to teacherInfos: " << query.lastError().text().toStdString() << endl;
+            std::cout << "Failed to insert data to teacherInfos: " << query.lastError().text().toStdString() << std::endl;
             return false;
         }
     }
@@ -258,7 +258,7 @@ bool DataManager::insertDataToStudentInfosTable(StudentInfos& infos)
                           .arg(info.studentName).arg(info.getStudentSchools()).arg(info.getStudentPhoneNumbers()).arg(info.getStudentTeachers()).arg(info.getStudentSujectsAndPays());
         bool ret = query.exec(sql);
         if (!ret) {
-            cout << "Failed to insert data to teacherInfos: " << query.lastError().text().toStdString() << endl;
+            std::cout << "Failed to insert data to teacherInfos: " << query.lastError().text().toStdString() << std::endl;
             return false;
         }
     }
@@ -283,37 +283,37 @@ bool DataManager::refreshAllDataFromFile(QString filePath)
 
     if(isTableExist(CLASS_INFOS_TABLE_NAME))
     {
-        cout << "drop table: " << CLASS_INFOS_TABLE_NAME.toStdString() << endl;
+        std::cout << "drop table: " << CLASS_INFOS_TABLE_NAME.toStdString() << std::endl;
         dropTable(CLASS_INFOS_TABLE_NAME);
     }
 
     if(isTableExist(TEACHER_INFOS_TABLE_NAME))
     {
-        cout << "drop table: " << TEACHER_INFOS_TABLE_NAME.toStdString() << endl;
+        std::cout << "drop table: " << TEACHER_INFOS_TABLE_NAME.toStdString() << std::endl;
         dropTable(TEACHER_INFOS_TABLE_NAME);
     }
 
     if(isTableExist(STUDENT_INFOS_TABLE_NAME))
     {
-        cout << "drop table: " << STUDENT_INFOS_TABLE_NAME.toStdString() << endl;
+        std::cout << "drop table: " << STUDENT_INFOS_TABLE_NAME.toStdString() << std::endl;
         dropTable(STUDENT_INFOS_TABLE_NAME);
     }
 
     if(!saveDataToClassInfosTable(mClassInfosFromDB))
     {
-        cout << "Failed to save data to ClassInfos table" << endl;
+        std::cout << "Failed to save data to ClassInfos table" << std::endl;
         return false;
     }
 
     if(!saveDataToTeacherInfosTable(mTeacherInfosFromDB))
     {
-        cout << "Failed to save data to TeacherInfos table" << endl;
+        std::cout << "Failed to save data to TeacherInfos table" << std::endl;
         return false;
     }
 
     if(!saveDataToStudentInfosTable(mStudentInfosFromDB))
     {
-        cout << "Failed to save data to StudentInfos table" << endl;
+        std::cout << "Failed to save data to StudentInfos table" << std::endl;
         return false;
     }
 
@@ -584,13 +584,13 @@ void DataManager::storeAllTableDataCount()
     {
         if(!isTableExist(name))
         {
-            cout << "Table " << name << " is not exist" << endl;
+            std::cout << "Table " << name << " is not exist" << std::endl;
         }
         query.exec(QString("SELECT count(*) FROM '%1'").arg(name));
         query.next();
         auto count = query.value(0).toInt();
         mDataCount[name] = count;
-        cout << "All tableDataCount, " << name << ": " << count << endl;
+        std::cout << "All tableDataCount, " << name << ": " << count << std::endl;
     }
 }
 
@@ -656,7 +656,7 @@ ClassInfos DataManager::getClassInfosFromExcelFile(QString filePath)
 bool DataManager::hasValidHeaders(Document& doc)
 {
     int row = 1, col = 1;
-    map<QString, bool> headers;
+    std::map<QString, bool> headers;
     while(col)
     {
         CellPtr cell = doc.cellAt(row, col);
@@ -666,7 +666,7 @@ bool DataManager::hasValidHeaders(Document& doc)
         }
         QVariant var = cell->value();
         auto str = var.toString();
-        //cout << str << endl;
+        //std::cout << str << std::endl;
         if(str.isEmpty())
         {
             break;
@@ -678,7 +678,7 @@ bool DataManager::hasValidHeaders(Document& doc)
     {
         if(!headers[header])
         {
-            cout << "无该信息: " << header << endl;
+            std::cout << "无该信息: " << header << std::endl;
             return false;
         }
     }
@@ -786,7 +786,7 @@ void DataManager::generateTeacherStudentInfos()
         }
         if(isNewTeacher)
         {
-            cout << "Error: there should not be a new teacher" << endl;
+            std::cout << "Error: there should not be a new teacher" << std::endl;
         }
     }
 
@@ -841,7 +841,7 @@ void DataManager::generateStudentClassInfos()
         }
         if(isNewStudent)
         {
-            cout << "Error: there should not be a new student" << endl;
+            std::cout << "Error: there should not be a new student" << std::endl;
         }
     }
 

@@ -1,3 +1,4 @@
+.pragma library
 function getMinClassInfoWidth(index)
 {
     switch(index)

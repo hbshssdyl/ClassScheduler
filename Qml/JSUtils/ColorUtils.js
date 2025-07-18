@@ -1,3 +1,4 @@
+.pragma library
 function getOperateAreaBorderColor() {
     return "#D6D6D6";
 }

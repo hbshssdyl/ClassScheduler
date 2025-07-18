@@ -1,4 +1,4 @@
-#include "NetworkManager.h"
+﻿#include "NetworkManager.h"
 #include <iostream>
 #include <curl/curl.h>
 #include <nlohmann/json.hpp>
@@ -29,7 +29,7 @@ void NetworkManager::sendLoginRequest(const std::string& username, const std::st
         struct curl_slist* headers = nullptr;
         headers = curl_slist_append(headers, "Content-Type: application/json");
 
-        curl_easy_setopt(curl, CURLOPT_URL, "http://127.0.0.1:8888/login");
+        curl_easy_setopt(curl, CURLOPT_URL, "http://127.0.0.1:8001/login");
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
         curl_easy_setopt(curl, CURLOPT_POSTFIELDS, jsonData.c_str());
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeCallback);

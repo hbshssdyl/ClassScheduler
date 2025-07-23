@@ -1,6 +1,4 @@
-#pragma once
-
-#include <QCoreApplication>
+﻿#include <QCoreApplication>
 #include <iostream>
 
 #include "SearchClassInfoController.h"

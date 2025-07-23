@@ -1,6 +1,4 @@
-#pragma once
-
-#include <iostream>
+﻿#include <iostream>
 #include "Controller.h"
 #include "Utils/ControllerUtils.h"
 

@@ -1,6 +1,4 @@
-#pragma once
-
-#include "DataUtils.h"
+﻿#include "DataUtils.h"
 #include "ControllerUtils.h"
 
 namespace fs = std::filesystem;

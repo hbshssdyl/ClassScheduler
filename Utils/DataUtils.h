@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <String>
 #include <vector>
@@ -985,6 +985,85 @@ namespace ClassScheduler
             }
         }
     };
+
+    enum class ResultStatus {
+        Success,
+        UserExist,
+        EmailExist,
+        UserNotFound,
+        PasswordIncorrect,
+        CurleNotOK,
+        UnknownError
+    };
+
+    struct ResponseResult {
+        ResultStatus status;
+        std::string statusStr; // 具体描述
+        std::string rawResponse; // 原始响应字符串（用于调试）
+
+        ResponseResult()
+        {
+            rawResponse = "curle error, no response";
+            status = ResultStatus::CurleNotOK;
+            statusStr = toString(ResultStatus::CurleNotOK);
+        }
+
+        void refreshResult(std::string response)
+        {
+            rawResponse = response;
+            if (response.find(toString(ResultStatus::Success), Qt::CaseSensitive) != std::string::npos) {
+                status = ResultStatus::Success;
+                statusStr = toString(ResultStatus::Success);
+                return;
+            }
+            if (response.find(toString(ResultStatus::UserExist), Qt::CaseSensitive) != std::string::npos) {
+                status = ResultStatus::UserExist;
+                statusStr = toString(ResultStatus::UserExist);
+                return;
+            }
+            if (response.find(toString(ResultStatus::EmailExist), Qt::CaseSensitive) != std::string::npos) {
+                status = ResultStatus::EmailExist;
+                statusStr = toString(ResultStatus::EmailExist);
+                return;
+            }
+            if (response.find(toString(ResultStatus::UserNotFound), Qt::CaseSensitive) != std::string::npos) {
+                status = ResultStatus::UserNotFound;
+                statusStr = toString(ResultStatus::UserNotFound);
+                return;
+            }
+            if (response.find(toString(ResultStatus::PasswordIncorrect), Qt::CaseSensitive) != std::string::npos) {
+                status = ResultStatus::PasswordIncorrect;
+                statusStr = toString(ResultStatus::PasswordIncorrect);
+                return;
+            }
+            status = ResultStatus::UnknownError;
+            statusStr = toString(ResultStatus::UnknownError);
+        }
+
+        std::string toString(ResultStatus status)
+        {
+            switch (status) {
+            case ResultStatus::Success:
+                return "Success";
+            case ResultStatus::UserExist:
+                return "UserExist";
+            case ResultStatus::EmailExist:
+                return "EmailExist";
+            case ResultStatus::UserNotFound:
+                return "UserNotFound";
+            case ResultStatus::PasswordIncorrect:
+                return "PasswordIncorrect";
+            case ResultStatus::CurleNotOK:
+                return "CurleNotOK";
+            case ResultStatus::UnknownError:
+                return "UnknownError";
+            default:
+                break;
+            }
+            return "UnknownError";
+        }
+    };
+
     using ScheduleClassResultInfos = std::vector<ScheduleClassResultInfo>;
 
     using TableDataCount = std::map<QString, int>; //QString tableName, int dataCount

@@ -148,6 +148,17 @@ void Controller::onOperateModeSelected(OperateMode mode)
     }
 }
 
+void Controller::onTryToRegister(QString email, QString username, QString password, QString role)
+{
+    if(email.isEmpty() || username.isEmpty() || password.isEmpty()) {
+        qWarning() << "用户名或密码为空";
+        return;
+    }
+
+    auto result = mNetworkManager->sendRegisterRequest(email.toStdString(), username.toStdString(), password.toStdString(), role.toStdString());
+    cout << result.statusStr << endl;
+}
+
 void Controller::onTryToLogin(QString username, QString password)
 {
     if(username.isEmpty() || password.isEmpty()) {
@@ -155,7 +166,8 @@ void Controller::onTryToLogin(QString username, QString password)
         return;
     }
 
-    mNetworkManager->sendLoginRequest(username.toStdString(), password.toStdString());
+    auto result = mNetworkManager->sendLoginRequest(username.toStdString(), password.toStdString());
+    cout << result.statusStr << endl;
     return;
 
 

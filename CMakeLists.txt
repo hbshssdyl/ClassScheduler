@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.16)
+﻿cmake_minimum_required(VERSION 3.16)
 
 project(ClassScheduler VERSION 0.1 LANGUAGES CXX)
 
@@ -79,6 +79,8 @@ qt_add_qml_module(appClassScheduler
     RESOURCES Resource/study.svg
     RESOURCES Resource/tag.svg
     RESOURCES Resource/user.svg
+    RESOURCES Resource/welcome.svg
+    RESOURCES Resource/welcome.jpg
     QML_FILES Qml/UserInfo/UserInfo.qml
     SOURCES Managers/UserManager.h Managers/UserManager.cpp
     SOURCES Managers/NetworkManager.h Managers/NetworkManager.cpp

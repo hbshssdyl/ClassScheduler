@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <QObject>
 #include <cstdio>
@@ -43,6 +43,7 @@ public:
 public slots:
     void onOperateModeSelected(OperateMode mode);
     void onTryToLogin(QString username, QString password);
+    void onTryToRegister(QString email, QString username, QString password, QString role);
     void onFileUploaded(QString filePath);
 
 signals:

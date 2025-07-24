@@ -47,6 +47,9 @@ public slots:
     void onFileUploaded(QString filePath);
 
 signals:
+    void registerResult(QString statusStr); // 注册结果信号
+
+signals:
     void operateModeChanged();
     void dataCountChanged();
     void actionItemsListChanged();

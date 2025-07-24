@@ -13,12 +13,47 @@ Rectangle {
     property var operateMode
     property string authMode: "none" // "login" or "register"
     property var rootController
-    property string feedbackMessage: ""
+    property string feedbackMessage
+    property color feedbackMessageColor: {
+        if(authMode === "registerSuccess")
+            return ColorUtils.getSuccessColor();
+        if(authMode === "registerFailed")
+            return ColorUtils.getErrorColor();
+        return "transparent";
+    }
 
     onAuthModeChanged: {
         userEmail.text = "";
         userName.text = "";
         password.text = "";
+        if(authMode === "login" || authMode === "register" || authMode === "none")
+            feedbackMessage = "";
+    }
+
+    onRootControllerChanged: {
+        if (rootController) {
+            rootController.registerResult.connect(function(statusStr) {
+                if (statusStr === "RegisterSuccess") {
+                    feedbackMessage = "注册成功";
+                    authMode = "registerSuccess";
+                } else if (statusStr === "UserExist") {
+                    feedbackMessage = "该用户名已存在";
+                    authMode = "registerFailed";
+                } else if (statusStr === "EmailExist") {
+                    feedbackMessage = "该邮箱已存在";
+                    authMode = "registerFailed";
+                } else if (statusStr === "EmailInvalid") {
+                    feedbackMessage = "邮箱格式不合法";
+                    authMode = "registerFailed";
+                } else if (statusStr === "EmptyInfo") {
+                    feedbackMessage = "邮箱、用户名或密码不能为空";
+                    authMode = "registerFailed";
+                } else {
+                    feedbackMessage = "注册失败，请重试";
+                    authMode = "registerFailed";
+                }
+            });
+        }
     }
 
     ColumnLayout {
@@ -87,7 +122,7 @@ Rectangle {
             Layout.alignment: Qt.AlignCenter
             border.color: "#3399FF"
             border.width: 1
-            visible: authMode !== "none"
+            visible: authMode === "login" || authMode === "register"
 
             ColumnLayout {
                 anchors.fill: parent
@@ -233,15 +268,6 @@ Rectangle {
                         }
                     }
                 }
-
-                Text {
-                    id: feedbackLabel
-                    text: feedbackMessage
-                    color: "#FF3333"
-                    font.pixelSize: 14
-                    visible: feedbackMessage.length > 0
-                    Layout.alignment: Qt.AlignHCenter
-                }
             }
         }
 
@@ -251,14 +277,85 @@ Rectangle {
             width: 320
             height: 360
             Layout.alignment: Qt.AlignCenter
-            visible: authMode === "none"
-            color: "transparent"
+            visible: {
+                if(authMode === "none")
+                    return true;
+                if(authMode === "registerSuccess")
+                    return true;
+                if(authMode === "registerFailed")
+                    return true;
+                return false;
+            }
+
+            color: "white"
+            radius: 12
+            border.color: "#3399FF"
+            border.width: 1
 
             Image {
                 id: welcomeSvg
 
+                visible: authMode === "none"
                 anchors.fill: parent
                 source: "qrc:/qt/qml/ClassScheduler/Resource/welcome.jpg"
+            }
+
+            Image {
+                id: okSvg
+
+                visible: authMode === "registerSuccess"
+                width: parent.width
+                height: width
+                z: 1
+                anchors {
+                    top: parent.top
+                    horizontalCenter: parent.horizontalCenter
+                }
+                source: "qrc:/qt/qml/ClassScheduler/Resource/ok.svg"
+            }
+
+            Image {
+                id: notokSvg
+
+                visible: authMode === "registerFailed"
+                width: parent.width
+                height: width
+                z: 1
+                anchors {
+                    top: parent.top
+                    horizontalCenter: parent.horizontalCenter
+                }
+                source: "qrc:/qt/qml/ClassScheduler/Resource/notok.svg"
+            }
+
+            Rectangle {
+                id: feedbackItem
+
+                visible: root.feedbackMessage !== ""
+                width: parent.width - 20
+                height: 30
+                radius: 12
+                color: root.feedbackMessageColor
+                border.color: "#3399FF"
+                border.width: 1
+                z: 2
+                anchors {
+                    bottom: parent.bottom
+                    bottomMargin: 10
+                    horizontalCenter: parent.horizontalCenter
+                }
+
+                Text {
+                    id: feedbackLabel
+
+                    anchors.centerIn: parent
+                    text: root.feedbackMessage
+                    color: "white"
+                    font {
+                        bold: false
+                        pixelSize: 12
+                    }
+                }
             }
         }
 

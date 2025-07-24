@@ -2,10 +2,6 @@
 
 project(ClassScheduler VERSION 0.1 LANGUAGES CXX)
 
-# 设置 vcpkg 工具链
-set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH};C:/PersonalDev/vcpkg/installed/x64-mingw-static")
-set(CMAKE_TOOLCHAIN_FILE "C:/PersonalDev/vcpkg/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
-
 # 设置 C++ 标准和 Qt 自动生成
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -81,6 +77,8 @@ qt_add_qml_module(appClassScheduler
     RESOURCES Resource/user.svg
     RESOURCES Resource/welcome.svg
     RESOURCES Resource/welcome.jpg
+    RESOURCES Resource/ok.svg
+    RESOURCES Resource/notok.svg
     QML_FILES Qml/UserInfo/UserInfo.qml
     SOURCES Managers/UserManager.h Managers/UserManager.cpp
     SOURCES Managers/NetworkManager.h Managers/NetworkManager.cpp

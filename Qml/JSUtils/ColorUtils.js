@@ -26,3 +26,11 @@ function getActionItemBackgroundHoverdColor() {
 function getActionItemsBackgroundHoverdColor() {
     return "#F5F5F5";
 }
+
+function getErrorColor() {
+    return "#ff3b3b";
+}
+
+function getSuccessColor() {
+    return "#6ce679"
+}

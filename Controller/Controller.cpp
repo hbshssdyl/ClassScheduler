@@ -151,12 +151,24 @@ void Controller::onOperateModeSelected(OperateMode mode)
 void Controller::onTryToRegister(QString email, QString username, QString password, QString role)
 {
     if(email.isEmpty() || username.isEmpty() || password.isEmpty()) {
-        qWarning() << "用户名或密码为空";
+        emit registerResult("EmptyInfo");
         return;
     }
 
     auto result = mNetworkManager->sendRegisterRequest(email.toStdString(), username.toStdString(), password.toStdString(), role.toStdString());
     cout << result.statusStr << endl;
+    cout << result.rawResponse << endl;
+    if(result.status == ResultStatus::Success) {
+        emit registerResult("RegisterSuccess");
+    } else if(result.status == ResultStatus::UserExist) {
+        emit registerResult("UserExist");
+    } else if(result.status == ResultStatus::EmailExist) {
+        emit registerResult("EmailExist");
+    } else if(result.status == ResultStatus::EmailInvalid) {
+        emit registerResult("EmailInvalid");
+    } else {
+        emit registerResult("RegisterFailed");
+    }
 }
 
 void Controller::onTryToLogin(QString username, QString password)

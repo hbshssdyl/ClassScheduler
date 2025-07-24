@@ -990,6 +990,7 @@ namespace ClassScheduler
         Success,
         UserExist,
         EmailExist,
+        EmailInvalid,
         UserNotFound,
         PasswordIncorrect,
         CurleNotOK,
@@ -1036,6 +1037,12 @@ namespace ClassScheduler
                 statusStr = toString(ResultStatus::PasswordIncorrect);
                 return;
             }
+            if (response.find("not a valid email address", Qt::CaseSensitive) != std::string::npos) {
+                status = ResultStatus::EmailInvalid;
+                statusStr = toString(ResultStatus::EmailInvalid);
+                return;
+            }
+
             status = ResultStatus::UnknownError;
             statusStr = toString(ResultStatus::UnknownError);
         }
@@ -1049,6 +1056,8 @@ namespace ClassScheduler
                 return "UserExist";
             case ResultStatus::EmailExist:
                 return "EmailExist";
+            case ResultStatus::EmailInvalid:
+                return "EmailInvalid";
             case ResultStatus::UserNotFound:
                 return "UserNotFound";
             case ResultStatus::PasswordIncorrect:

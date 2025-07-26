@@ -991,7 +991,7 @@ namespace ClassScheduler
         UserExist,
         EmailExist,
         EmailInvalid,
-        UserNotFound,
+        UserOrEmailNotFound,
         PasswordIncorrect,
         CurleNotOK,
         UnknownError
@@ -1027,9 +1027,9 @@ namespace ClassScheduler
                 statusStr = toString(ResultStatus::EmailExist);
                 return;
             }
-            if (response.find(toString(ResultStatus::UserNotFound), Qt::CaseSensitive) != std::string::npos) {
-                status = ResultStatus::UserNotFound;
-                statusStr = toString(ResultStatus::UserNotFound);
+            if (response.find(toString(ResultStatus::UserOrEmailNotFound), Qt::CaseSensitive) != std::string::npos) {
+                status = ResultStatus::UserOrEmailNotFound;
+                statusStr = toString(ResultStatus::UserOrEmailNotFound);
                 return;
             }
             if (response.find(toString(ResultStatus::PasswordIncorrect), Qt::CaseSensitive) != std::string::npos) {
@@ -1058,8 +1058,8 @@ namespace ClassScheduler
                 return "EmailExist";
             case ResultStatus::EmailInvalid:
                 return "EmailInvalid";
-            case ResultStatus::UserNotFound:
-                return "UserNotFound";
+            case ResultStatus::UserOrEmailNotFound:
+                return "UserOrEmailNotFound";
             case ResultStatus::PasswordIncorrect:
                 return "PasswordIncorrect";
             case ResultStatus::CurleNotOK:

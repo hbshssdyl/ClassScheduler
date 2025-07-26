@@ -15,9 +15,9 @@ Rectangle {
     property var rootController
     property string feedbackMessage
     property color feedbackMessageColor: {
-        if(authMode === "registerSuccess")
+        if(authMode === "success")
             return ColorUtils.getSuccessColor();
-        if(authMode === "registerFailed")
+        if(authMode === "failed")
             return ColorUtils.getErrorColor();
         return "transparent";
     }
@@ -32,25 +32,39 @@ Rectangle {
 
     onRootControllerChanged: {
         if (rootController) {
-            rootController.registerResult.connect(function(statusStr) {
+            rootController.registerOrLoginResult.connect(function(statusStr) {
                 if (statusStr === "RegisterSuccess") {
                     feedbackMessage = "注册成功";
-                    authMode = "registerSuccess";
+                    authMode = "success";
                 } else if (statusStr === "UserExist") {
                     feedbackMessage = "该用户名已存在";
-                    authMode = "registerFailed";
+                    authMode = "failed";
                 } else if (statusStr === "EmailExist") {
                     feedbackMessage = "该邮箱已存在";
-                    authMode = "registerFailed";
+                    authMode = "failed";
                 } else if (statusStr === "EmailInvalid") {
                     feedbackMessage = "邮箱格式不合法";
-                    authMode = "registerFailed";
+                    authMode = "failed";
                 } else if (statusStr === "EmptyInfo") {
                     feedbackMessage = "邮箱、用户名或密码不能为空";
-                    authMode = "registerFailed";
-                } else {
-                    feedbackMessage = "注册失败，请重试";
-                    authMode = "registerFailed";
+                    authMode = "failed";
+                } else if(statusStr === "UserOrEmailNotFound"){
+                    feedbackMessage = "邮箱或用户名不存在";
+                    authMode = "failed";
+                } else if(statusStr === "PasswordIncorrect"){
+                    feedbackMessage = "密码错误";
+                    authMode = "failed";
+                } else if(statusStr === "LoginFailed"){
+                    feedbackMessage = "登陆失败，请重试";
+                    authMode = "failed";
+                }
+                else if(statusStr === "LoginSuccess"){
+                    feedbackMessage = "登录成功";
+                    authMode = "success";
+                }
+                else {
+                    feedbackMessage = "未知错误，请联系管理员";
+                    authMode = "failed";
                 }
             });
         }
@@ -260,6 +274,8 @@ Rectangle {
                         anchors.centerIn: parent
                     }
 
+                    Keys.onEnterPressed: clicked()
+
                     onClicked: {
                         if (authMode === "login") {
                             rootController.onTryToLogin(userName.text, password.text)
@@ -280,9 +296,9 @@ Rectangle {
             visible: {
                 if(authMode === "none")
                     return true;
-                if(authMode === "registerSuccess")
+                if(authMode === "success")
                     return true;
-                if(authMode === "registerFailed")
+                if(authMode === "failed")
                     return true;
                 return false;
             }
@@ -303,7 +319,7 @@ Rectangle {
             Image {
                 id: okSvg
 
-                visible: authMode === "registerSuccess"
+                visible: authMode === "success"
                 width: parent.width
                 height: width
                 z: 1
@@ -317,7 +333,7 @@ Rectangle {
             Image {
                 id: notokSvg
 
-                visible: authMode === "registerFailed"
+                visible: authMode === "failed"
                 width: parent.width
                 height: width
                 z: 1

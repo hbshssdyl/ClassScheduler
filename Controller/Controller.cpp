@@ -151,7 +151,7 @@ void Controller::onOperateModeSelected(OperateMode mode)
 void Controller::onTryToRegister(QString email, QString username, QString password, QString role)
 {
     if(email.isEmpty() || username.isEmpty() || password.isEmpty()) {
-        emit registerResult("EmptyInfo");
+        emit registerOrLoginResult("EmptyInfo");
         return;
     }
 
@@ -159,44 +159,51 @@ void Controller::onTryToRegister(QString email, QString username, QString passwo
     cout << result.statusStr << endl;
     cout << result.rawResponse << endl;
     if(result.status == ResultStatus::Success) {
-        emit registerResult("RegisterSuccess");
+        emit registerOrLoginResult("RegisterSuccess");
     } else if(result.status == ResultStatus::UserExist) {
-        emit registerResult("UserExist");
+        emit registerOrLoginResult("UserExist");
     } else if(result.status == ResultStatus::EmailExist) {
-        emit registerResult("EmailExist");
+        emit registerOrLoginResult("EmailExist");
     } else if(result.status == ResultStatus::EmailInvalid) {
-        emit registerResult("EmailInvalid");
+        emit registerOrLoginResult("EmailInvalid");
     } else {
-        emit registerResult("RegisterFailed");
+        emit registerOrLoginResult("RegisterFailed");
     }
 }
 
-void Controller::onTryToLogin(QString username, QString password)
+void Controller::onTryToLogin(QString login, QString password)
 {
-    if(username.isEmpty() || password.isEmpty()) {
-        qWarning() << "用户名或密码为空";
+    if(login.isEmpty() || password.isEmpty()) {
+        emit registerOrLoginResult("EmptyInfo");
         return;
     }
 
-    auto result = mNetworkManager->sendLoginRequest(username.toStdString(), password.toStdString());
+    auto result = mNetworkManager->sendLoginRequest(login.toStdString(), password.toStdString());
     cout << result.statusStr << endl;
+    cout << result.rawResponse << endl;
+    if(result.status == ResultStatus::Success) {
+        emit registerOrLoginResult("LoginSuccess");
+    } else if(result.status == ResultStatus::UserOrEmailNotFound) {
+        emit registerOrLoginResult("UserOrEmailNotFound");
+    } else if(result.status == ResultStatus::PasswordIncorrect) {
+        emit registerOrLoginResult("PasswordIncorrect");
+    } else {
+        emit registerOrLoginResult("LoginFailed");
+    }
     return;
 
 
-
-    qDebug() << username << password;
-
-    auto loginInfo = mDataManager->getLoginInfoFromDB();
-    std::string stdUsername = username.toStdString();
-    std::string stdPassword = password.toStdString();
-    mUserInfo = mUserManager->getUserInfoByLoginInfo(stdUsername, stdPassword, loginInfo);
-    if(!mUserInfo.name.empty())
-    {
-        mName = QString::fromStdString(mUserInfo.name);
-        refreshActionItems();
-        emit nameChanged();
-        onOperateModeSelected(OperateMode::FileView);
-    }
+    // auto loginInfo = mDataManager->getLoginInfoFromDB();
+    // std::string stdUsername = username.toStdString();
+    // std::string stdPassword = password.toStdString();
+    // mUserInfo = mUserManager->getUserInfoByLoginInfo(stdUsername, stdPassword, loginInfo);
+    // if(!mUserInfo.name.empty())
+    // {
+    //     mName = QString::fromStdString(mUserInfo.name);
+    //     refreshActionItems();
+    //     emit nameChanged();
+    //     onOperateModeSelected(OperateMode::FileView);
+    // }
 }
 
 void Controller::onFileUploaded(QString filePath)

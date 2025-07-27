@@ -381,6 +381,4 @@ Rectangle {
             Layout.fillHeight: true
         }
     }
-
-
 }

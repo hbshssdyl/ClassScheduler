@@ -179,10 +179,12 @@ void Controller::onTryToLogin(QString login, QString password)
     }
 
     auto result = mNetworkManager->sendLoginRequest(login.toStdString(), password.toStdString());
+
     cout << result.statusStr << endl;
     cout << result.rawResponse << endl;
+
     if(result.status == ResultStatus::Success) {
-        emit registerOrLoginResult("LoginSuccess");
+        onOperateModeSelected(OperateMode::WelcomePage);
     } else if(result.status == ResultStatus::UserOrEmailNotFound) {
         emit registerOrLoginResult("UserOrEmailNotFound");
     } else if(result.status == ResultStatus::PasswordIncorrect) {
@@ -190,8 +192,6 @@ void Controller::onTryToLogin(QString login, QString password)
     } else {
         emit registerOrLoginResult("LoginFailed");
     }
-    return;
-
 
     // auto loginInfo = mDataManager->getLoginInfoFromDB();
     // std::string stdUsername = username.toStdString();

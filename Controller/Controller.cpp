@@ -180,7 +180,7 @@ void Controller::onTryToLogin(QString username, QString password)
 
     auto result = mNetworkManager->sendLoginRequest(username.toStdString(), password.toStdString());
     cout << result.statusStr << endl;
-    return;
+    //return;
 
 
 
@@ -190,6 +190,7 @@ void Controller::onTryToLogin(QString username, QString password)
     std::string stdUsername = username.toStdString();
     std::string stdPassword = password.toStdString();
     mUserInfo = mUserManager->getUserInfoByLoginInfo(stdUsername, stdPassword, loginInfo);
+    qDebug() << mUserInfo.name << "MYTEST";
     if(!mUserInfo.name.empty())
     {
         mName = QString::fromStdString(mUserInfo.name);

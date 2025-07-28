@@ -42,12 +42,12 @@ public:
 
 public slots:
     void onOperateModeSelected(OperateMode mode);
-    void onTryToLogin(QString username, QString password);
+    void onTryToLogin(QString login, QString password);
     void onTryToRegister(QString email, QString username, QString password, QString role);
     void onFileUploaded(QString filePath);
 
 signals:
-    void registerResult(QString statusStr); // 注册结果信号
+    void registerOrLoginResult(QString statusStr); // 注册结果信号
 
 signals:
     void operateModeChanged();

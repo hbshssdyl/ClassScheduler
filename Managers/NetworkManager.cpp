@@ -239,3 +239,47 @@ ResponseResult NetworkManager::sendUpdateRoleRequest(const std::string& username
     return result;
 }
 
+ResponseResult NetworkManager::uploadDbFile(const std::string& dbFilePath) {
+    CURL* curl;
+    CURLcode res;
+    std::string responseStr;
+    ResponseResult result;
+
+    curl = curl_easy_init();
+    if (curl) {
+        curl_mime* form = curl_mime_init(curl);
+        curl_mimepart* field = curl_mime_addpart(form);
+        curl_mime_name(field, "file");
+        curl_mime_filedata(field, dbFilePath.c_str());
+        curl_mime_filename(field, "tianming.db");
+
+        curl_easy_setopt(curl, CURLOPT_URL, (SERVER_URL + "upload-db/").c_str());
+        curl_easy_setopt(curl, CURLOPT_MIMEPOST, form);
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeCallback);
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &responseStr);
+        // 统一 SSL 设置（与生产环境兼容）
+        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 1L);
+        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 2L);
+
+        res = curl_easy_perform(curl);
+
+        if (res != CURLE_OK) {
+            result.rawResponse = curl_easy_strerror(res);
+        } else {
+            long responseCode;
+            curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &responseCode);
+            if (responseCode == 200) {
+                result.refreshResult(responseStr);
+            } else {
+                result.rawResponse = "HTTP error: " + std::to_string(responseCode) + ", Response: " + responseStr;
+            }
+        }
+
+        curl_mime_free(form);
+        curl_easy_cleanup(curl);
+    } else {
+        result.rawResponse = "Fail to init curl";
+    }
+    return result;
+}
+

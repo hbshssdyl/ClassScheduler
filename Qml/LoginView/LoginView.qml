@@ -10,9 +10,11 @@ Rectangle {
 
     color: ColorUtils.getOperateAreaBackgroundColor()
 
+    property var rootController
+    property string viewName
+
     property var operateMode
     property string authMode: "none" // "login" or "register"
-    property var rootController
     property string feedbackMessage
     property color feedbackMessageColor: {
         if(authMode === "success")

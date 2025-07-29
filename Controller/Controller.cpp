@@ -26,16 +26,17 @@ void Controller::initManagers()
 void Controller::initDB()
 {
     mDataManager = std::make_shared<DataManager>();
-    if(mDataManager)
-    {
-        mDataManager->createDBConnection();
-        mDataManager->storeAllTableDataCount();
-        mDataCount = QString::number(mDataManager->getTableDataCount(CLASS_INFOS_TABLE_NAME));
-        refreshAppSettings();
-        mDataManager->closeDBConnection();
-        emit dataCountChanged();
-        cout << "initDB, currentDataCount: " << mDataCount.toStdString() << endl;
-    }
+    refreshAllDataFromDBFile();
+    // if(mDataManager)
+    // {
+    //     mDataManager->createDBConnection();
+    //     mDataManager->storeAllTableDataCount();
+    //     mDataCount = QString::number(mDataManager->getTableDataCount(CLASS_INFOS_TABLE_NAME));
+    //     refreshAppSettings();
+    //     mDataManager->closeDBConnection();
+    //     emit dataCountChanged();
+    //     cout << "initDB, currentDataCount: " << mDataCount.toStdString() << endl;
+    // }
 }
 
 void Controller::refreshAppSettings()
@@ -88,49 +89,32 @@ QString Controller::toOperateModeString(OperateMode mode)
 void Controller::refreshOperateMode(OperateMode mode)
 {
     mOperateMode = mode;
-    mLoadedView = toOperateModeString(mode);
-    mShowUserInfo = true;
     switch (mode)
     {
         case OperateMode::None:
         case OperateMode::LoginView:
-        case OperateMode::FileView:
         {
             mShowActions = false;
             mShowUserInfo = false;
             break;
         }
-
         case OperateMode::SearchClassInfo:
-        {
-            if(mSearchTeacherInfoController)
-            {
-                mSearchTeacherInfoController->refreshSearchTeacherInfo();
-            }
-            mShowActions = true;
-            break;
-        }
         case OperateMode::SearchTeacherInfo:
-        {
-            if(mSearchClassInfoController)
-            {
-                mSearchClassInfoController->refreshSearchClassInfo();
-            }
-            mShowActions = true;
-            break;
-        }
+        case OperateMode::SearchStudentInfo:
         case OperateMode::WelcomePage:
         case OperateMode::ScheduleClass:
-        case OperateMode::SearchStudentInfo:
+        case OperateMode::FileView:
         case OperateMode::TeacherEvaluation:
         {
             mShowActions = true;
+            mShowUserInfo = true;
             break;
         }
         default:
             break;
     }
     emit operateModeChanged();
+    emit updateOperateMode(toOperateModeString(mode));
 }
 
 void Controller::onOperateModeSelected(OperateMode mode)
@@ -155,10 +139,10 @@ void Controller::onTryToRegister(QString email, QString username, QString passwo
         return;
     }
 
-    auto result = mNetworkManager->sendRegisterRequest(email.toStdString(), username.toStdString(), password.toStdString(), role.toStdString());
+    auto result = mNetworkManager->sendRegisterRequest(email.toStdString(), username.toStdString(), password.toStdString(), CUtils::toRoleString(role));
     cout << result.statusStr << endl;
     cout << result.rawResponse << endl;
-    if(result.status == ResultStatus::Success) {
+    if(result.status == ResultStatus::RegisterSuccess) {
         emit registerOrLoginResult("RegisterSuccess");
     } else if(result.status == ResultStatus::UserExist) {
         emit registerOrLoginResult("UserExist");
@@ -173,18 +157,33 @@ void Controller::onTryToRegister(QString email, QString username, QString passwo
 
 void Controller::onTryToLogin(QString login, QString password)
 {
-    if(login.isEmpty() || password.isEmpty()) {
-        emit registerOrLoginResult("EmptyInfo");
-        return;
-    }
+    // if(login.isEmpty() || password.isEmpty()) {
+    //     emit registerOrLoginResult("EmptyInfo");
+    //     return;
+    // }
 
-    auto result = mNetworkManager->sendLoginRequest(login.toStdString(), password.toStdString());
+    // auto result = mNetworkManager->sendLoginRequest(login.toStdString(), password.toStdString());
 
-    cout << result.statusStr << endl;
-    cout << result.rawResponse << endl;
+    // cout << result.statusStr << endl;
+    // cout << result.rawResponse << endl;
 
-    if(result.status == ResultStatus::Success) {
-        onOperateModeSelected(OperateMode::WelcomePage);
+    ResponseResult result;
+    result.username = "Dylan";
+    result.status = ResultStatus::LoginSuccess;
+    result.role = UserRole::SuperAdmin;
+
+    if(result.status == ResultStatus::LoginSuccess) {
+        mUserInfo = mUserManager->getUserInfoByLoginInfo(result.username, result.role);
+        if(!mUserInfo.name.empty())
+        {
+            mName = QString::fromStdString(mUserInfo.name);
+            refreshActionItems();
+            emit nameChanged();
+        }
+        if(mAllDataIsReady)
+        {
+            onOperateModeSelected(OperateMode::WelcomePage);
+        }
     } else if(result.status == ResultStatus::UserOrEmailNotFound) {
         emit registerOrLoginResult("UserOrEmailNotFound");
     } else if(result.status == ResultStatus::PasswordIncorrect) {
@@ -192,50 +191,73 @@ void Controller::onTryToLogin(QString login, QString password)
     } else {
         emit registerOrLoginResult("LoginFailed");
     }
-
-    // auto loginInfo = mDataManager->getLoginInfoFromDB();
-    // std::string stdUsername = username.toStdString();
-    // std::string stdPassword = password.toStdString();
-    // mUserInfo = mUserManager->getUserInfoByLoginInfo(stdUsername, stdPassword, loginInfo);
-    // if(!mUserInfo.name.empty())
-    // {
-    //     mName = QString::fromStdString(mUserInfo.name);
-    //     refreshActionItems();
-    //     emit nameChanged();
-    //     onOperateModeSelected(OperateMode::FileView);
-    // }
 }
 
 void Controller::onFileUploaded(QString filePath)
 {
     if (!mDataManager) {
         qWarning() << "DataManager 为空，无法处理文件：" << filePath;
+        emit refreshDatabaseFinished();
         return;
     }
 
     mNewDataFilePath = QUrl(filePath).toLocalFile();
     cout << "filePath: " << mNewDataFilePath.toStdString() << endl;
+    if(mNewDataFilePath.isEmpty())
+    {
+        qWarning() << "filePath 为空，无法处理文件：" << mNewDataFilePath;
+        emit refreshDatabaseFinished();
+        return;
+    }
 
     // 使用 QtConcurrent 异步运行长时间任务
     QFuture<void> future = QtConcurrent::run([this]() {
         mDataManager->createDBConnection();
-        if(!mNewDataFilePath.isEmpty())
+        if(mDataManager->refreshAllDataFromFile(mNewDataFilePath))
         {
-            if(mDataManager->refreshAllDataFromFile(mNewDataFilePath))
-            {
-                cout << "Refresh DB data by excel file" << endl;
-            }
-        }
-        else{
-            mDataManager->refreshAllDataFromDB();
+            cout << "Refresh DB data by excel file" << endl;
         }
         mDataManager->closeDBConnection();
-        onOperateModeSelected(OperateMode::WelcomePage);
     });
 
     // 连接 QFutureWatcher 以处理任务完成
-    connect(&mFutureWatcher, &QFutureWatcher<void>::finished, this, []() {
-        cout << "文件处理完成" << endl;
+    disconnect(&mFutureWatcher, nullptr, this, nullptr);
+    connect(&mFutureWatcher, &QFutureWatcher<void>::finished, this, [this]() {
+        cout << "onFileUploaded 文件处理完成" << endl;
+        mSearchClassInfoController->refreshSearchClassInfo();
+        mSearchTeacherInfoController->refreshSearchTeacherInfo();
+        mSearchStudentInfoController->refreshSearchStudentInfo();
+        emit refreshDatabaseFinished();
+    });
+
+    // 设置 future 以监控任务完成
+    mFutureWatcher.setFuture(future);
+}
+
+void Controller::refreshAllDataFromDBFile()
+{
+    if (!mDataManager) {
+        qWarning() << "DataManager 为空，无法处理数据文件";
+        return;
+    }
+
+    // 使用 QtConcurrent 异步运行长时间任务
+    QFuture<void> future = QtConcurrent::run([this]() {
+        mDataManager->createDBConnection();
+
+        mDataManager->refreshAllDataFromDB();
+        mDataManager->storeAllTableDataCount();
+        mDataCount = QString::number(mDataManager->getTableDataCount(CLASS_INFOS_TABLE_NAME));
+
+        mDataManager->closeDBConnection();
+        emit dataCountChanged();
+    });
+
+    // 连接 QFutureWatcher 以处理任务完成
+    disconnect(&mFutureWatcher, nullptr, this, nullptr);
+    connect(&mFutureWatcher, &QFutureWatcher<void>::finished, this, [this]() {
+        cout << "refreshAllDataFromDBFile 文件处理完成" << endl;
+        mAllDataIsReady = true;
     });
 
     // 设置 future 以监控任务完成

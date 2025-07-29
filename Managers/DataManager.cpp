@@ -1,4 +1,4 @@
-#include "DataManager.h"
+﻿#include "DataManager.h"
 #include <iostream>
 
 using namespace ClassScheduler;
@@ -28,7 +28,6 @@ bool DataManager::init()
     }
 
     readAllSettings();
-    readAllUserInfos();
 
     std::cout << "DataManager init: " << ret << std::endl;
     return ret;
@@ -188,16 +187,6 @@ bool DataManager::readAllSettings()
         mAppSettings.push_back(s);
     }
 
-    return true;
-}
-
-bool DataManager::readAllUserInfos()
-{
-    mLoginInfos.emplace_back(LoginInfo("zhuhui", "zh615", UserLevel::Owner));
-    mLoginInfos.emplace_back(LoginInfo("jiajia", "xwj123", UserLevel::Owner));
-    mLoginInfos.emplace_back(LoginInfo("tingting", "xyt123", UserLevel::RegularUser));
-    mLoginInfos.emplace_back(LoginInfo("xiaoru", "cmr123", UserLevel::Owner));
-    mLoginInfos.emplace_back(LoginInfo("Dylan", "dylanadmin", UserLevel::SuperAdmin));
     return true;
 }
 
@@ -363,11 +352,6 @@ StudentInfos DataManager::getStudentInfosFromDB()
 AppSettings DataManager::getAppSettingsFromDB()
 {
     return mAppSettings;
-}
-
-LoginInfos DataManager::getLoginInfoFromDB()
-{
-    return mLoginInfos;
 }
 
 bool DataManager::saveDataToClassInfosTable(ClassInfos& infos)

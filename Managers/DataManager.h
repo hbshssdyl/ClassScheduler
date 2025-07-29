@@ -1,4 +1,4 @@
-#ifndef DATAMANAGER_H
+﻿#ifndef DATAMANAGER_H
 #define DATAMANAGER_H
 #include "Utils/DataUtils.h"
 #include "xlsxdocument.h"
@@ -33,7 +33,6 @@ public:
     TeacherInfos getTeacherInfosFromDB();
     StudentInfos getStudentInfosFromDB();
     AppSettings getAppSettingsFromDB();
-    LoginInfos getLoginInfoFromDB();
 
 private:
     bool init();
@@ -54,7 +53,6 @@ private:
     bool createAppSettingsTable();
     bool initializeAppSettings();
     bool readAllSettings();
-    bool readAllUserInfos();
     bool setAppSetting(const QString& key, bool value);
     bool insertDataToClassInfosTable(ClassInfos& infos);
     bool insertDataToTeacherInfosTable(TeacherInfos& infos);
@@ -82,7 +80,6 @@ private:
     StudentInfos mStudentInfosFromDB;
     TableDataCount mDataCount;
     AppSettings mAppSettings;
-    LoginInfos mLoginInfos;
 };
 
 #endif // DATAMANAGER_H

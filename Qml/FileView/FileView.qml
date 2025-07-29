@@ -1,11 +1,19 @@
-import QtQuick 2.15
+﻿import QtQuick 2.15
 import QtQuick.Controls 2.15
 
 Rectangle {
     id: root
 
     property var rootController
-    //property string currentDataCount: rootController.dataCount
+    property string viewName
+
+    onRootControllerChanged: {
+        if (rootController) {
+            rootController.refreshDatabaseFinished.connect(function() {
+                pageLoader.source = "FileUploadView.qml";
+            });
+        }
+    }
 
     Loader {
         id: pageLoader
@@ -17,8 +25,8 @@ Rectangle {
             if (item && item.hasOwnProperty("fileUploadFinish")) {
                 item.fileUploadFinish.connect(function(filePath) {
                     console.debug(filePath);
-                    rootController.onFileUploaded(filePath);
                     pageLoader.source = "FileProcessingView.qml";
+                    rootController.onFileUploaded(filePath);
                 });
             }
         }

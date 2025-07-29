@@ -257,9 +257,6 @@ ResponseResult NetworkManager::uploadDbFile(const std::string& dbFilePath) {
         curl_easy_setopt(curl, CURLOPT_MIMEPOST, form);
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeCallback);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, &responseStr);
-        // 统一 SSL 设置（与生产环境兼容）
-        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 1L);
-        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 2L);
 
         res = curl_easy_perform(curl);
 

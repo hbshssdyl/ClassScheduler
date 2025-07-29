@@ -1,4 +1,4 @@
-import QtQuick
+﻿import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 
@@ -7,6 +7,7 @@ Rectangle {
 
     property var operateMode
     property var rootController
+    property string viewName
     property var controller: rootController.getScheduleClassController()
     // property int startTimeH: 8
     // property int startTimeM: 0

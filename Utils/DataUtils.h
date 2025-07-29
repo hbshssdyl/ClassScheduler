@@ -7,6 +7,7 @@
 #include <map>
 #include <QVariant>
 #include <algorithm>
+#include <nlohmann/json.hpp>
 
 namespace ClassScheduler
 {
@@ -20,16 +21,6 @@ namespace ClassScheduler
     static std::vector validTeacherHeader{"老师姓名", "使用过的昵称", "教过的科目及学生", "科目及工资（每小时）", "科目及年级"};
     static std::vector validStudentHeader{"学生姓名", "就读学校", "手机号", "教过该生的老师", "科目及费用（每小时）"};
     static std::vector allTableNameForDB{"classInfos", "teacherInfos", "studentInfos"};
-
-    enum class UserLevel
-    {
-        None = 0,
-        RegularUser,
-        SeniorUser,
-        Manager,
-        Owner,
-        SuperAdmin
-    };
 
     enum class OperateMode
     {
@@ -45,23 +36,32 @@ namespace ClassScheduler
     };
     using OperateModes = std::vector<OperateMode>;
 
-    struct UserInfo{
-        std::string name;
-        UserLevel level;
-        OperateModes mods;
+    enum class ResultStatus {
+        RegisterSuccess,
+        LoginSuccess,
+        UserExist,
+        EmailExist,
+        EmailInvalid,
+        UserOrEmailNotFound,
+        PasswordIncorrect,
+        CurleNotOK,
+        UnknownError
     };
 
-    struct LoginInfo{
-        std::string username;
-        std::string password;
-        UserLevel level;
+    enum class UserRole {
+        None,
+        Staff,
+        SeniorStaff,
+        Manager,
+        Boss,
+        PersonalAssistant,
+        SuperAdmin
+    };
 
-        LoginInfo(std::string name, std::string pwd, UserLevel ulevel)
-        {
-            username = name;
-            password = pwd;
-            level = ulevel;
-        }
+    struct UserInfo{
+        std::string name;
+        UserRole role;
+        OperateModes mods;
     };
 
     struct Setting {
@@ -986,21 +986,14 @@ namespace ClassScheduler
         }
     };
 
-    enum class ResultStatus {
-        Success,
-        UserExist,
-        EmailExist,
-        EmailInvalid,
-        UserOrEmailNotFound,
-        PasswordIncorrect,
-        CurleNotOK,
-        UnknownError
-    };
-
     struct ResponseResult {
         ResultStatus status;
         std::string statusStr; // 具体描述
         std::string rawResponse; // 原始响应字符串（用于调试）
+
+        //login
+        UserRole role;
+        std::string username;
 
         ResponseResult()
         {
@@ -1012,9 +1005,25 @@ namespace ClassScheduler
         void refreshResult(std::string response)
         {
             rawResponse = response;
-            if (response.find(toString(ResultStatus::Success), Qt::CaseSensitive) != std::string::npos) {
-                status = ResultStatus::Success;
-                statusStr = toString(ResultStatus::Success);
+            if(response.find(toString(ResultStatus::LoginSuccess), Qt::CaseSensitive) != std::string::npos){
+                status = ResultStatus::LoginSuccess;
+                statusStr = toString(ResultStatus::LoginSuccess);
+                nlohmann::json j = nlohmann::json::parse(response);
+                std::map<std::string, std::string> result = j.get<std::map<std::string, std::string>>();
+
+                for (const auto& [key, value] : result) {
+                    if(key == "role"){
+                        role = toUserRole(value);
+                    }
+                    if(key == "username"){
+                        username = value;
+                    }
+                }
+                return;
+            }
+            if(response.find(toString(ResultStatus::RegisterSuccess), Qt::CaseSensitive) != std::string::npos){
+                status = ResultStatus::RegisterSuccess;
+                statusStr = toString(ResultStatus::RegisterSuccess);
                 return;
             }
             if (response.find(toString(ResultStatus::UserExist), Qt::CaseSensitive) != std::string::npos) {
@@ -1047,11 +1056,30 @@ namespace ClassScheduler
             statusStr = toString(ResultStatus::UnknownError);
         }
 
+        UserRole toUserRole(std::string role)
+        {
+            if(role == "Staff")
+                return UserRole::Staff;
+            if(role == "SeniorStaff")
+                return UserRole::SeniorStaff;
+            if(role == "Manager")
+                return UserRole::Manager;
+            if(role == "Boss")
+                return UserRole::Boss;
+            if(role == "PersonalAssistant")
+                return UserRole::PersonalAssistant;
+            if(role == "SuperAdmin")
+                return UserRole::SuperAdmin;
+            return UserRole::None;
+        }
+
         std::string toString(ResultStatus status)
         {
             switch (status) {
-            case ResultStatus::Success:
-                return "Success";
+            case ResultStatus::LoginSuccess:
+                return "LoginSuccess";
+            case ResultStatus::RegisterSuccess:
+                return "RegisterSuccess";
             case ResultStatus::UserExist:
                 return "UserExist";
             case ResultStatus::EmailExist:
@@ -1077,6 +1105,4 @@ namespace ClassScheduler
 
     using TableDataCount = std::map<QString, int>; //QString tableName, int dataCount
     using AppSettings = std::vector<Setting>;
-
-    using LoginInfos = std::vector<LoginInfo>;
 } // namespace ClassScheduler

@@ -11,6 +11,8 @@ QString toOperateModeString(OperateMode mode)
     {
     case OperateMode::None:
         return "None";
+    case OperateMode::FileView:
+        return "更新数据库";
     case OperateMode::WelcomePage:
         return "欢迎使用";
     case OperateMode::SearchClassInfo:
@@ -35,6 +37,8 @@ QString getIconNameByOperateMode(OperateMode mode)
     case OperateMode::None:
     case OperateMode::WelcomePage:
         return "";
+    case OperateMode::FileView:
+        return "database.svg";
     case OperateMode::SearchClassInfo:
         return "folder.svg";
     case OperateMode::SearchTeacherInfo:
@@ -402,6 +406,24 @@ void CUtils::updateScheduleClassResultsList(QList<QList<QVariantMap>>& data, Sch
                                  { "value", result.strTeacherValidFreeTime } });
         data.append(tmp);
     }
+}
+
+//Others
+std::string CUtils::toRoleString(QString& role)
+{
+    if(role == "普通员工")
+        return "Staff";
+    if(role == "高级员工")
+        return "SeniorStaff";
+    if(role == "管理者")
+        return "Manager";
+    if(role == "老板")
+        return "Boss";
+    if(role == "一对一助理")
+        return "PersonalAssistant";
+    if(role == "超级管理员")
+        return "SuperAdmin";
+    return "Staff";
 }
 
 } // namespace PictureManager

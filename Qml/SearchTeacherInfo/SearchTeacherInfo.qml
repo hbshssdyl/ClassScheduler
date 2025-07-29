@@ -1,4 +1,4 @@
-import "../BasicComponent"
+﻿import "../BasicComponent"
 import "../JSUtils/ColorUtils.js" as ColorUtils
 import "../JSUtils/MainUtils.js" as MainUtils
 import QtQuick
@@ -11,6 +11,7 @@ Rectangle {
 
     property var operateMode
     property var rootController
+    property string viewName
     property var controller: rootController.getSearchTeacherInfoController()
     property int delegateHeight: 50
 

@@ -75,6 +75,7 @@ qt_add_qml_module(appClassScheduler
     RESOURCES Resource/study.svg
     RESOURCES Resource/tag.svg
     RESOURCES Resource/user.svg
+    RESOURCES Resource/database.svg
     RESOURCES Resource/welcome.svg
     RESOURCES Resource/welcome.jpg
     RESOURCES Resource/ok.svg

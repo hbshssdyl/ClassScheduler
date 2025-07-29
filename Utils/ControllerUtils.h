@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "Controller/Controller.h"
 #include "DataUtils.h"
@@ -33,6 +33,9 @@ namespace ClassScheduler
         //For ScheduleClassController.cpp
         static bool isTimeOverlap(const QString& timeRange1, const QString& timeRange2);
         static void updateScheduleClassResultsList(QList<QList<QVariantMap>>& data, ScheduleClassInputInfo& inputInfos, ClassInfos& classInfosList);
+
+        //Others
+        static std::string toRoleString(QString& role);
     };
 
 } // namespace PictureManager

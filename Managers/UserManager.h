@@ -1,4 +1,4 @@
-#ifndef USERMANAGER_H
+﻿#ifndef USERMANAGER_H
 #define USERMANAGER_H
 #include "Utils/DataUtils.h"
 
@@ -10,11 +10,10 @@ class UserManager
 {
 public:
     UserManager();
-    UserInfo getUserInfoByLoginInfo(std::string& username, std::string& password, LoginInfos& loginInfos);
+    UserInfo getUserInfoByLoginInfo(std::string& username, UserRole& role);
 
 private:
-    OperateModes getModsByUserLevel(UserLevel& level);
-    std::string getNameByUsername(std::string username);
+    OperateModes getModsByUserRole(UserRole& role);
 };
 
 #endif // USERMANAGER_H

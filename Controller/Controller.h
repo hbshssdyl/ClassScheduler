@@ -25,7 +25,6 @@ public:
     Q_PROPERTY(OperateMode operateMode MEMBER mOperateMode NOTIFY operateModeChanged)
     Q_PROPERTY(bool showActions MEMBER mShowActions NOTIFY operateModeChanged)
     Q_PROPERTY(bool showUserInfo MEMBER mShowUserInfo NOTIFY operateModeChanged)
-    Q_PROPERTY(QString loadedView MEMBER mLoadedView NOTIFY operateModeChanged)
     Q_PROPERTY(QString name MEMBER mName NOTIFY nameChanged)
     Q_PROPERTY(QString dataCount MEMBER mDataCount NOTIFY dataCountChanged)
     Q_PROPERTY(QVariantList actionItemsList MEMBER mActionItemsList NOTIFY actionItemsListChanged)
@@ -47,7 +46,9 @@ public slots:
     void onFileUploaded(QString filePath);
 
 signals:
-    void registerOrLoginResult(QString statusStr); // 注册结果信号
+    void registerOrLoginResult(QString statusStr);
+    void refreshDatabaseFinished();
+    void updateOperateMode(QString mode);
 
 signals:
     void operateModeChanged();
@@ -64,6 +65,7 @@ private:
     void initDB();
     void refreshAppSettings();
     void refreshActionItems();
+    void refreshAllDataFromDBFile();
 
 private:
     OperateMode mOperateMode { OperateMode::None };
@@ -74,7 +76,6 @@ private:
     QString mNewDataFilePath { "" };
     UserInfo mUserInfo;
 
-    QString mLoadedView { "" };
     QString mName{ "" };
     bool mShowActions;
     bool mShowUserInfo;
@@ -82,6 +83,8 @@ private:
     QVariantList mActionItemsList;
     OperateModes mAllOperateMode;
     QVariantMap mAppSettings;
+
+    atomic_bool mAllDataIsReady = false;
 
     QPointer<SearchClassInfoController> mSearchClassInfoController;
     QPointer<SearchTeacherInfoController> mSearchTeacherInfoController;

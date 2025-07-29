@@ -14,7 +14,8 @@ public:
     ResponseResult sendClearUsersRequest();
     ResponseResult sendChangePasswordRequest(const std::string& username, const std::string& oldPassword, const std::string& newPassword);
     ResponseResult sendUpdateRoleRequest(const std::string& username, const std::string& newRole);
-    ResponseResult uploadDbFile(const std::string& dbFilePath);
+    ResponseResult uploadDbFile();
+    ResponseResult downloadDbFile();
 };
 
 #endif // NETWORKMANAGER_H

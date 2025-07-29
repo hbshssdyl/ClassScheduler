@@ -239,7 +239,7 @@ ResponseResult NetworkManager::sendUpdateRoleRequest(const std::string& username
     return result;
 }
 
-ResponseResult NetworkManager::uploadDbFile(const std::string& dbFilePath) {
+ResponseResult NetworkManager::uploadDbFile() {
     CURL* curl;
     CURLcode res;
     std::string responseStr;
@@ -250,8 +250,8 @@ ResponseResult NetworkManager::uploadDbFile(const std::string& dbFilePath) {
         curl_mime* form = curl_mime_init(curl);
         curl_mimepart* field = curl_mime_addpart(form);
         curl_mime_name(field, "file");
-        curl_mime_filedata(field, dbFilePath.c_str());
-        curl_mime_filename(field, "tianming.db");
+        curl_mime_filedata(field, DATABASE_FULL_PATH.toStdString().c_str());
+        curl_mime_filename(field, DATABASE_NAME.toStdString().c_str());
 
         curl_easy_setopt(curl, CURLOPT_URL, (SERVER_URL + "upload-db/").c_str());
         curl_easy_setopt(curl, CURLOPT_MIMEPOST, form);
@@ -277,6 +277,50 @@ ResponseResult NetworkManager::uploadDbFile(const std::string& dbFilePath) {
     } else {
         result.rawResponse = "Fail to init curl";
     }
+    return result;
+}
+
+ResponseResult NetworkManager::downloadDbFile() {
+    CURL* curl;
+    CURLcode res;
+    ResponseResult result;
+
+    FILE* fp = fopen(DATABASE_FULL_PATH.toStdString().c_str(), "wb");
+    if (!fp) {
+        result.rawResponse = "无法创建本地文件: " + DATABASE_FULL_PATH.toStdString();
+        return result;
+    }
+    std::cout << "test: " << DATABASE_FULL_PATH.toStdString() << std::endl;
+
+    curl = curl_easy_init();
+    if (curl) {
+        std::string url = SERVER_URL + "export-sqlite-db/";
+
+        curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, nullptr);  // 使用默认写文件方式
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
+
+        res = curl_easy_perform(curl);
+
+        if (res != CURLE_OK) {
+            result.rawResponse = "下载失败: " + std::string(curl_easy_strerror(res));
+        } else {
+            long responseCode;
+            curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &responseCode);
+            if (responseCode == 200) {
+                //result.status = ResultStatus::Success;
+                result.rawResponse = "数据库文件下载成功";
+            } else {
+                result.rawResponse = "HTTP错误: " + std::to_string(responseCode);
+            }
+        }
+
+        curl_easy_cleanup(curl);
+    } else {
+        result.rawResponse = "无法初始化 CURL";
+    }
+
+    fclose(fp);
     return result;
 }
 

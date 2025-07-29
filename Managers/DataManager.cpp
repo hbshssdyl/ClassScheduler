@@ -7,8 +7,9 @@ DataManager::DataManager() {}
 
 bool DataManager::createDBConnection()
 {
-    auto db = QSqlDatabase::addDatabase("QSQLITE");
-    db.setDatabaseName("ClassScheduler.db");
+    QDir().mkpath(DATABASE_PATH_DIR);
+    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
+    db.setDatabaseName(DATABASE_FULL_PATH);
     if (!db.open()) {
         std::cout << "Failed to connect database." << std::endl;
         return false;

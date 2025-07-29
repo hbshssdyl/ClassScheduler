@@ -1,4 +1,4 @@
-#include <QApplication>
+﻿#include <QApplication>
 #include <QQmlApplicationEngine>
 #include <QQuickStyle>
 #include "Controller/Controller.h"
@@ -30,9 +30,9 @@ int main(int argc, char *argv[])
 #endif
 
     QApplication app(argc, argv);
-    app.setOrganizationName("Dylan  ");
+    app.setOrganizationName("Dylan");
     app.setOrganizationDomain("dylan.com");
-    app.setApplicationName("Class Scheduler");
+    app.setApplicationName("ClassScheduler");
 
     // 设置支持自定义的样式（任选其一）
     QQuickStyle::setStyle("Fusion");    // 跨平台风格

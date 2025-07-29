@@ -4,6 +4,7 @@
 #include <vector>
 #include <QString>
 #include <QTime>
+#include <QtSql>
 #include <map>
 #include <QVariant>
 #include <algorithm>
@@ -16,11 +17,17 @@ namespace ClassScheduler
     static const QString STUDENT_INFOS_TABLE_NAME = "studentInfos";
     static const QString APP_TOGGLE_INFOS_TABLE_NAME = "toggleInfos";
 
+    static const QString DATABASE_NAME = "InfoDatabase.db";
+    static const QString DATABASE_PATH_DIR = QDir::currentPath();
+    static const QString DATABASE_FULL_PATH = DATABASE_PATH_DIR + "/" + DATABASE_NAME;
+
     static QString nullString = "无该信息";
     static std::vector validExcelClassHeader{"日期", "星期", "姓名", "学校", "电话", "年级", "学科", "时间", "老师", "网课or面授", "课时", "金额/小时", "课酬总计", "老师姓名", "老师工资", "已收金额", "付费方式", "收费日期"};
     static std::vector validTeacherHeader{"老师姓名", "使用过的昵称", "教过的科目及学生", "科目及工资（每小时）", "科目及年级"};
     static std::vector validStudentHeader{"学生姓名", "就读学校", "手机号", "教过该生的老师", "科目及费用（每小时）"};
     static std::vector allTableNameForDB{"classInfos", "teacherInfos", "studentInfos"};
+
+
 
     enum class OperateMode
     {

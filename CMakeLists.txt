@@ -1,32 +1,49 @@
 ﻿cmake_minimum_required(VERSION 3.16)
+project(ClassScheduler
+    VERSION 0.1
+    LANGUAGES CXX
+)
 
-project(ClassScheduler VERSION 0.1 LANGUAGES CXX)
-
-# 设置 C++ 标准和 Qt 自动生成
+#============================================
+# 基本配置
+#============================================
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
-# 查找 Qt6 和其他依赖
-find_package(Qt6 REQUIRED COMPONENTS Quick QuickControls2 QuickLayouts Sql Core Charts Concurrent AxContainer)
+#============================================
+# 依赖配置
+#============================================
+find_package(Qt6 REQUIRED COMPONENTS
+    Quick QuickControls2 QuickLayouts Sql Core Charts Concurrent AxContainer)
 find_package(nlohmann_json CONFIG REQUIRED)
 find_package(CURL REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(OpenSSL REQUIRED)
 
 # 调试信息
-message("OpenSSL include dir: ${OPENSSL_INCLUDE_DIR}")
-message("OpenSSL libraries: ${OPENSSL_LIBRARIES}")
-message("CURL include dir: ${CURL_INCLUDE_DIRS}")
-message("CURL libraries: ${CURL_LIBRARIES}")
+message(STATUS "OpenSSL include dir: ${OPENSSL_INCLUDE_DIR}")
+message(STATUS "OpenSSL libraries: ${OPENSSL_LIBRARIES}")
+message(STATUS "CURL include dir: ${CURL_INCLUDE_DIRS}")
+message(STATUS "CURL libraries: ${CURL_LIBRARIES}")
 
-# 包含头文件
-include_directories(${CURL_INCLUDE_DIRS} ${OPENSSL_INCLUDE_DIR})
+include_directories(
+    ${CURL_INCLUDE_DIRS}
+    ${OPENSSL_INCLUDE_DIR}
+)
 
 qt_standard_project_setup(REQUIRES 6.8)
 
+#============================================
+# QXlsx处理
+#============================================
+add_subdirectory(QXlsx)
+
+#============================================
+# 可执行文件配置
+#============================================
 qt_add_executable(appClassScheduler
     main.cpp
 )
@@ -34,6 +51,7 @@ qt_add_executable(appClassScheduler
 qt_add_qml_module(appClassScheduler
     URI ClassScheduler
     VERSION 1.0
+    # QML文件
     QML_FILES Main.qml
     QML_FILES Qml/WelcomePage/WelcomePage.qml
     QML_FILES Qml/SearchClassInfo/SearchClassInfo.qml
@@ -41,6 +59,7 @@ qt_add_qml_module(appClassScheduler
     QML_FILES Qml/ScheduleClass/ScheduleClass.qml
     QML_FILES Qml/TeacherEvaluation/TeacherEvaluation.qml
     QML_FILES Qml/SearchStudentInfo/SearchStudentInfo.qml
+    QML_FILES Qml/SearchStudentInfo/SearchStudentInfoDelegate.qml
     QML_FILES Qml/ActionItems/ActionItems.qml
     QML_FILES Qml/ActionItems/ActionItemDelegate.qml
     QML_FILES Qml/OperateArea/OperateArea.qml
@@ -50,6 +69,15 @@ qt_add_qml_module(appClassScheduler
     QML_FILES Qml/FileView/FileUploadView.qml
     QML_FILES Qml/FileView/FileProcessingView.qml
     QML_FILES Qml/JSUtils/ColorUtils.js
+    QML_FILES Qml/JSUtils/MainUtils.js
+    QML_FILES Qml/BasicComponent/SearchBar.qml
+    QML_FILES Qml/SearchTeacherInfo/SearchTeacherInfo.qml
+    QML_FILES Qml/SearchTeacherInfo/SearchTeacherInfoDelegate.qml
+    QML_FILES Qml/UserInfo/UserInfo.qml
+    QML_FILES Qml/TaskManagerView/TaskManagerView.qml
+    QML_FILES Qml/TaskAssistantView/TaskAssistantView.qml
+
+    # 源文件
     SOURCES Controller/Controller.h
     SOURCES Controller/Controller.cpp
     SOURCES Utils/ControllerUtils.h
@@ -57,15 +85,20 @@ qt_add_qml_module(appClassScheduler
     SOURCES Utils/DataUtils.h
     SOURCES Controller/SearchClassInfoController.cpp
     SOURCES Controller/SearchClassInfoController.h
-    SOURCES Managers/DataManager.h Managers/DataManager.cpp
-    QML_FILES Qml/BasicComponent/SearchBar.qml
-    SOURCES Controller/SearchTeacherInfoController.cpp Controller/SearchTeacherInfoController.h
-    QML_FILES Qml/SearchTeacherInfo/SearchTeacherInfo.qml Qml/SearchTeacherInfo/SearchTeacherInfoDelegate.qml
-    QML_FILES Qml/JSUtils/MainUtils.js
-    SOURCES Controller/ScheduleClassController.h Controller/ScheduleClassController.cpp
+    SOURCES Managers/DataManager.h
+    SOURCES Managers/DataManager.cpp
+    SOURCES Controller/SearchTeacherInfoController.cpp
+    SOURCES Controller/SearchTeacherInfoController.h
+    SOURCES Controller/ScheduleClassController.h
+    SOURCES Controller/ScheduleClassController.cpp
     SOURCES Controller/SearchStudentInfoController.cpp
     SOURCES Controller/SearchStudentInfoController.h
-    QML_FILES Qml/SearchStudentInfo/SearchStudentInfoDelegate.qml
+    SOURCES Managers/UserManager.h
+    SOURCES Managers/UserManager.cpp
+    SOURCES Managers/NetworkManager.h
+    SOURCES Managers/NetworkManager.cpp
+
+    # 资源文件
     RESOURCES Resource/Avatar-self.jpg
     RESOURCES Resource/Banner-sky.jpg
     RESOURCES Resource/Banner-mountain.jpg
@@ -80,12 +113,14 @@ qt_add_qml_module(appClassScheduler
     RESOURCES Resource/welcome.jpg
     RESOURCES Resource/ok.svg
     RESOURCES Resource/notok.svg
-    QML_FILES Qml/UserInfo/UserInfo.qml
-    SOURCES Managers/UserManager.h Managers/UserManager.cpp
-    SOURCES Managers/NetworkManager.h Managers/NetworkManager.cpp
+    RESOURCES Resource/notification.svg
+    RESOURCES Resource/task.svg
+    RESOURCES Resource/manage.svg
 )
 
-# 链接库
+#============================================
+# 链接配置
+#============================================
 target_link_libraries(appClassScheduler PRIVATE
     Qt6::Quick
     Qt6::QuickControls2
@@ -101,17 +136,13 @@ target_link_libraries(appClassScheduler PRIVATE
     ZLIB::ZLIB
     nlohmann_json::nlohmann_json
     QXlsx::QXlsx
-    -lws2_32  # Windows 网络库
+    -lws2_32
     -static
 )
 
-# 确保静态链接
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static")
-
-# QXlsx 配置
-add_subdirectory(QXlsx)
-target_link_libraries(appClassScheduler PRIVATE QXlsx::QXlsx)
-
+#============================================
+# 安装配置
+#============================================
 include(GNUInstallDirs)
 install(TARGETS appClassScheduler
     BUNDLE DESTINATION .

@@ -65,7 +65,8 @@ private:
     void initDB();
     void refreshAppSettings();
     void refreshActionItems();
-    void refreshAllDataFromDBFile();
+    void getDatabaseFileAndRefreshAllData();
+    void refreshControllersData();
 
 private:
     OperateMode mOperateMode { OperateMode::None };

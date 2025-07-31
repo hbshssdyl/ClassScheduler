@@ -53,7 +53,7 @@ ResponseResult NetworkManager::sendRegisterRequest(const std::string& email, con
         curl_slist_free_all(headers);
         curl_easy_cleanup(curl);
     } else {
-        result.rawResponse = "Fail to init curl";
+        result.updateToCurlError();
     }
     return result;
 }
@@ -91,7 +91,7 @@ ResponseResult NetworkManager::sendLoginRequest(const std::string& login, const 
         curl_slist_free_all(headers);
         curl_easy_cleanup(curl);
     } else {
-        result.rawResponse = "Fail to init curl";
+        result.updateToCurlError();
     }
     return result;
 }
@@ -128,7 +128,7 @@ ResponseResult NetworkManager::sendDeleteUserRequest(const std::string& username
         curl_slist_free_all(headers);
         curl_easy_cleanup(curl);
     } else {
-        result.rawResponse = "Fail to init curl";
+        result.updateToCurlError();
     }
     return result;
 }
@@ -155,7 +155,7 @@ ResponseResult NetworkManager::sendClearUsersRequest() {
 
         curl_easy_cleanup(curl);
     } else {
-        result.rawResponse = "Fail to init curl";
+        result.updateToCurlError();
     }
     return result;
 }
@@ -195,7 +195,7 @@ ResponseResult NetworkManager::sendChangePasswordRequest(const std::string& user
         curl_slist_free_all(headers);
         curl_easy_cleanup(curl);
     } else {
-        result.rawResponse = "Fail to init curl";
+        result.updateToCurlError();
     }
     return result;
 }
@@ -234,7 +234,7 @@ ResponseResult NetworkManager::sendUpdateRoleRequest(const std::string& username
         curl_slist_free_all(headers);
         curl_easy_cleanup(curl);
     } else {
-        result.rawResponse = "Fail to init curl";
+        result.updateToCurlError();
     }
     return result;
 }
@@ -263,19 +263,13 @@ ResponseResult NetworkManager::uploadDbFile() {
         if (res != CURLE_OK) {
             result.rawResponse = curl_easy_strerror(res);
         } else {
-            long responseCode;
-            curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &responseCode);
-            if (responseCode == 200) {
-                result.refreshResult(responseStr);
-            } else {
-                result.rawResponse = "HTTP error: " + std::to_string(responseCode) + ", Response: " + responseStr;
-            }
+            result.refreshResult(responseStr);
         }
 
         curl_mime_free(form);
         curl_easy_cleanup(curl);
     } else {
-        result.rawResponse = "Fail to init curl";
+        result.updateToCurlError();
     }
     return result;
 }
@@ -287,7 +281,9 @@ ResponseResult NetworkManager::downloadDbFile() {
 
     FILE* fp = fopen(DATABASE_FULL_PATH.toStdString().c_str(), "wb");
     if (!fp) {
+        result.status = ResultStatus::CreateDatabaseFileFailed;
         result.rawResponse = "无法创建本地文件: " + DATABASE_FULL_PATH.toStdString();
+        result.statusStr = result.toString(ResultStatus::CreateDatabaseFileFailed);
         return result;
     }
     std::cout << "test: " << DATABASE_FULL_PATH.toStdString() << std::endl;
@@ -303,21 +299,27 @@ ResponseResult NetworkManager::downloadDbFile() {
         res = curl_easy_perform(curl);
 
         if (res != CURLE_OK) {
+            result.status = ResultStatus::CurlNotOK;
             result.rawResponse = "下载失败: " + std::string(curl_easy_strerror(res));
+            result.statusStr = result.toString(ResultStatus::CurlNotOK);
+
         } else {
             long responseCode;
             curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &responseCode);
             if (responseCode == 200) {
-                //result.status = ResultStatus::Success;
-                result.rawResponse = "数据库文件下载成功";
+                result.status = ResultStatus::DatabaseFileDownloadSucess;
+                result.rawResponse = "数据库文件下载成功！";
+                result.statusStr = result.toString(ResultStatus::DatabaseFileDownloadSucess);
             } else {
+                result.status = ResultStatus::DatabaseFileDownloadFailed;
                 result.rawResponse = "HTTP错误: " + std::to_string(responseCode);
+                result.statusStr = result.toString(ResultStatus::DatabaseFileDownloadFailed);
             }
         }
 
         curl_easy_cleanup(curl);
     } else {
-        result.rawResponse = "无法初始化 CURL";
+        result.updateToCurlError();
     }
 
     fclose(fp);

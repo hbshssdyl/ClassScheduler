@@ -44,14 +44,28 @@ namespace ClassScheduler
     using OperateModes = std::vector<OperateMode>;
 
     enum class ResultStatus {
+        //Register
         RegisterSuccess,
-        LoginSuccess,
         UserExist,
         EmailExist,
         EmailInvalid,
+
+        //Login
+        LoginSuccess,
         UserOrEmailNotFound,
         PasswordIncorrect,
-        CurleNotOK,
+
+        //Upload DB file
+        DatabaseUploadSuccess,
+        DatabaseUploadFailed,
+
+        //Download DB file
+        CreateDatabaseFileFailed,
+        DatabaseFileDownloadSucess,
+        DatabaseFileDownloadFailed,
+
+        //Other
+        CurlNotOK,
         UnknownError
     };
 
@@ -1004,14 +1018,23 @@ namespace ClassScheduler
 
         ResponseResult()
         {
-            rawResponse = "curle error, no response";
-            status = ResultStatus::CurleNotOK;
-            statusStr = toString(ResultStatus::CurleNotOK);
+            rawResponse = "ResponseResult: init rawResponse";
+            status = ResultStatus::UnknownError;
+            statusStr = toString(ResultStatus::UnknownError);
+        }
+
+        void updateToCurlError()
+        {
+            rawResponse = "Fail to init curl";
+            status = ResultStatus::CurlNotOK;
+            statusStr = toString(ResultStatus::CurlNotOK);
         }
 
         void refreshResult(std::string response)
         {
             rawResponse = response;
+
+            // Login cases
             if(response.find(toString(ResultStatus::LoginSuccess), Qt::CaseSensitive) != std::string::npos){
                 status = ResultStatus::LoginSuccess;
                 statusStr = toString(ResultStatus::LoginSuccess);
@@ -1028,6 +1051,8 @@ namespace ClassScheduler
                 }
                 return;
             }
+
+            // Register cases
             if(response.find(toString(ResultStatus::RegisterSuccess), Qt::CaseSensitive) != std::string::npos){
                 status = ResultStatus::RegisterSuccess;
                 statusStr = toString(ResultStatus::RegisterSuccess);
@@ -1043,6 +1068,13 @@ namespace ClassScheduler
                 statusStr = toString(ResultStatus::EmailExist);
                 return;
             }
+            if (response.find("not a valid email address", Qt::CaseSensitive) != std::string::npos) {
+                status = ResultStatus::EmailInvalid;
+                statusStr = toString(ResultStatus::EmailInvalid);
+                return;
+            }
+
+            // Login error cases
             if (response.find(toString(ResultStatus::UserOrEmailNotFound), Qt::CaseSensitive) != std::string::npos) {
                 status = ResultStatus::UserOrEmailNotFound;
                 statusStr = toString(ResultStatus::UserOrEmailNotFound);
@@ -1053,12 +1085,44 @@ namespace ClassScheduler
                 statusStr = toString(ResultStatus::PasswordIncorrect);
                 return;
             }
-            if (response.find("not a valid email address", Qt::CaseSensitive) != std::string::npos) {
-                status = ResultStatus::EmailInvalid;
-                statusStr = toString(ResultStatus::EmailInvalid);
+
+            // Database upload cases
+            if (response.find(toString(ResultStatus::DatabaseUploadSuccess), Qt::CaseSensitive) != std::string::npos) {
+                status = ResultStatus::DatabaseUploadSuccess;
+                statusStr = toString(ResultStatus::DatabaseUploadSuccess);
+                return;
+            }
+            if (response.find(toString(ResultStatus::DatabaseUploadFailed), Qt::CaseSensitive) != std::string::npos) {
+                status = ResultStatus::DatabaseUploadFailed;
+                statusStr = toString(ResultStatus::DatabaseUploadFailed);
                 return;
             }
 
+            // Database download cases
+            if (response.find(toString(ResultStatus::DatabaseFileDownloadSucess), Qt::CaseSensitive) != std::string::npos) {
+                status = ResultStatus::DatabaseFileDownloadSucess;
+                statusStr = toString(ResultStatus::DatabaseFileDownloadSucess);
+                return;
+            }
+            if (response.find(toString(ResultStatus::DatabaseFileDownloadFailed), Qt::CaseSensitive) != std::string::npos) {
+                status = ResultStatus::DatabaseFileDownloadFailed;
+                statusStr = toString(ResultStatus::DatabaseFileDownloadFailed);
+                return;
+            }
+            if (response.find(toString(ResultStatus::CreateDatabaseFileFailed), Qt::CaseSensitive) != std::string::npos) {
+                status = ResultStatus::CreateDatabaseFileFailed;
+                statusStr = toString(ResultStatus::CreateDatabaseFileFailed);
+                return;
+            }
+
+            // Other cases
+            if (response.find(toString(ResultStatus::CurlNotOK), Qt::CaseSensitive) != std::string::npos) {
+                status = ResultStatus::CurlNotOK;
+                statusStr = toString(ResultStatus::CurlNotOK);
+                return;
+            }
+
+            // Default case
             status = ResultStatus::UnknownError;
             statusStr = toString(ResultStatus::UnknownError);
         }
@@ -1083,26 +1147,46 @@ namespace ClassScheduler
         std::string toString(ResultStatus status)
         {
             switch (status) {
-            case ResultStatus::LoginSuccess:
-                return "LoginSuccess";
-            case ResultStatus::RegisterSuccess:
-                return "RegisterSuccess";
-            case ResultStatus::UserExist:
-                return "UserExist";
-            case ResultStatus::EmailExist:
-                return "EmailExist";
-            case ResultStatus::EmailInvalid:
-                return "EmailInvalid";
-            case ResultStatus::UserOrEmailNotFound:
-                return "UserOrEmailNotFound";
-            case ResultStatus::PasswordIncorrect:
-                return "PasswordIncorrect";
-            case ResultStatus::CurleNotOK:
-                return "CurleNotOK";
-            case ResultStatus::UnknownError:
-                return "UnknownError";
-            default:
-                break;
+                // Register
+                case ResultStatus::RegisterSuccess:
+                    return "RegisterSuccess";
+                case ResultStatus::UserExist:
+                    return "UserExist";
+                case ResultStatus::EmailExist:
+                    return "EmailExist";
+                case ResultStatus::EmailInvalid:
+                    return "EmailInvalid";
+
+                // Login
+                case ResultStatus::LoginSuccess:
+                    return "LoginSuccess";
+                case ResultStatus::UserOrEmailNotFound:
+                    return "UserOrEmailNotFound";
+                case ResultStatus::PasswordIncorrect:
+                    return "PasswordIncorrect";
+
+                // Upload DB file
+                case ResultStatus::DatabaseUploadSuccess:
+                    return "DatabaseUploadSuccess";
+                case ResultStatus::DatabaseUploadFailed:
+                    return "DatabaseUploadFailed";
+
+                // Download DB file
+                case ResultStatus::CreateDatabaseFileFailed:
+                    return "CreateDatabaseFileFailed";
+                case ResultStatus::DatabaseFileDownloadSucess:
+                    return "DatabaseFileDownloadSucess";
+                case ResultStatus::DatabaseFileDownloadFailed:
+                    return "DatabaseFileDownloadFailed";
+
+                // Other
+                case ResultStatus::CurlNotOK:
+                    return "CurlNotOK";
+                case ResultStatus::UnknownError:
+                    return "UnknownError";
+
+                default:
+                    break;
             }
             return "UnknownError";
         }

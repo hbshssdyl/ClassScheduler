@@ -25,8 +25,7 @@ void Controller::initManagers()
 
 void Controller::initDB()
 {
-    mDataManager = std::make_shared<DataManager>();
-    refreshAllDataFromDBFile();
+    getDatabaseFileAndRefreshAllData();
 }
 
 void Controller::refreshAppSettings()
@@ -185,10 +184,6 @@ void Controller::onTryToLogin(QString login, QString password)
 
 void Controller::onFileUploaded(QString filePath)
 {
-    auto result = mNetworkManager->downloadDbFile();
-    cout << result.statusStr << endl;
-    cout << result.rawResponse << endl;
-    return;
     if (!mDataManager) {
         qWarning() << "DataManager 为空，无法处理文件：" << filePath;
         emit refreshDatabaseFinished();
@@ -206,30 +201,19 @@ void Controller::onFileUploaded(QString filePath)
 
     // 使用 QtConcurrent 异步运行长时间任务
     QFuture<void> future = QtConcurrent::run([this]() {
-        // mDataManager->createDBConnection();
-        // if(mDataManager->refreshAllDataFromFile(mNewDataFilePath))
-        // {
-        //     cout << "Refresh DB data by excel file" << endl;
-        // }
-        // mDataManager->closeDBConnection();
+        mDataManager->createDBConnection();
+        if(mDataManager->refreshAllDataFromFile(mNewDataFilePath))
+        {
+            cout << "Refresh DB data by excel file" << endl;
+        }
+        mDataManager->closeDBConnection();
     });
 
     // 连接 QFutureWatcher 以处理任务完成
     disconnect(&mFutureWatcher, nullptr, this, nullptr);
     connect(&mFutureWatcher, &QFutureWatcher<void>::finished, this, [this]() {
         cout << "onFileUploaded 文件处理完成" << endl;
-        // if(mSearchClassInfoController)
-        // {
-        //     mSearchClassInfoController->refreshSearchClassInfo();
-        // }
-        // if(mSearchTeacherInfoController)
-        // {
-        //     mSearchTeacherInfoController->refreshSearchTeacherInfo();
-        // }
-        // if(mSearchStudentInfoController)
-        // {
-        //     mSearchStudentInfoController->refreshSearchStudentInfo();
-        // }
+        refreshControllersData();
         auto result = mNetworkManager->uploadDbFile();
         cout << result.statusStr << endl;
         cout << result.rawResponse << endl;
@@ -240,34 +224,56 @@ void Controller::onFileUploaded(QString filePath)
     mFutureWatcher.setFuture(future);
 }
 
-void Controller::refreshAllDataFromDBFile()
+void Controller::getDatabaseFileAndRefreshAllData()
 {
-    if (!mDataManager) {
+    if (!mDataManager || !mNetworkManager) {
         qWarning() << "DataManager 为空，无法处理数据文件";
         return;
     }
 
     // 使用 QtConcurrent 异步运行长时间任务
     QFuture<void> future = QtConcurrent::run([this]() {
-        mDataManager->createDBConnection();
+        auto result = mNetworkManager->downloadDbFile();
+        cout << result.statusStr << endl;
+        cout << result.rawResponse << endl;
+        if(result.status == ResultStatus::DatabaseFileDownloadSucess)
+        {
+            mDataManager->createDBConnection();
 
-        mDataManager->refreshAllDataFromDB();
-        mDataManager->storeAllTableDataCount();
-        mDataCount = QString::number(mDataManager->getTableDataCount(CLASS_INFOS_TABLE_NAME));
-
-        mDataManager->closeDBConnection();
-        emit dataCountChanged();
+            mDataManager->refreshAllDataFromDB();
+            mDataManager->storeAllTableDataCount();
+            mDataCount = QString::number(mDataManager->getTableDataCount(CLASS_INFOS_TABLE_NAME));
+            mDataManager->closeDBConnection();
+            refreshControllersData();
+            emit dataCountChanged();
+        }
     });
 
     // 连接 QFutureWatcher 以处理任务完成
     disconnect(&mFutureWatcher, nullptr, this, nullptr);
     connect(&mFutureWatcher, &QFutureWatcher<void>::finished, this, [this]() {
-        cout << "refreshAllDataFromDBFile 文件处理完成" << endl;
+        cout << "getDatabaseFileAndRefreshAllData 文件处理完成" << endl;
         mAllDataIsReady = true;
     });
 
     // 设置 future 以监控任务完成
     mFutureWatcher.setFuture(future);
+}
+
+void Controller::refreshControllersData()
+{
+    if(mSearchClassInfoController)
+    {
+        mSearchClassInfoController->refreshSearchClassInfo();
+    }
+    if(mSearchTeacherInfoController)
+    {
+        mSearchTeacherInfoController->refreshSearchTeacherInfo();
+    }
+    if(mSearchStudentInfoController)
+    {
+        mSearchStudentInfoController->refreshSearchStudentInfo();
+    }
 }
 
 SearchClassInfoController* Controller::getSearchClassInfoController()

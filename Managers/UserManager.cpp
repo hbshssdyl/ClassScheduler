@@ -15,7 +15,9 @@ OperateModes UserManager::getModsByUserRole(UserRole& role)
 {
     switch (role) {
         case UserRole::SuperAdmin:
-            return { OperateMode::FileView,
+            return { OperateMode::TaskAssistantView,
+                    OperateMode::TaskManagerView,
+                    OperateMode::FileView,
                     OperateMode::SearchClassInfo,
                     OperateMode::SearchTeacherInfo,
                     OperateMode::SearchStudentInfo,
@@ -38,6 +40,18 @@ OperateModes UserManager::getModsByUserRole(UserRole& role)
                     OperateMode::ScheduleClass};
         case UserRole::Staff:
             return { OperateMode::SearchClassInfo,
+                    OperateMode::SearchTeacherInfo,
+                    OperateMode::SearchStudentInfo,
+                    OperateMode::ScheduleClass};
+        case UserRole::OneToOneAssistant:
+            return { OperateMode::TaskAssistantView,
+                    OperateMode::SearchClassInfo,
+                    OperateMode::SearchTeacherInfo,
+                    OperateMode::SearchStudentInfo,
+                    OperateMode::ScheduleClass};
+        case UserRole::OneToOneManager:
+            return { OperateMode::TaskManagerView,
+                    OperateMode::SearchClassInfo,
                     OperateMode::SearchTeacherInfo,
                     OperateMode::SearchStudentInfo,
                     OperateMode::ScheduleClass};

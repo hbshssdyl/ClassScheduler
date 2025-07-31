@@ -25,6 +25,10 @@ QString toOperateModeString(OperateMode mode)
         return "排课";
     case OperateMode::TeacherEvaluation:
         return "老师评价";
+    case OperateMode::TaskAssistantView:
+        return "一对一助理";
+    case OperateMode::TaskManagerView:
+        return "一对一管理";
     default:
         return "default";
     }
@@ -49,6 +53,10 @@ QString getIconNameByOperateMode(OperateMode mode)
         return "tag.svg";
     case OperateMode::TeacherEvaluation:
         return "QA.svg";
+    case OperateMode::TaskAssistantView:
+        return "task.svg";
+    case OperateMode::TaskManagerView:
+        return "manage.svg";
     default:
         return "default";
     }
@@ -420,7 +428,9 @@ std::string CUtils::toRoleString(QString& role)
     if(role == "老板")
         return "Boss";
     if(role == "一对一助理")
-        return "PersonalAssistant";
+        return "OneToOneAssistant";
+    if(role == "一对一管理")
+        return "OneToOneManager";
     if(role == "超级管理员")
         return "SuperAdmin";
     return "Staff";

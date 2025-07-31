@@ -67,6 +67,10 @@ QString Controller::toOperateModeString(OperateMode mode)
         return "SearchStudentInfo";
     case OperateMode::ScheduleClass:
         return "ScheduleClass";
+    case OperateMode::TaskAssistantView:
+        return "TaskAssistantView";
+    case OperateMode::TaskManagerView:
+        return "TaskManagerView";
     case OperateMode::TeacherEvaluation:
         return "TeacherEvaluation";
     default:
@@ -93,6 +97,8 @@ void Controller::refreshOperateMode(OperateMode mode)
         case OperateMode::WelcomePage:
         case OperateMode::ScheduleClass:
         case OperateMode::FileView:
+        case OperateMode::TaskAssistantView:
+        case OperateMode::TaskManagerView:
         case OperateMode::TeacherEvaluation:
         {
             mShowActions = true;

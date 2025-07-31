@@ -39,6 +39,8 @@ namespace ClassScheduler
         SearchTeacherInfo,
         SearchStudentInfo,
         ScheduleClass,
+        TaskAssistantView,
+        TaskManagerView,
         TeacherEvaluation
     };
     using OperateModes = std::vector<OperateMode>;
@@ -75,7 +77,8 @@ namespace ClassScheduler
         SeniorStaff,
         Manager,
         Boss,
-        PersonalAssistant,
+        OneToOneAssistant,
+        OneToOneManager,
         SuperAdmin
     };
 
@@ -1137,8 +1140,10 @@ namespace ClassScheduler
                 return UserRole::Manager;
             if(role == "Boss")
                 return UserRole::Boss;
-            if(role == "PersonalAssistant")
-                return UserRole::PersonalAssistant;
+            if(role == "OneToOneAssistant")
+                return UserRole::OneToOneAssistant;
+            if(role == "OneToOneManager")
+                return UserRole::OneToOneManager;
             if(role == "SuperAdmin")
                 return UserRole::SuperAdmin;
             return UserRole::None;

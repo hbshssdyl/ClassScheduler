@@ -76,6 +76,7 @@ qt_add_qml_module(appClassScheduler
     QML_FILES Qml/UserInfo/UserInfo.qml
     QML_FILES Qml/TaskManagerView/TaskManagerView.qml
     QML_FILES Qml/TaskAssistantView/TaskAssistantView.qml
+    QML_FILES Qml/TaskAssistantView/TaskItem.qml
 
     # 源文件
     SOURCES Controller/Controller.h

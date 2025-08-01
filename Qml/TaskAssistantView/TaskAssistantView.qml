@@ -84,23 +84,51 @@ Rectangle {
                         ListElement { title: "Today’s Task"; desc: "Description..."; publish: "Apr 24, 2024"; due: "Apr 24, 2024"; rating: "3"; status: "In Progress"; category: "today" }
                         ListElement { title: "Weekly Review"; desc: "Description..."; publish: "Apr 20, 2024"; due: "Apr 26, 2024"; rating: "4"; status: "Not Started"; category: "week" }
                         ListElement { title: "Monthly Report"; desc: "Description..."; publish: "Apr 01, 2024"; due: "Apr 30, 2024"; rating: "5"; status: "Completed"; category: "recurring" }
+                        ListElement { title: "Today’s Task"; desc: "Description..."; publish: "Apr 24, 2024"; due: "Apr 24, 2024"; rating: "3"; status: "In Progress"; category: "today" }
+                        ListElement { title: "Weekly Review"; desc: "Description..."; publish: "Apr 20, 2024"; due: "Apr 26, 2024"; rating: "4"; status: "Not Started"; category: "week" }
+                        ListElement { title: "Monthly Report"; desc: "Description..."; publish: "Apr 01, 2024"; due: "Apr 30, 2024"; rating: "5"; status: "Completed"; category: "recurring" }
+                        ListElement { title: "Today’s Task"; desc: "Description..."; publish: "Apr 24, 2024"; due: "Apr 24, 2024"; rating: "3"; status: "In Progress"; category: "today" }
+                        ListElement { title: "Weekly Review"; desc: "Description..."; publish: "Apr 20, 2024"; due: "Apr 26, 2024"; rating: "4"; status: "Not Started"; category: "week" }
+                        ListElement { title: "Monthly Report"; desc: "Description..."; publish: "Apr 01, 2024"; due: "Apr 30, 2024"; rating: "5"; status: "Completed"; category: "recurring" }
+
                     }
 
                     delegate: Rectangle {
+                        id: taskItem
+
+                        property bool isDetail: false
                         visible: model.category === currentCategory
                         width: parent.width
                         radius: 12
                         color: "white"
                         border.color: "#ddd"
                         border.width: 1
-                        implicitHeight: contentLayout.implicitHeight + 32
+                        implicitHeight: (taskItem.isDetail ? contentLayoutDetail.implicitHeight : contentLayoutSummary.implicitHeight) + 32
 
-                        ColumnLayout {
-                            id: contentLayout
+
+                        RowLayout {
+                            id: contentLayoutSummary
 
                             anchors.margins: 16
                             anchors.fill: parent
                             spacing: 10
+                            visible: !taskItem.isDetail
+
+                            Button {
+                                id: toggleArea1
+                                width: 24
+                                height: 24
+                                onClicked: {
+                                    taskItem.isDetail = !taskItem.isDetail;
+                                }
+
+                                Text {
+                                    anchors.centerIn: parent
+                                    text: "展开"
+                                    font.pixelSize: 12
+                                    color: "#444"
+                                }
+                            }
 
                             Text {
                                 text: model.title
@@ -108,6 +136,62 @@ Rectangle {
                                 font.bold: true
                                 color: "#222"
                                 wrapMode: Text.Wrap
+                            }
+
+                            RowLayout {
+                                spacing: 10
+
+                                Repeater {
+                                    model: 5
+                                    delegate: Text {
+                                        text: index < parseInt(model.rating) ? "★" : "☆"
+                                        font.pixelSize: 18
+                                        color: "#ff9900"
+                                    }
+                                }
+                            }
+
+                            Item { Layout.fillWidth: true }
+                            Text { text: "Due: " + model.due; color: "#555"; font.pixelSize: 13 }
+                            Text { text: "Status: " + model.status; color: "#777"; font.pixelSize: 13 }
+                        }
+
+                        ColumnLayout {
+                            id: contentLayoutDetail
+
+                            anchors.margins: 16
+                            anchors.fill: parent
+                            spacing: 10
+                            visible: taskItem.isDetail
+
+
+                            RowLayout {
+                                id: titleLayout
+                                spacing: 10
+
+                                Button {
+                                    id: toggleArea2
+                                    width: 24
+                                    height: 24
+                                    onClicked: {
+                                        taskItem.isDetail = !taskItem.isDetail;
+                                    }
+
+                                    Text {
+                                        anchors.centerIn: parent
+                                        text: "收起"
+                                        font.pixelSize: 12
+                                        color: "#444"
+                                    }
+                                }
+
+                                Text {
+                                    text: model.title
+                                    font.pixelSize: 20
+                                    font.bold: true
+                                    color: "#222"
+                                    wrapMode: Text.Wrap
+                                }
                             }
 
                             Text {
@@ -153,13 +237,6 @@ Rectangle {
                             RowLayout {
                                 spacing: 10
                                 Layout.alignment: Qt.AlignLeft
-
-                                Text { text: "Rating:"; font.pixelSize: 14; color: "#333" }
-                                ComboBox {
-                                    model: ["1", "2", "3", "4", "5"]
-                                    currentIndex: parseInt(model.rating) - 1
-                                    width: 100
-                                }
 
                                 Text { text: "Status: " + model.status; font.pixelSize: 14; color: "#666" }
 
@@ -272,14 +349,14 @@ Rectangle {
                     text: "添加"
                     onClicked: {
                         taskModel.append({
-                            "title": titleField.text,
-                            "desc": descField.text,
-                            "publish": publishField.text,
-                            "due": dueField.text,
-                            "rating": parseInt(ratingBox.currentText),
-                            "status": "未开始",
-                            "category": categoryBox.currentValue
-                        })
+                                             "title": titleField.text,
+                                             "desc": descField.text,
+                                             "publish": publishField.text,
+                                             "due": dueField.text,
+                                             "rating": parseInt(ratingBox.currentText),
+                                             "status": "未开始",
+                                             "category": categoryBox.currentValue
+                                         })
                         addTaskPopup.close()
                     }
                 }

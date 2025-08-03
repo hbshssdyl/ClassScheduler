@@ -11,16 +11,18 @@ Controller::Controller(QObject* parent)
 
 void Controller::initialize()
 {
-    initManagers();
+    initCoreFramework();
     initDB();
     onOperateModeSelected(OperateMode::LoginView);
 }
 
-void Controller::initManagers()
+void Controller::initCoreFramework()
 {
-    mDataManager = std::make_shared<DataManager>();
-    mUserManager = std::make_shared<UserManager>();
-    mNetworkManager = std::make_shared<NetworkManager>();
+    mCoreFramework = std::make_shared<CoreFramework>();
+    if(mCoreFramework)
+    {
+        mCoreFramework->initialize();
+    }
 }
 
 void Controller::initDB()

@@ -16,6 +16,9 @@ public:
     ResponseResult sendUpdateRoleRequest(const std::string& username, const std::string& newRole);
     ResponseResult uploadDbFile();
     ResponseResult downloadDbFile();
+    ResponseResult createOneToOneTask(const Task& task);
+    ResponseResult updateOneToOneTask(int taskId, const Task& task);
+    ResponseResult deleteOneToOneTask(int taskId);
 };
 
 #endif // NETWORKMANAGER_H

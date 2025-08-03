@@ -76,28 +76,35 @@ qt_add_qml_module(appClassScheduler
     QML_FILES Qml/UserInfo/UserInfo.qml
     QML_FILES Qml/TaskManagerView/TaskManagerView.qml
     QML_FILES Qml/TaskAssistantView/TaskAssistantView.qml
-    QML_FILES Qml/TaskAssistantView/TaskItem.qml
 
     # 源文件
-    SOURCES Controller/Controller.h
-    SOURCES Controller/Controller.cpp
+    SOURCES Utils/DataUtils.h
     SOURCES Utils/ControllerUtils.h
     SOURCES Utils/ControllerUtils.cpp
-    SOURCES Utils/DataUtils.h
+
+    SOURCES Controller/Controller.h
+    SOURCES Controller/Controller.cpp
     SOURCES Controller/SearchClassInfoController.cpp
     SOURCES Controller/SearchClassInfoController.h
-    SOURCES Managers/DataManager.h
-    SOURCES Managers/DataManager.cpp
     SOURCES Controller/SearchTeacherInfoController.cpp
     SOURCES Controller/SearchTeacherInfoController.h
     SOURCES Controller/ScheduleClassController.h
     SOURCES Controller/ScheduleClassController.cpp
     SOURCES Controller/SearchStudentInfoController.cpp
     SOURCES Controller/SearchStudentInfoController.h
+    SOURCES Controller/TaskController.h
+    SOURCES Controller/TaskController.cpp
+
+    SOURCES Managers/CoreFramework.h
+    SOURCES Managers/CoreFramework.cpp
     SOURCES Managers/UserManager.h
     SOURCES Managers/UserManager.cpp
     SOURCES Managers/NetworkManager.h
     SOURCES Managers/NetworkManager.cpp
+    SOURCES Managers/TaskManager.h
+    SOURCES Managers/TaskManager.cpp
+    SOURCES Managers/DataManager.h
+    SOURCES Managers/DataManager.cpp
 
     # 资源文件
     RESOURCES Resource/Avatar-self.jpg

@@ -82,6 +82,21 @@ namespace ClassScheduler
         SuperAdmin
     };
 
+    struct Task {
+        std::string title;
+        std::string category;
+        std::string description;
+        std::string publish;
+        std::string due;
+        std::string rating;
+        std::string finishStatus;
+        std::string comment;
+        std::string review;
+        std::string result;
+        std::string reviewStatus;
+    };
+
+
     struct UserInfo{
         std::string name;
         UserRole role;

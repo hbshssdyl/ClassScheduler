@@ -326,3 +326,124 @@ ResponseResult NetworkManager::downloadDbFile() {
     return result;
 }
 
+ResponseResult NetworkManager::createOneToOneTask(const Task& task) {
+    CURL* curl;
+    CURLcode res;
+    std::string responseStr;
+    ResponseResult result;
+
+    json payload = {
+        {"title", task.title},
+        {"category", task.category},
+        {"description", task.description},
+        {"publish", task.publish},
+        {"due", task.due},
+        {"rating", task.rating},
+        {"finishStatus", task.finishStatus},
+        {"comment", task.comment},
+        {"review", task.review},
+        {"result", task.result},
+        {"reviewStatus", task.reviewStatus}
+    };
+
+    curl = curl_easy_init();
+    if (curl) {
+        struct curl_slist* headers = nullptr;
+        headers = curl_slist_append(headers, "Content-Type: application/json");
+
+        std::string jsonData = payload.dump();
+
+        curl_easy_setopt(curl, CURLOPT_URL, (SERVER_URL + "one-to-one/").c_str());
+        curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+        curl_easy_setopt(curl, CURLOPT_POSTFIELDS, jsonData.c_str());
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeCallback);
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &responseStr);
+
+        res = curl_easy_perform(curl);
+        if (res != CURLE_OK)
+            result.rawResponse = curl_easy_strerror(res);
+        else
+            result.refreshResult(responseStr);
+
+        curl_slist_free_all(headers);
+        curl_easy_cleanup(curl);
+    }
+
+    return result;
+}
+
+ResponseResult NetworkManager::updateOneToOneTask(int taskId, const Task& task) {
+    CURL* curl;
+    CURLcode res;
+    std::string responseStr;
+    ResponseResult result;
+
+    json payload = {
+        {"title", task.title},
+        {"category", task.category},
+        {"description", task.description},
+        {"publish", task.publish},
+        {"due", task.due},
+        {"rating", task.rating},
+        {"finishStatus", task.finishStatus},
+        {"comment", task.comment},
+        {"review", task.review},
+        {"result", task.result},
+        {"reviewStatus", task.reviewStatus}
+    };
+
+    std::string url = SERVER_URL + "one-to-one/" + std::to_string(taskId);
+
+    curl = curl_easy_init();
+    if (curl) {
+        struct curl_slist* headers = nullptr;
+        headers = curl_slist_append(headers, "Content-Type: application/json");
+
+        std::string jsonData = payload.dump();
+
+        curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "PUT");
+        curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+        curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+        curl_easy_setopt(curl, CURLOPT_POSTFIELDS, jsonData.c_str());
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeCallback);
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &responseStr);
+
+        res = curl_easy_perform(curl);
+        if (res != CURLE_OK)
+            result.rawResponse = curl_easy_strerror(res);
+        else
+            result.refreshResult(responseStr);
+
+        curl_slist_free_all(headers);
+        curl_easy_cleanup(curl);
+    }
+
+    return result;
+}
+
+ResponseResult NetworkManager::deleteOneToOneTask(int taskId) {
+    CURL* curl;
+    CURLcode res;
+    std::string responseStr;
+    ResponseResult result;
+
+    std::string url = SERVER_URL + "one-to-one/" + std::to_string(taskId);
+
+    curl = curl_easy_init();
+    if (curl) {
+        curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "DELETE");
+        curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeCallback);
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &responseStr);
+
+        res = curl_easy_perform(curl);
+        if (res != CURLE_OK)
+            result.rawResponse = curl_easy_strerror(res);
+        else
+            result.refreshResult(responseStr);
+
+        curl_easy_cleanup(curl);
+    }
+
+    return result;
+}

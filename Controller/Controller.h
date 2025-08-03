@@ -9,9 +9,7 @@
 #include <QFutureWatcher>
 #include <condition_variable>
 
-#include "Managers/DataManager.h"
-#include "Managers/UserManager.h"
-#include "Managers/NetworkManager.h"
+#include "Managers/CoreFramework.h"
 #include "SearchClassInfoController.h"
 #include "SearchTeacherInfoController.h"
 #include "SearchStudentInfoController.h"
@@ -61,7 +59,7 @@ private:
     QString toOperateModeString(OperateMode mode);
     void refreshOperateMode(OperateMode mode);
     void getClassInfosByExcelFile(QString filePath);
-    void initManagers();
+    void initCoreFramework();
     void initDB();
     void refreshAppSettings();
     void refreshActionItems();
@@ -70,9 +68,7 @@ private:
 
 private:
     OperateMode mOperateMode { OperateMode::None };
-    DataManagerPtr mDataManager;
-    UserManagerPtr mUserManager;
-    NetworkManagerPtr mNetworkManager;
+    CoreFrameworkPtr mCoreFramework;
 
     QString mNewDataFilePath { "" };
     UserInfo mUserInfo;

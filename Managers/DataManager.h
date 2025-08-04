@@ -14,18 +14,18 @@
 using namespace ClassScheduler;
 using namespace QXlsx;
 using CellPtr = std::shared_ptr<Cell>;
-using DataManagerPtr = std::shared_ptr<class DataManager>;
+
+using CoreFrameworkPtr = std::shared_ptr<class CoreFramework>;
 
 class DataManager : public std::enable_shared_from_this<DataManager>
 {
 public:
-    DataManager();
+    DataManager(CoreFrameworkPtr coreFramework);
     virtual ~DataManager() = default;
 
 public:
     bool createDBConnection();
     void closeDBConnection();
-    void storeAllTableDataCount();
     int getTableDataCount(QString tableName);
     bool refreshAllDataFromFile(QString filePath);
     void refreshAllDataFromDB();
@@ -47,6 +47,7 @@ private:
     bool saveDataToStudentInfosTable(StudentInfos& infos);
     TeacherInfos getTeacherInfosList(ClassInfos& classInfos);
     StudentInfos getStudentInfosList(ClassInfos& classInfos);
+    void storeAllTableDataCount();
     bool createClassInfosTable();
     bool createTeacherInfosTable();
     bool createStudentInfosTable();
@@ -74,6 +75,7 @@ private:
     void generateStudentClassBasicInfo();
 
 private:
+    std::weak_ptr<CoreFramework> mCoreFramework;
     QSqlDatabase mDB;
     ClassInfos mClassInfosFromDB;
     TeacherInfos mTeacherInfosFromDB;

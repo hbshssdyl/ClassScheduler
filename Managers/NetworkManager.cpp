@@ -1,4 +1,5 @@
 ﻿#include "NetworkManager.h"
+#include "CoreFramework.h"
 #include <string>
 #include <iostream>
 #include <curl/curl.h>
@@ -8,7 +9,10 @@ using json = nlohmann::json;
 
 static const std::string SERVER_URL = "http://127.0.0.1:8888/";
 
-NetworkManager::NetworkManager() {}
+NetworkManager::NetworkManager(CoreFrameworkPtr coreFramework)
+    : mCoreFramework(coreFramework)
+{
+}
 
 size_t writeCallback(void* contents, size_t size, size_t nmemb, void* userp) {
     ((std::string*)userp)->append((char*)contents, size * nmemb);

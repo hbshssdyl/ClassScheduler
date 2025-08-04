@@ -3,11 +3,13 @@
 #include "Utils/DataUtils.h"
 
 using namespace ClassScheduler;
-using NetworkManagerPtr = std::shared_ptr<class NetworkManager>;
 
-class NetworkManager {
+using CoreFrameworkPtr = std::shared_ptr<class CoreFramework>;
+
+class NetworkManager : public std::enable_shared_from_this<NetworkManager>
+{
 public:
-    NetworkManager();
+    NetworkManager(CoreFrameworkPtr coreFramework);
     ResponseResult sendRegisterRequest(const std::string& email, const std::string& username, const std::string& password, const std::string& role);
     ResponseResult sendLoginRequest(const std::string& login, const std::string& password);
     ResponseResult sendDeleteUserRequest(const std::string& username);
@@ -19,6 +21,9 @@ public:
     ResponseResult createOneToOneTask(const Task& task);
     ResponseResult updateOneToOneTask(int taskId, const Task& task);
     ResponseResult deleteOneToOneTask(int taskId);
+
+private:
+    std::weak_ptr<CoreFramework> mCoreFramework;
 };
 
 #endif // NETWORKMANAGER_H

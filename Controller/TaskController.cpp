@@ -1,5 +1,6 @@
-#include "TaskController.h"
+﻿#include "TaskController.h"
 
-TaskController::TaskController(QObject *parent)
-    : QObject{parent}
+TaskController::TaskController(CoreFrameworkPtr& coreFramework, QObject *parent)
+    : mCoreFramework(coreFramework)
+    , QObject{parent}
 {}

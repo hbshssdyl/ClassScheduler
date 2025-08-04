@@ -4,16 +4,19 @@
 
 using namespace ClassScheduler;
 
-using UserManagerPtr = std::shared_ptr<class UserManager>;
+using CoreFrameworkPtr = std::shared_ptr<class CoreFramework>;
 
-class UserManager
+class UserManager : public std::enable_shared_from_this<UserManager>
 {
 public:
-    UserManager();
+    UserManager(CoreFrameworkPtr coreFramework);
     UserInfo getUserInfoByLoginInfo(std::string& username, UserRole& role);
 
 private:
     OperateModes getModsByUserRole(UserRole& role);
+
+private:
+    std::weak_ptr<CoreFramework> mCoreFramework;
 };
 
 #endif // USERMANAGER_H

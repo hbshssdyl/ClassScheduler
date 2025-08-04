@@ -5,7 +5,7 @@
 #include <QString>
 #include <QVariant>
 #include <QVariantMap>
-#include <vector>
+#include <iostream>
 #include <io.h>
 
 using namespace std;
@@ -17,6 +17,7 @@ namespace ClassScheduler
     public:
         //For Controller.cpp
         static void updateActionItemsList(QVariantList& data, const OperateMode& selectedMode, const OperateModes& actionItems);
+        static QString toString(OperateMode mode);
 
         //For SearchClassInfoController.cpp
         static void updateClassInfoList(QVariantMap& data, ClassInfos& classInfos);

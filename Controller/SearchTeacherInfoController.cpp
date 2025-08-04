@@ -3,11 +3,12 @@
 
 #include "SearchTeacherInfoController.h"
 #include "Utils/ControllerUtils.h"
+#include "Managers/DataManager.h"
 
 using namespace ClassScheduler;
 
-SearchTeacherInfoController::SearchTeacherInfoController(DataManagerPtr DataManager, QObject* parent)
-    : mDataManager(DataManager)
+SearchTeacherInfoController::SearchTeacherInfoController(CoreFrameworkPtr coreFramework, QObject* parent)
+    : mCoreFramework(coreFramework)
     , QObject(parent)
 {
     initialize();
@@ -20,9 +21,16 @@ void SearchTeacherInfoController::initialize()
 
 void SearchTeacherInfoController::refreshSearchTeacherInfo()
 {
+    auto coreFramework = mCoreFramework.lock();
+    auto dataManager = coreFramework->getDataManager();
+    if(!dataManager)
+    {
+        return;
+    }
+
     if(mTeacherInfosFromDB.size() == 0)
     {
-        mTeacherInfosFromDB = mDataManager->getTeacherInfosFromDB();
+        mTeacherInfosFromDB = dataManager->getTeacherInfosFromDB();
     }
 
     if(mTeacherInfosFromDB.size() == 0)

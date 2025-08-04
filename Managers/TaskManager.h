@@ -1,15 +1,19 @@
-#ifndef TASKMANAGER_H
+﻿#ifndef TASKMANAGER_H
 #define TASKMANAGER_H
 
 #include "Utils/DataUtils.h"
 
 using namespace ClassScheduler;
-using TaskManagerPtr = std::shared_ptr<class TaskManager>;
 
-class TaskManager
+using CoreFrameworkPtr = std::shared_ptr<class CoreFramework>;
+
+class TaskManager : public std::enable_shared_from_this<TaskManager>
 {
 public:
-    TaskManager();
+    TaskManager(CoreFrameworkPtr coreFramework);
+
+private:
+    std::weak_ptr<CoreFramework> mCoreFramework;
 };
 
 #endif // TASKMANAGER_H

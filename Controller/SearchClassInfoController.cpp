@@ -7,8 +7,8 @@
 
 using namespace ClassScheduler;
 
-SearchClassInfoController::SearchClassInfoController(DataManagerPtr DataManager, QObject* parent)
-    : mDataManager(DataManager)
+SearchClassInfoController::SearchClassInfoController(CoreFrameworkPtr coreFramework, QObject* parent)
+    : mCoreFramework(coreFramework)
     , QObject(parent)
 {
     initialize();
@@ -21,9 +21,16 @@ void SearchClassInfoController::initialize()
 
 void SearchClassInfoController::refreshSearchClassInfo()
 {
+    auto coreFramework = mCoreFramework.lock();
+    auto dataManager = coreFramework->getDataManager();
+    if(!dataManager)
+    {
+        return;
+    }
+
     if(mClassInfosFromDB.size() == 0)
     {
-        mClassInfosFromDB = mDataManager->getClassInfosFromDB();
+        mClassInfosFromDB = dataManager->getClassInfosFromDB();
     }
 
     if(mClassInfosFromDB.size() == 0)

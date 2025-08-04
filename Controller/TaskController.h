@@ -1,15 +1,17 @@
-#ifndef TASKCONTROLLER_H
+﻿#ifndef TASKCONTROLLER_H
 #define TASKCONTROLLER_H
 
 #include <QObject>
+#include "Managers/CoreFramework.h"
 
 class TaskController : public QObject
 {
     Q_OBJECT
 public:
-    explicit TaskController(QObject *parent = nullptr);
+    explicit TaskController(CoreFrameworkPtr& coreFramework, QObject *parent = nullptr);
 
-signals:
+private:
+    CoreFrameworkPtr mCoreFramework;
 };
 
 #endif // TASKCONTROLLER_H

@@ -107,6 +107,37 @@ void CUtils::updateActionItemsList(QVariantList& data, const OperateMode& select
     }
 }
 
+QString CUtils::toString(OperateMode mode)
+{
+    switch (mode)
+    {
+    case OperateMode::None:
+        return "None";
+    case OperateMode::LoginView:
+        return "LoginView";
+    case OperateMode::FileView:
+        return "FileView";
+    case OperateMode::WelcomePage:
+        return "WelcomePage";
+    case OperateMode::SearchClassInfo:
+        return "SearchClassInfo";
+    case OperateMode::SearchTeacherInfo:
+        return "SearchTeacherInfo";
+    case OperateMode::SearchStudentInfo:
+        return "SearchStudentInfo";
+    case OperateMode::ScheduleClass:
+        return "ScheduleClass";
+    case OperateMode::TaskAssistantView:
+        return "TaskAssistantView";
+    case OperateMode::TaskManagerView:
+        return "TaskManagerView";
+    case OperateMode::TeacherEvaluation:
+        return "TeacherEvaluation";
+    default:
+        return "default";
+    }
+}
+
 //For SearchClassInfoController.cpp
 void CUtils::updateClassInfoList(QVariantMap& data, ClassInfos& classInfos)
 {
@@ -255,7 +286,7 @@ bool CUtils::isTimeOverlap(const QString& timeRange1, const QString& timeRange2)
     QTime end2 = QTime::fromString(range2[1], "hh:mm");
 
     if (!start1.isValid() || !end1.isValid() || !start2.isValid() || !end2.isValid()) {
-        cout << "Invalid time format" << endl;
+        std::cout << "Invalid time format" << std::endl;
         return false; // Invalid time format
     }
 
@@ -327,7 +358,7 @@ void CUtils::updateScheduleClassResultsList(QList<QList<QVariantMap>>& data, Sch
         {
             if(isTimeOverlap(classInfo.time, inputInfos.timeRange))
             {
-                cout << "TimeOverlap: classInfo.time: " << classInfo.time.toStdString() << ", inputInfos.timeRange: " << inputInfos.timeRange.toStdString() << endl;
+                std::cout << "TimeOverlap: classInfo.time: " << classInfo.time.toStdString() << ", inputInfos.timeRange: " << inputInfos.timeRange.toStdString() << std::endl;
                 isValidTeacher[classInfo.teacherName] = false;
             }
         }

@@ -1,9 +1,13 @@
 ﻿#include "DataManager.h"
+#include "CoreFramework.h"
 #include <iostream>
 
 using namespace ClassScheduler;
 
-DataManager::DataManager() {}
+DataManager::DataManager(CoreFrameworkPtr coreFramework)
+    : mCoreFramework(coreFramework)
+{
+}
 
 bool DataManager::createDBConnection()
 {
@@ -22,15 +26,15 @@ bool DataManager::init()
 {
     bool ret = true;
 
-    if(!isTableExist(APP_TOGGLE_INFOS_TABLE_NAME))
-    {
-        ret &= createAppSettingsTable();
-        ret &= initializeAppSettings();
-    }
+    // if(!isTableExist(APP_TOGGLE_INFOS_TABLE_NAME))
+    // {
+    //     ret &= createAppSettingsTable();
+    //     ret &= initializeAppSettings();
+    // }
 
-    readAllSettings();
+    // readAllSettings();
 
-    std::cout << "DataManager init: " << ret << std::endl;
+    // std::cout << "DataManager init: " << ret << std::endl;
     return ret;
 }
 
@@ -264,6 +268,8 @@ bool DataManager::isTableExist(QString tableName)
 
 bool DataManager::refreshAllDataFromFile(QString filePath)
 {
+    createDBConnection();
+
     clearAllData();
     mClassInfosFromDB = getClassInfosFromExcelFile(filePath);
     mTeacherInfosFromDB = getTeacherInfosList(mClassInfosFromDB);
@@ -308,14 +314,7 @@ bool DataManager::refreshAllDataFromFile(QString filePath)
     }
 
     storeAllTableDataCount();
-    if(getTableDataCount(CLASS_INFOS_TABLE_NAME) == 0 ||
-       getTableDataCount(TEACHER_INFOS_TABLE_NAME) == 0 ||
-       getTableDataCount(STUDENT_INFOS_TABLE_NAME) == 0)
-    {
-        return false;
-    }
-
-    refreshAllDataFromDB();
+    closeDBConnection();
 
     return true;
 }
@@ -329,10 +328,14 @@ void DataManager::clearAllData()
 
 void DataManager::refreshAllDataFromDB()
 {
+    createDBConnection();
+
     clearAllData();
     queryDataFromClassInfosTable(mClassInfosFromDB);
     queryDataFromTeacherInfosTable(mTeacherInfosFromDB);
     queryDataFromStudentInfosTable(mStudentInfosFromDB);
+
+    closeDBConnection();
 }
 
 ClassInfos DataManager::getClassInfosFromDB()
@@ -865,68 +868,3 @@ QVariant DataManager::readCellValue(QString headerStr, CellPtr cell)
     }
     return cell->readValue();
 }
-// excelcomhandler.cpp
-// #include "excelcomhandler.h"
-// #include <QDebug>
-
-// ExcelCOMHandler::ExcelCOMHandler(QObject *parent) : QObject(parent) {}
-
-// ExcelCOMHandler::~ExcelCOMHandler() {
-//     closeExcel();
-// }
-
-// bool ExcelCOMHandler::openProtectedExcel(const QString &filePath, const QString &password)
-// {
-//     try {
-//         // 创建Excel应用对象
-//         m_excel = new QAxObject("Excel.Application");
-//         if(!m_excel) return false;
-
-//         m_excel->setProperty("Visible", false);
-//         m_excel->setProperty("DisplayAlerts", false);
-
-//         // 获取工作簿集合
-//         QAxObject *workbooks = m_excel->querySubObject("Workbooks");
-//         if(!workbooks) {
-//             delete m_excel;
-//             m_excel = nullptr;
-//             return false;
-//         }
-
-//         // 打开带密码的工作簿
-//         QVariant varFilePath(filePath);
-//         QVariant varPassword(password);
-//         m_workbook = workbooks->querySubObject("Open(const QString&, const QVariant&, const QVariant&)",
-//                                                varFilePath,
-//                                                QVariant(false),
-//                                                varPassword);
-
-//         if(!m_workbook) {
-//             qWarning() << "Failed to open workbook with password";
-//             delete workbooks;
-//             delete m_excel;
-//             m_excel = nullptr;
-//             return false;
-//         }
-
-//         return true;
-//     } catch(...) {
-//         qCritical() << "Exception occurred while opening Excel";
-//         return false;
-//     }
-// }
-
-// void ExcelCOMHandler::closeExcel()
-// {
-//     if(m_workbook) {
-//         m_workbook->dynamicCall("Close()");
-//         delete m_workbook;
-//         m_workbook = nullptr;
-//     }
-
-//     if(m_excel) {
-//         m_excel->dynamicCall("Quit()");
-//         delete m_excel;
-//         m_excel = nullptr;
-//     }
-// }

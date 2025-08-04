@@ -1,8 +1,9 @@
-#include "ScheduleClassController.h"
+﻿#include "ScheduleClassController.h"
 #include "Utils/ControllerUtils.h"
+#include "Managers/DataManager.h"
 
-ScheduleClassController::ScheduleClassController(DataManagerPtr DataManager, QObject* parent)
-    : mDataManager(DataManager)
+ScheduleClassController::ScheduleClassController(CoreFrameworkPtr coreFramework, QObject* parent)
+    : mCoreFramework(coreFramework)
     , QObject(parent)
 {
     initialize();
@@ -10,10 +11,11 @@ ScheduleClassController::ScheduleClassController(DataManagerPtr DataManager, QOb
 
 void ScheduleClassController::initialize()
 {
-    if(mDataManager)
+    auto coreFramework = mCoreFramework.lock();
+    if(auto dataManager = coreFramework->getDataManager())
     {
-        mClassInfosFromDB = mDataManager->getClassInfosFromDB();
-        mTeacherInfosFromDB = mDataManager->getTeacherInfosFromDB();
+        mClassInfosFromDB = dataManager->getClassInfosFromDB();
+        mTeacherInfosFromDB = dataManager->getTeacherInfosFromDB();
     }
 }
 
@@ -38,7 +40,14 @@ void ScheduleClassController::onRequiredInfosReceived(QVariantList requiredInfos
 
 void ScheduleClassController::updateScheduleClassResultsList(ScheduleClassInputInfo inputInfos)
 {
-    auto classInfosList = mDataManager->getClassInfosFromDB();
+    auto coreFramework = mCoreFramework.lock();
+    auto dataManager = coreFramework->getDataManager();
+    if(!dataManager)
+    {
+        return;
+    }
+
+    auto classInfosList = dataManager->getClassInfosFromDB();
     if(classInfosList.size() == 0)
     {
         return;

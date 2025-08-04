@@ -1,11 +1,10 @@
-#pragma once
+﻿#pragma once
 
 #include "Utils/DataUtils.h"
-#include "Managers/DataManager.h"
+#include "Managers/CoreFramework.h"
 
 #include <QObject>
 #include <cstdio>
-#include <vector>
 #include <QString>
 #include <QVariant>
 
@@ -18,7 +17,7 @@ public:
     Q_PROPERTY(QVariantMap studentInfoMap MEMBER mStudentInfoMap NOTIFY studentInfoMapChanged)
 
 public:
-    explicit SearchStudentInfoController(DataManagerPtr DataManager, QObject* parent = nullptr);
+    explicit SearchStudentInfoController(CoreFrameworkPtr coreFramework, QObject* parent = nullptr);
     void refreshSearchStudentInfo();
 
 signals:
@@ -35,6 +34,6 @@ private:
     QVariantMap mStudentInfoMap;
     StudentInfos mStudentInfosFromDB;
     AppSettings mAppSettings;
-    DataManagerPtr mDataManager;
+    std::weak_ptr<CoreFramework> mCoreFramework;
 };
 

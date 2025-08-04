@@ -1,3 +1,7 @@
-#include "TaskManager.h"
+﻿#include "TaskManager.h"
+#include "CoreFramework.h"
 
-TaskManager::TaskManager() {}
+TaskManager::TaskManager(CoreFrameworkPtr coreFramework)
+    : mCoreFramework(coreFramework)
+{
+}

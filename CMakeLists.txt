@@ -94,6 +94,8 @@ qt_add_qml_module(appClassScheduler
     SOURCES Controller/SearchStudentInfoController.h
     SOURCES Controller/TaskController.h
     SOURCES Controller/TaskController.cpp
+    SOURCES Controller/DatabaseController.cpp
+    SOURCES Controller/DatabaseController.h
 
     SOURCES Managers/CoreFramework.h
     SOURCES Managers/CoreFramework.cpp

@@ -1,9 +1,9 @@
-#ifndef SCHEDULECLASSCONTROLLER_H
+﻿#ifndef SCHEDULECLASSCONTROLLER_H
 #define SCHEDULECLASSCONTROLLER_H
 
 #include <QObject>
 #include "Utils/DataUtils.h"
-#include "Managers/DataManager.h"
+#include "Managers/CoreFramework.h"
 
 class ScheduleClassController : public QObject{
     Q_OBJECT
@@ -12,7 +12,7 @@ public:
     Q_PROPERTY(QList<QList<QVariantMap>> scheduleClassResultsList MEMBER mScheduleClassResultsList NOTIFY scheduleClassResultsListChanged)
 
 public:
-    explicit ScheduleClassController(DataManagerPtr DataManager, QObject* parent = nullptr);
+    explicit ScheduleClassController(CoreFrameworkPtr coreFramework, QObject* parent = nullptr);
 
 public slots:
     void onRequiredInfosReceived(QVariantList requiredInfosList);
@@ -25,7 +25,7 @@ private:
     void updateScheduleClassResultsList(ScheduleClassInputInfo inputInfos);
 
 private:
-    DataManagerPtr mDataManager;
+    std::weak_ptr<CoreFramework> mCoreFramework;
     ClassInfos mClassInfosFromDB;
     TeacherInfos mTeacherInfosFromDB;
     QVariantList mRequiredInfosList;

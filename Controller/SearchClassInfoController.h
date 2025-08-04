@@ -1,7 +1,7 @@
-#pragma once
+﻿#pragma once
 
 #include "Utils/DataUtils.h"
-#include "Managers/DataManager.h"
+#include "Managers/CoreFramework.h"
 
 #include <QObject>
 #include <cstdio>
@@ -18,7 +18,7 @@ public:
     Q_PROPERTY(QVariantMap classInfoMap MEMBER mClassInfoMap NOTIFY classInfoMapChanged)
 
 public:
-    explicit SearchClassInfoController(DataManagerPtr DataManager, QObject* parent = nullptr);
+    explicit SearchClassInfoController(CoreFrameworkPtr coreFramework, QObject* parent = nullptr);
     void refreshSearchClassInfo();
 
 signals:
@@ -34,7 +34,7 @@ private:
 private:
     QVariantMap mClassInfoMap;
     ClassInfos mClassInfosFromDB;
-    DataManagerPtr mDataManager;
+    std::weak_ptr<CoreFramework> mCoreFramework;
 
 };
 

@@ -1,6 +1,10 @@
 ﻿#include "UserManager.h"
+#include "CoreFramework.h"
 
-UserManager::UserManager() {}
+UserManager::UserManager(CoreFrameworkPtr coreFramework)
+    : mCoreFramework(coreFramework)
+{
+}
 
 UserInfo UserManager::getUserInfoByLoginInfo(std::string& username, UserRole& role)
 {

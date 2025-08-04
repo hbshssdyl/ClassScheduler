@@ -6,10 +6,11 @@ Rectangle {
 
     property var rootController
     property string viewName
+    property var controller: rootController.getDatabaseController()
 
-    onRootControllerChanged: {
-        if (rootController) {
-            rootController.refreshDatabaseFinished.connect(function() {
+    onControllerChanged: {
+        if (controller) {
+            controller.refreshDatabaseFinished.connect(function() {
                 pageLoader.source = "FileUploadView.qml";
             });
         }
@@ -26,7 +27,7 @@ Rectangle {
                 item.fileUploadFinish.connect(function(filePath) {
                     console.debug(filePath);
                     pageLoader.source = "FileProcessingView.qml";
-                    rootController.onFileUploaded(filePath);
+                    controller.onFileUploaded(filePath);
                 });
             }
         }
@@ -34,7 +35,7 @@ Rectangle {
         Binding {
             target: pageLoader.item
             property: "rootController"
-            value: root.rootController
+            value: root.controller
         }
     }
 }

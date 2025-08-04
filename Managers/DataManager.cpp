@@ -12,6 +12,7 @@ DataManager::DataManager(CoreFrameworkPtr coreFramework)
 bool DataManager::createDBConnection()
 {
     QDir().mkpath(DATABASE_PATH_DIR);
+    QSqlDatabase::removeDatabase(QSqlDatabase::defaultConnection);
     QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
     db.setDatabaseName(DATABASE_FULL_PATH);
     if (!db.open()) {
@@ -334,6 +335,7 @@ void DataManager::refreshAllDataFromDB()
     queryDataFromClassInfosTable(mClassInfosFromDB);
     queryDataFromTeacherInfosTable(mTeacherInfosFromDB);
     queryDataFromStudentInfosTable(mStudentInfosFromDB);
+    storeAllTableDataCount();
 
     closeDBConnection();
 }

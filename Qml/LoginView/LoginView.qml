@@ -292,7 +292,7 @@ Rectangle {
         Rectangle {
             id: welcomeMessage
 
-            width: 320
+            width: 360
             height: 360
             Layout.alignment: Qt.AlignCenter
             visible: {
@@ -315,7 +315,7 @@ Rectangle {
 
                 visible: authMode === "none"
                 anchors.fill: parent
-                source: "qrc:/qt/qml/ClassScheduler/Resource/welcome.jpg"
+                source: "qrc:/qt/qml/ClassScheduler/Resource/tianming.jpg"
             }
 
             Image {

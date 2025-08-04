@@ -20,7 +20,6 @@ void DatabaseController::refreshDataCount()
     if(auto dataManager = coreFramework->getDataManager())
     {
         mDataCount = QString::number(dataManager->getTableDataCount(CLASS_INFOS_TABLE_NAME));
-        dataManager->closeDBConnection();
         emit dataCountChanged();
     }
 }
@@ -53,10 +52,10 @@ void DatabaseController::onFileUploaded(QString filePath)
         // 连接 QFutureWatcher 以处理任务完成
         disconnect(&mFutureWatcher, nullptr, this, nullptr);
         connect(&mFutureWatcher, &QFutureWatcher<void>::finished, this, [this, networkManager]() {
-            std::cout << "onFileUploaded 文件处理完成" << std::endl;
             auto result = networkManager->uploadDbFile();
             std::cout << result.statusStr << std::endl;
             std::cout << result.rawResponse << std::endl;
+            refreshDataCount();
             emit refreshDatabaseFinished();
         });
 

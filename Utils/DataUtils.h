@@ -91,9 +91,26 @@ namespace ClassScheduler
         std::string rating;
         std::string finishStatus;
         std::string comment;
-        std::string review;
-        std::string result;
+        std::string reviewString;
+        std::string resultRating;
         std::string reviewStatus;
+
+        // 构造函数，便于初始化
+        Task(const std::string& t, const std::string& c, const std::string& d,
+             const std::string& p, const std::string& du, const std::string& r,
+             const std::string& fs, const std::string& cm, const std::string& rs,
+             const std::string& rr, const std::string& rv)
+            : title(t), category(c), description(d), publish(p), due(du), rating(r),
+            finishStatus(fs), comment(cm), reviewString(rs), resultRating(rr), reviewStatus(rv) {}
+
+
+    };
+
+    struct TaskTemplate {
+        std::string title;
+        std::string category;
+        std::string description;
+        std::string rating;
     };
 
 

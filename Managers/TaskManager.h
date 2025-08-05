@@ -13,6 +13,12 @@ public:
     TaskManager(CoreFrameworkPtr coreFramework);
 
 private:
+    std::string getCurrentDate();
+    Task createTask(const TaskTemplate& tmpl, const std::string& date);
+    // 生成每日任务
+    std::vector<Task> generateDailyTasks();
+
+private:
     std::weak_ptr<CoreFramework> mCoreFramework;
 };
 

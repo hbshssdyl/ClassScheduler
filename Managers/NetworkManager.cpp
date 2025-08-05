@@ -345,8 +345,8 @@ ResponseResult NetworkManager::createOneToOneTask(const Task& task) {
         {"rating", task.rating},
         {"finishStatus", task.finishStatus},
         {"comment", task.comment},
-        {"review", task.review},
-        {"result", task.result},
+        {"reviewString", task.reviewString},
+        {"resultRating", task.resultRating},
         {"reviewStatus", task.reviewStatus}
     };
 
@@ -391,8 +391,8 @@ ResponseResult NetworkManager::updateOneToOneTask(int taskId, const Task& task) 
         {"rating", task.rating},
         {"finishStatus", task.finishStatus},
         {"comment", task.comment},
-        {"review", task.review},
-        {"result", task.result},
+        {"resultRating", task.reviewString},
+        {"resultRating", task.resultRating},
         {"reviewStatus", task.reviewStatus}
     };
 

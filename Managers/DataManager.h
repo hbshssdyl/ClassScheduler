@@ -24,7 +24,7 @@ public:
     virtual ~DataManager() = default;
 
 public:
-    bool createDBConnection();
+    bool createDBConnection(bool shouldDeleteOldDb = false);
     void closeDBConnection();
     int getTableDataCount(QString tableName);
     bool refreshAllDataFromFile(QString filePath);

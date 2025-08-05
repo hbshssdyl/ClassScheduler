@@ -9,13 +9,19 @@ DataManager::DataManager(CoreFrameworkPtr coreFramework)
 {
 }
 
-bool DataManager::createDBConnection()
+bool DataManager::createDBConnection(bool shouldDeleteOldDb)
 {
     QDir().mkpath(DATABASE_PATH_DIR);
+
+    if (shouldDeleteOldDb && QFile::exists(DATABASE_FULL_PATH)) {
+        QFile::remove(DATABASE_FULL_PATH);
+        qDebug() << "Old database deleted.";
+    }
+
     QSqlDatabase::removeDatabase(QSqlDatabase::defaultConnection);
-    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
-    db.setDatabaseName(DATABASE_FULL_PATH);
-    if (!db.open()) {
+    mDB = QSqlDatabase::addDatabase("QSQLITE");
+    mDB.setDatabaseName(DATABASE_FULL_PATH);
+    if (!mDB.open()) {
         std::cout << "Failed to connect database." << std::endl;
         return false;
     }
@@ -41,9 +47,18 @@ bool DataManager::init()
 
 void DataManager::closeDBConnection()
 {
-    QString connectionName = QSqlDatabase::database().connectionName();
+    QString connectionName = mDB.connectionName();
+
+    // 第一步：关闭数据库
     mDB.close();
+
+    // 第二步：清空 mDB（让 Qt 知道我们不再使用这个连接）
+    mDB = QSqlDatabase(); // 重置
+
+    // 第三步：移除连接
     QSqlDatabase::removeDatabase(connectionName);
+
+    qDebug() << "Database connection closed and removed:" << connectionName;
 }
 
 int DataManager::getTableDataCount(QString tableName)
@@ -269,7 +284,7 @@ bool DataManager::isTableExist(QString tableName)
 
 bool DataManager::refreshAllDataFromFile(QString filePath)
 {
-    createDBConnection();
+    createDBConnection(true);
 
     clearAllData();
     mClassInfosFromDB = getClassInfosFromExcelFile(filePath);

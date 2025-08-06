@@ -7,6 +7,7 @@ Rectangle {
     property var rootController
     property string viewName
     property var controller: rootController.getDatabaseController()
+    clip: true
 
     onControllerChanged: {
         if (controller) {

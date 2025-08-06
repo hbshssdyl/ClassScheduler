@@ -4,9 +4,19 @@ import QtQuick.Layouts 1.15
 
 Rectangle {
     id: root
-    width: 800
-    height: 1000
-    color: "#f5f5f5"
+    property var operateMode
+    property var rootController
+    property string viewName
+
+    // color: "#FFFFFF"
+    radius: 5
+
+    border {
+        color: "#D6D6D6"
+        width: 1
+    }
+    color: "#F0F4F8" // 柔和浅蓝色背景
+    clip: true
 
     property string currentCategory: "today"
 
@@ -46,6 +56,7 @@ Rectangle {
         ScrollView {
             Layout.fillWidth: true
             Layout.fillHeight: true
+            contentWidth: availableWidth // 明确设置内容宽度跟随可用宽度
 
             Column {
                 width: parent.width

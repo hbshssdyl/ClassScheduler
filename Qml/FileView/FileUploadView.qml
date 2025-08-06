@@ -1,4 +1,4 @@
-import QtQuick 2.15
+﻿import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Controls.Basic
 import QtQuick.Layouts 1.15
@@ -30,6 +30,7 @@ Rectangle {
             height: 60
             color: "#4CAF50"
             radius: 10
+            clip: true
 
             Text {
                 text: "数据更新"
@@ -49,6 +50,7 @@ Rectangle {
             color: "#ffffff"
             radius: 10
             border.color: "#dddddd"
+            clip: true
 
             ColumnLayout {
                 id: dataLayout
@@ -86,6 +88,7 @@ Rectangle {
             color: "#ffffff"
             radius: 10
             border.color: "#dddddd"
+            clip: true
 
             ColumnLayout {
                 id: fileUploadItemLayout

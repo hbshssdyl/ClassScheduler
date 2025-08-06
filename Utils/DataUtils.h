@@ -66,6 +66,10 @@ namespace ClassScheduler
         DatabaseFileDownloadSucess,
         DatabaseFileDownloadFailed,
 
+        //OneToOne task
+        GetOneToOneTasksSuccess,
+        AddOneToOneTaskSuccess,
+
         //Other
         CurlNotOK,
         UnknownError
@@ -83,6 +87,7 @@ namespace ClassScheduler
     };
 
     struct Task {
+        int id;
         std::string title;
         std::string category;
         std::string description;
@@ -95,6 +100,8 @@ namespace ClassScheduler
         std::string resultRating;
         std::string reviewStatus;
 
+        Task();
+
         // 构造函数，便于初始化
         Task(const std::string& t, const std::string& c, const std::string& d,
              const std::string& p, const std::string& du, const std::string& r,
@@ -102,9 +109,8 @@ namespace ClassScheduler
              const std::string& rr, const std::string& rv)
             : title(t), category(c), description(d), publish(p), due(du), rating(r),
             finishStatus(fs), comment(cm), reviewString(rs), resultRating(rr), reviewStatus(rv) {}
-
-
     };
+    using Tasks = std::vector<Task>;
 
     struct TaskTemplate {
         std::string title;
@@ -1051,6 +1057,9 @@ namespace ClassScheduler
         UserRole role;
         std::string username;
 
+        //OneToOneTasks
+        Tasks oneToOneTasks;
+
         ResponseResult()
         {
             rawResponse = "ResponseResult: init rawResponse";
@@ -1070,9 +1079,11 @@ namespace ClassScheduler
             rawResponse = response;
 
             // Login cases
-            if(response.find(toString(ResultStatus::LoginSuccess), Qt::CaseSensitive) != std::string::npos){
+            if(response.find(toString(ResultStatus::LoginSuccess), Qt::CaseSensitive) != std::string::npos)
+            {
                 status = ResultStatus::LoginSuccess;
                 statusStr = toString(ResultStatus::LoginSuccess);
+
                 nlohmann::json j = nlohmann::json::parse(response);
                 std::map<std::string, std::string> result = j.get<std::map<std::string, std::string>>();
 
@@ -1086,6 +1097,33 @@ namespace ClassScheduler
                 }
                 return;
             }
+
+            //oneToOne Task cases
+            if(response.find(toString(ResultStatus::GetOneToOneTasksSuccess), Qt::CaseSensitive) != std::string::npos)
+            {
+                status = ResultStatus::GetOneToOneTasksSuccess;
+                statusStr = toString(ResultStatus::GetOneToOneTasksSuccess);
+
+                nlohmann::json taskArray = nlohmann::json::parse(response);
+                for (const auto& item : taskArray) {
+                    Task task;
+                    task.id = item.at("id").get<int>();
+                    task.title = item.at("title").get<std::string>();
+                    task.category = item.at("category").get<std::string>();
+                    task.description = item.at("description").get<std::string>();
+                    task.publish = item.at("publish").get<std::string>();
+                    task.due = item.at("due").get<std::string>();
+                    task.rating = item.at("rating").get<std::string>();
+                    task.finishStatus = item.at("finishStatus").get<std::string>();
+                    task.comment = item.at("comment").get<std::string>();
+                    task.reviewString = item.at("reviewString").get<std::string>();
+                    task.resultRating = item.at("resultRating").get<std::string>();
+                    task.reviewStatus = item.at("reviewStatus").get<std::string>();
+
+                    oneToOneTasks.push_back(task);
+                }
+            }
+
 
             // Register cases
             if(response.find(toString(ResultStatus::RegisterSuccess), Qt::CaseSensitive) != std::string::npos){
@@ -1147,6 +1185,13 @@ namespace ClassScheduler
             if (response.find(toString(ResultStatus::CreateDatabaseFileFailed), Qt::CaseSensitive) != std::string::npos) {
                 status = ResultStatus::CreateDatabaseFileFailed;
                 statusStr = toString(ResultStatus::CreateDatabaseFileFailed);
+                return;
+            }
+
+            // OneToOne task
+            if (response.find(toString(ResultStatus::AddOneToOneTaskSuccess), Qt::CaseSensitive) != std::string::npos) {
+                status = ResultStatus::AddOneToOneTaskSuccess;
+                statusStr = toString(ResultStatus::AddOneToOneTaskSuccess);
                 return;
             }
 
@@ -1215,6 +1260,12 @@ namespace ClassScheduler
                     return "DatabaseFileDownloadSucess";
                 case ResultStatus::DatabaseFileDownloadFailed:
                     return "DatabaseFileDownloadFailed";
+
+                // OneToOne task
+                case ClassScheduler::ResultStatus::GetOneToOneTasksSuccess:
+                    return "getOneToOneTasksSuccess";
+                case ClassScheduler::ResultStatus::AddOneToOneTaskSuccess:
+                    return "addOneToOneTaskSuccess";
 
                 // Other
                 case ResultStatus::CurlNotOK:

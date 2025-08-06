@@ -21,6 +21,7 @@ public:
     ResponseResult createOneToOneTask(const Task& task);
     ResponseResult updateOneToOneTask(int taskId, const Task& task);
     ResponseResult deleteOneToOneTask(int taskId);
+    ResponseResult getAllOneToOneTasks();
 
 private:
     std::weak_ptr<CoreFramework> mCoreFramework;

@@ -1,4 +1,5 @@
 ﻿#include "TaskManager.h"
+#include "NetworkManager.h"
 #include "CoreFramework.h"
 #include <iostream>
 
@@ -25,9 +26,33 @@ void printTasks(const std::vector<Task>& tasks) {
 TaskManager::TaskManager(CoreFrameworkPtr coreFramework)
     : mCoreFramework(coreFramework)
 {
+    initialize();
+}
+
+void TaskManager::initialize()
+{
     auto tasks = generateDailyTasks();
     printTasks(tasks);
+}
 
+void TaskManager::initTasks()
+{
+    mTasks = getTaskFromServer();
+}
+
+Tasks TaskManager::getTaskFromServer()
+{
+    if(auto coreFramework = mCoreFramework.lock())
+    {
+        if(auto networkManager = coreFramework->getNetworkManager())
+        {
+            auto response = networkManager->getAllOneToOneTasks();
+            if(response.status == ResultStatus::GetOneToOneTasksSuccess)
+            {
+                return response.oneToOneTasks;
+            }
+        }
+    }
 }
 
 std::string TaskManager::getCurrentDate() {

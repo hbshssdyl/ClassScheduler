@@ -451,3 +451,27 @@ ResponseResult NetworkManager::deleteOneToOneTask(int taskId) {
 
     return result;
 }
+
+ResponseResult NetworkManager::getAllOneToOneTasks() {
+    CURL* curl = curl_easy_init();
+    std::string responseStr;
+    ResponseResult result;
+
+    if (curl) {
+        curl_easy_setopt(curl, CURLOPT_URL, (SERVER_URL + "tasks/one-to-one/all").c_str());
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeCallback);
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &responseStr);
+
+        CURLcode res = curl_easy_perform(curl);
+        if (res != CURLE_OK) {
+            result.rawResponse = curl_easy_strerror(res);
+        } else {
+            result.refreshResult(responseStr);
+        }
+
+        curl_easy_cleanup(curl);
+    }
+
+    return result;
+}
+

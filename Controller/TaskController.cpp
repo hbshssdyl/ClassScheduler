@@ -1,4 +1,5 @@
 ﻿#include "TaskController.h"
+#include "Managers/TaskManager.h"
 
 TaskController::TaskController(CoreFrameworkPtr& coreFramework, QObject *parent)
     : mCoreFramework(coreFramework)

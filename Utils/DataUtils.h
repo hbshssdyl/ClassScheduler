@@ -8,6 +8,7 @@
 #include <map>
 #include <QVariant>
 #include <algorithm>
+#include <iostream>
 #include <nlohmann/json.hpp>
 
 namespace ClassScheduler
@@ -100,7 +101,7 @@ namespace ClassScheduler
         std::string resultRating;
         std::string reviewStatus;
 
-        Task();
+        Task() = default;
 
         // 构造函数，便于初始化
         Task(const std::string& t, const std::string& c, const std::string& d,
@@ -1059,6 +1060,7 @@ namespace ClassScheduler
 
         //OneToOneTasks
         Tasks oneToOneTasks;
+        int taskId;
 
         ResponseResult()
         {
@@ -1076,6 +1078,7 @@ namespace ClassScheduler
 
         void refreshResult(std::string response)
         {
+            //std::cout << response << std::endl;
             rawResponse = response;
 
             // Login cases
@@ -1105,22 +1108,25 @@ namespace ClassScheduler
                 statusStr = toString(ResultStatus::GetOneToOneTasksSuccess);
 
                 nlohmann::json taskArray = nlohmann::json::parse(response);
-                for (const auto& item : taskArray) {
-                    Task task;
-                    task.id = item.at("id").get<int>();
-                    task.title = item.at("title").get<std::string>();
-                    task.category = item.at("category").get<std::string>();
-                    task.description = item.at("description").get<std::string>();
-                    task.publish = item.at("publish").get<std::string>();
-                    task.due = item.at("due").get<std::string>();
-                    task.rating = item.at("rating").get<std::string>();
-                    task.finishStatus = item.at("finishStatus").get<std::string>();
-                    task.comment = item.at("comment").get<std::string>();
-                    task.reviewString = item.at("reviewString").get<std::string>();
-                    task.resultRating = item.at("resultRating").get<std::string>();
-                    task.reviewStatus = item.at("reviewStatus").get<std::string>();
+                // 确保 tasks 是数组
+                if (taskArray.contains("tasks") && taskArray["tasks"].is_array()) {
+                    for (const auto& item : taskArray["tasks"]) {
+                        Task task;
+                        task.id = item.at("id").get<int>();
+                        task.title = item.at("title").get<std::string>();
+                        task.category = item.at("category").get<std::string>();
+                        task.description = item.at("description").get<std::string>();
+                        task.publish = item.at("publish").get<std::string>();
+                        task.due = item.at("due").get<std::string>();
+                        task.rating = item.at("rating").get<std::string>();
+                        task.finishStatus = item.at("finishStatus").get<std::string>();
+                        task.comment = item.at("comment").get<std::string>();
+                        task.reviewString = item.at("reviewString").get<std::string>();
+                        task.resultRating = item.at("resultRating").get<std::string>();
+                        task.reviewStatus = item.at("reviewStatus").get<std::string>();
 
-                    oneToOneTasks.push_back(task);
+                        oneToOneTasks.push_back(task);
+                    }
                 }
             }
 
@@ -1192,6 +1198,12 @@ namespace ClassScheduler
             if (response.find(toString(ResultStatus::AddOneToOneTaskSuccess), Qt::CaseSensitive) != std::string::npos) {
                 status = ResultStatus::AddOneToOneTaskSuccess;
                 statusStr = toString(ResultStatus::AddOneToOneTaskSuccess);
+
+                nlohmann::json j = nlohmann::json::parse(response);
+
+                if (j.contains("id") && j["id"].is_number_integer()) {
+                    taskId = j["id"];
+                }
                 return;
             }
 

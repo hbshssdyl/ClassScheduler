@@ -12,11 +12,12 @@ class TaskManager : public std::enable_shared_from_this<TaskManager>
 public:
     TaskManager(CoreFrameworkPtr coreFramework);
     Tasks getTasks();
+    void initialize();
 
 private:
-    void initialize();
     void initTasks();
-    void initTaskFromServer();
+    void initDailyTasks();
+    Tasks getTaskFromServer();
     std::string getCurrentDate();
     Task createTask(const TaskTemplate& tmpl, const std::string& date);
     Tasks generateDailyTasks();

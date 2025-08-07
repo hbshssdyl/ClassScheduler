@@ -8,12 +8,18 @@ CoreFramework::CoreFramework() {}
 
 void CoreFramework::initialize()
 {
+    initManagers();
+    initAppData();
+}
+
+void CoreFramework::initManagers()
+{
     mDataManager = std::make_shared<DataManager>(shared_from_this());
     mUserManager = std::make_shared<UserManager>(shared_from_this());
     mNetworkManager = std::make_shared<NetworkManager>(shared_from_this());
     mTaskManager = std::make_shared<TaskManager>(shared_from_this());
 
-    initAppData();
+    mTaskManager->initialize();
 }
 
 void CoreFramework::initAppData()

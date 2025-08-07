@@ -22,6 +22,7 @@ public:
 
 private:
     void initAppData();
+    void initManagers();
 
 private:
     DataManagerPtr mDataManager;

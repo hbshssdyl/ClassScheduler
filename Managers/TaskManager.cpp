@@ -26,18 +26,59 @@ void printTasks(const std::vector<Task>& tasks) {
 TaskManager::TaskManager(CoreFrameworkPtr coreFramework)
     : mCoreFramework(coreFramework)
 {
-    initialize();
 }
 
 void TaskManager::initialize()
 {
-    auto tasks = generateDailyTasks();
-    printTasks(tasks);
+    initTasks();
 }
 
 void TaskManager::initTasks()
 {
     mTasks = getTaskFromServer();
+    initDailyTasks();
+}
+
+Tasks TaskManager::getTasks()
+{
+    return mTasks;
+}
+
+void TaskManager::initDailyTasks()
+{
+    auto coreFramework = mCoreFramework.lock();
+    auto networkManager = coreFramework->getNetworkManager();
+
+    std::string data = getCurrentDate();
+    bool needNewDailyTasks = true;
+    for(auto& task : mTasks)
+    {
+        std::cout << task.publish << " " << data << std::endl;
+        if(task.publish == data)
+        {
+            needNewDailyTasks = false;
+            break;
+        }
+    }
+    if(needNewDailyTasks)
+    {
+        auto dailyTasks = generateDailyTasks();
+        for(auto& dailyTask : dailyTasks)
+        {
+            auto result = networkManager->createOneToOneTask(dailyTask);
+            std::cout << result.statusStr << std::endl;
+            std::cout << result.rawResponse << std::endl;
+            if(result.status == ResultStatus::AddOneToOneTaskSuccess)
+            {
+                dailyTask.id = result.taskId;
+            }
+            mTasks.emplace_back(dailyTask);
+        }
+    }
+    else
+    {
+        std::cout << "Daily tasks already exist" << std::endl;
+    }
 }
 
 Tasks TaskManager::getTaskFromServer()
@@ -51,8 +92,12 @@ Tasks TaskManager::getTaskFromServer()
             {
                 return response.oneToOneTasks;
             }
+            std::cout << response.rawResponse << std::endl;
+            return {};
         }
     }
+    std::cout << "no coreFramework or no networkManager" << std::endl;
+    return {};
 }
 
 std::string TaskManager::getCurrentDate() {

@@ -357,7 +357,7 @@ ResponseResult NetworkManager::createOneToOneTask(const Task& task) {
 
         std::string jsonData = payload.dump();
 
-        curl_easy_setopt(curl, CURLOPT_URL, (SERVER_URL + "one-to-one/").c_str());
+        curl_easy_setopt(curl, CURLOPT_URL, (SERVER_URL + "tasks/one-to-one/add").c_str());
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
         curl_easy_setopt(curl, CURLOPT_POSTFIELDS, jsonData.c_str());
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeCallback);
@@ -396,7 +396,7 @@ ResponseResult NetworkManager::updateOneToOneTask(int taskId, const Task& task) 
         {"reviewStatus", task.reviewStatus}
     };
 
-    std::string url = SERVER_URL + "one-to-one/" + std::to_string(taskId);
+    std::string url = SERVER_URL + "tasks/one-to-one/update" + std::to_string(taskId);
 
     curl = curl_easy_init();
     if (curl) {
@@ -431,7 +431,7 @@ ResponseResult NetworkManager::deleteOneToOneTask(int taskId) {
     std::string responseStr;
     ResponseResult result;
 
-    std::string url = SERVER_URL + "one-to-one/" + std::to_string(taskId);
+    std::string url = SERVER_URL + "tasks/one-to-one/delete" + std::to_string(taskId);
 
     curl = curl_easy_init();
     if (curl) {

@@ -14,14 +14,17 @@ public:
     Tasks getTasks();
     void initialize();
 
+    bool updateTaskFinishStatus(int taskId, std::string commentString);
+
 private:
     void initTasks();
     void initDailyTasks();
-    void refreshShowStatus();
+    void refreshTaskStatus();
     Tasks getTaskFromServer();
-    std::string getCurrentDate();
-    Task createTask(const TaskTemplate& tmpl, const std::string& date);
+    Task createTask(const TaskTemplate& tmpl, const std::string& publishDate, const std::string& dueDate);
     Tasks generateDailyTasks();
+    Tasks generateWeeklyTasks();
+    Tasks generateMonthlyTasks();
 
 private:
     std::weak_ptr<CoreFramework> mCoreFramework;

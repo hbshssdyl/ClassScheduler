@@ -391,12 +391,12 @@ ResponseResult NetworkManager::updateOneToOneTask(int taskId, const Task& task) 
         {"rating", task.rating},
         {"finishStatus", task.finishStatus},
         {"comment", task.comment},
-        {"resultRating", task.reviewString},
+        {"reviewString", task.reviewString},
         {"resultRating", task.resultRating},
         {"reviewStatus", task.reviewStatus}
     };
 
-    std::string url = SERVER_URL + "tasks/one-to-one/update" + std::to_string(taskId);
+    std::string url = SERVER_URL + "tasks/one-to-one/update/" + std::to_string(taskId);
 
     curl = curl_easy_init();
     if (curl) {
@@ -466,6 +466,7 @@ ResponseResult NetworkManager::getAllOneToOneTasks() {
         if (res != CURLE_OK) {
             result.rawResponse = curl_easy_strerror(res);
         } else {
+            std::cout << responseStr << std::endl;
             result.refreshResult(responseStr);
         }
 

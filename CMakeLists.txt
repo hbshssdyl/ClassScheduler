@@ -63,7 +63,6 @@ qt_add_qml_module(appClassScheduler
     QML_FILES Qml/ActionItems/ActionItems.qml
     QML_FILES Qml/ActionItems/ActionItemDelegate.qml
     QML_FILES Qml/OperateArea/OperateArea.qml
-    QML_FILES Qml/BasicComponent/MButton.qml
     QML_FILES Qml/LoginView/LoginView.qml
     QML_FILES Qml/FileView/FileView.qml
     QML_FILES Qml/FileView/FileUploadView.qml
@@ -71,6 +70,8 @@ qt_add_qml_module(appClassScheduler
     QML_FILES Qml/JSUtils/ColorUtils.js
     QML_FILES Qml/JSUtils/MainUtils.js
     QML_FILES Qml/BasicComponent/SearchBar.qml
+    QML_FILES Qml/BasicComponent/DateSelector.qml
+    QML_FILES Qml/BasicComponent/MButton.qml
     QML_FILES Qml/SearchTeacherInfo/SearchTeacherInfo.qml
     QML_FILES Qml/SearchTeacherInfo/SearchTeacherInfoDelegate.qml
     QML_FILES Qml/UserInfo/UserInfo.qml
@@ -81,6 +82,8 @@ qt_add_qml_module(appClassScheduler
     SOURCES Utils/DataUtils.h
     SOURCES Utils/ControllerUtils.h
     SOURCES Utils/ControllerUtils.cpp
+    SOURCES Utils/ManagerUtils.h
+    SOURCES Utils/ManagerUtils.cpp
 
     SOURCES Controller/Controller.h
     SOURCES Controller/Controller.cpp
@@ -103,10 +106,10 @@ qt_add_qml_module(appClassScheduler
     SOURCES Managers/UserManager.cpp
     SOURCES Managers/NetworkManager.h
     SOURCES Managers/NetworkManager.cpp
-    SOURCES Managers/TaskManager.h
-    SOURCES Managers/TaskManager.cpp
     SOURCES Managers/DataManager.h
     SOURCES Managers/DataManager.cpp
+    SOURCES Managers/TaskManager.h
+    SOURCES Managers/TaskManager.cpp
 
     # 资源文件
     RESOURCES Resource/Avatar-self.jpg

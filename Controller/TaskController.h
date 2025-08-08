@@ -17,6 +17,9 @@ private:
     void initialize();
     void refreshTaskList();
 
+public slots:
+    void onTaskFinished(int taskId, QString commentString);
+
 signals:
     void taskListChanged();
 

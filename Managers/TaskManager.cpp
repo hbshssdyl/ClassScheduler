@@ -1,6 +1,7 @@
 ﻿#include "TaskManager.h"
 #include "NetworkManager.h"
 #include "CoreFramework.h"
+#include "Utils/ManagerUtils.h"
 #include <iostream>
 
 // 打印任务列表
@@ -49,7 +50,7 @@ void TaskManager::initDailyTasks()
     auto coreFramework = mCoreFramework.lock();
     auto networkManager = coreFramework->getNetworkManager();
 
-    std::string data = getCurrentDate();
+    std::string data = MUtils::getCurrentDate();
     bool needNewDailyTasks = true;
     for(auto& task : mTasks)
     {
@@ -81,23 +82,64 @@ void TaskManager::initDailyTasks()
     }
 }
 
-void TaskManager::refreshShowStatus()
+void TaskManager::refreshTaskStatus()
 {
-    const std::string currentDate = getCurrentDate(); // 替换为实际当前日期
-    const std::string startOfWeek = "2000-01-01"; // 本周第一天（假设和当前日期相同）
-    const std::string startOfMonth = "2000-01-01"; // 本月第一天（假设和当前日期相同）
+    const std::string currentDate = MUtils::getCurrentDate();
+    const std::string startOfWeek = MUtils::getCurrentWeekFirstDay();
+    const std::string endOfWeek = MUtils::getCurrentWeekLastDay();
+    const std::string startOfMonth = MUtils::getCurrentMonthFirstDay();
+    const std::string endOfMonth = MUtils::getCurrentMonthLastDay();
 
     for (auto& task : mTasks) {
-        if (task.category == "本日") {
-            task.shouldShow = (task.publish >= currentDate); // publish 不早于今日才显示
+        // 1. 先判断 shouldShow
+        if (task.category == "今日") {
+            task.shouldShow = (task.publish >= currentDate);
         } else if (task.category == "本周") {
-            task.shouldShow = (task.publish >= startOfWeek); // publish 不早于本周才显示
+            task.shouldShow = (task.publish >= startOfWeek);
         } else if (task.category == "本月") {
-            task.shouldShow = (task.publish >= startOfMonth); // publish 不早于本月才显示
+            task.shouldShow = (task.publish >= startOfMonth);
         } else {
-            task.shouldShow = true; // 其他情况默认显示
+            task.shouldShow = true;
+        }
+
+        // 2. 再判断过期状态
+        task.isOverdue = false; // 默认未过期
+        if (!task.due.empty()) {
+            if (task.category == "今日") {
+                task.isOverdue = (task.due < currentDate);
+            } else if (task.category == "本周") {
+                task.isOverdue = (task.due < endOfWeek);
+            } else if (task.category == "本月") {
+                task.isOverdue = (task.due < endOfMonth);
+            }
         }
     }
+}
+
+bool TaskManager::updateTaskFinishStatus(int taskId, std::string commentString)
+{
+    auto coreFramework = mCoreFramework.lock();
+    auto networkManager = coreFramework->getNetworkManager();
+
+    for(auto& task : mTasks)
+    {
+        std::cout << "taskId: " << taskId << "task.id: " << task.id << std::endl;
+        if(task.id == taskId)
+        {
+            task.comment = commentString;
+            task.finishStatus = "已完成";
+
+            auto result = networkManager->updateOneToOneTask(task.id, task);
+            std::cout << result.statusStr << std::endl;
+            std::cout << result.rawResponse << std::endl;
+            if(result.status == ResultStatus::UpdateOneToOneTaskSuccess)
+            {
+                return true;
+            }
+        }
+    }
+
+    return false;
 }
 
 Tasks TaskManager::getTaskFromServer()
@@ -119,15 +161,7 @@ Tasks TaskManager::getTaskFromServer()
     return {};
 }
 
-std::string TaskManager::getCurrentDate() {
-    std::time_t now = std::time(nullptr);
-    std::tm* local = std::localtime(&now);
-    std::ostringstream oss;
-    oss << std::put_time(local, "%Y-%m-%d");
-    return oss.str();
-}
-
-Task TaskManager::createTask(const TaskTemplate& tmpl, const std::string& date) {
+Task TaskManager::createTask(const TaskTemplate& tmpl, const std::string& date, const std::string& dueDate) {
     return Task(
         tmpl.title,
         tmpl.category,
@@ -145,19 +179,61 @@ Task TaskManager::createTask(const TaskTemplate& tmpl, const std::string& date) 
 
 // 生成每日任务
 std::vector<Task> TaskManager::generateDailyTasks() {
-    std::string date = getCurrentDate();
+    std::string publishDate = MUtils::getCurrentDate();
+    std::string dueDate = publishDate;
 
     // 定义任务模板
     std::vector<TaskTemplate> templates = {
-        {"登记退课情况", "本日", "登记当天所有学生的退课情况，本日需完成", "5"},
-        {"登记新好友名单", "本日", "登记当天新加好友名单及咨询情况", "5"},
-        {"登记当天工作", "本日", "登记当天必须完成的工作，完成后列在下方（如老师测试卷，家长是否做完，收费，催老师或者家长等）", "5"},
-        {"登记明日跟进内容", "本日", "登记明天需要跟进的内容，列在下方（如老师测试卷，家长是否做完，收费，催老师或者家长等）", "5"}
+        {"登记退课情况", "今日", "登记当天所有学生的退课情况，今日需完成", "5"},
+        {"登记新好友名单", "今日", "登记当天新加好友名单及咨询情况", "5"},
+        {"登记当天工作", "今日", "登记当天必须完成的工作，完成后列在下方（如老师测试卷，家长是否做完，收费，催老师或者家长等）", "5"},
+        {"登记明日跟进内容", "今日", "登记明天需要跟进的内容，列在下方（如老师测试卷，家长是否做完，收费，催老师或者家长等）", "5"}
     };
 
     std::vector<Task> tasks;
     for (const auto& tmpl : templates) {
-        tasks.push_back(createTask(tmpl, date));
+        tasks.push_back(createTask(tmpl, publishDate, dueDate));
+    }
+
+    return tasks;
+}
+
+// 生成每周任务
+std::vector<Task> TaskManager::generateWeeklyTasks() {
+    std::string publishDate = MUtils::getCurrentWeekFirstDay();
+    std::string dueDate = MUtils::getCurrentWeekLastDay();
+    // 定义任务模板
+    std::vector<TaskTemplate> templates = {
+        {"登记退课情况", "本周", "登记当天所有学生的退课情况，本周需完成", "1"},
+        {"登记新好友名单", "本周", "登记当天新加好友名单及咨询情况", "2"},
+        {"登记当天工作", "本周", "登记当天必须完成的工作，完成后列在下方（如老师测试卷，家长是否做完，收费，催老师或者家长等）", "3"},
+        {"登记下周跟进内容", "本周", "登记明天需要跟进的内容，列在下方（如老师测试卷，家长是否做完，收费，催老师或者家长等）", "5"}
+    };
+
+    std::vector<Task> tasks;
+    for (const auto& tmpl : templates) {
+        tasks.push_back(createTask(tmpl, publishDate, dueDate));
+    }
+
+    return tasks;
+}
+
+// 生成每月任务
+std::vector<Task> TaskManager::generateMonthlyTasks() {
+    std::string publishDate = MUtils::getCurrentMonthFirstDay();
+    std::string dueDate = MUtils::getCurrentMonthLastDay();
+
+    // 定义任务模板
+    std::vector<TaskTemplate> templates = {
+        {"登记退课情况", "本月", "登记当天所有学生的退课情况，本月需完成", "1"},
+        {"登记新好友名单", "本月", "登记当天新加好友名单及咨询情况", "2"},
+        {"登记当天工作", "本月", "登记当天必须完成的工作，完成后列在下方（如老师测试卷，家长是否做完，收费，催老师或者家长等）", "3"},
+        {"登记下月跟进内容", "本月", "登记明天需要跟进的内容，列在下方（如老师测试卷，家长是否做完，收费，催老师或者家长等）", "4"}
+    };
+
+    std::vector<Task> tasks;
+    for (const auto& tmpl : templates) {
+        tasks.push_back(createTask(tmpl, publishDate, dueDate));
     }
 
     return tasks;

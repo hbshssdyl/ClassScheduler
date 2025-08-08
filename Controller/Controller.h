@@ -35,6 +35,7 @@ public:
     Q_INVOKABLE virtual SearchStudentInfoController* getSearchStudentInfoController();
     Q_INVOKABLE virtual ScheduleClassController* getScheduleClassController();
     Q_INVOKABLE virtual DatabaseController* getDatabaseController();
+    Q_INVOKABLE virtual TaskController* getTaskController();
 
 public slots:
     void onOperateModeSelected(OperateMode mode);

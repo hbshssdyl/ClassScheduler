@@ -453,6 +453,9 @@ void CUtils::updateTasksList(QVariantList& data, Tasks& tasks)
     for(const auto& task : tasks)
     {
         data.append(QVariantMap{
+            { "taskId", task.id },
+            { "shouldShow", task.shouldShow },
+            { "isOverdue", task.isOverdue },
             { "title", QString::fromStdString(task.title) },
             { "category", QString::fromStdString(task.category) },
             { "description", QString::fromStdString(task.description) },

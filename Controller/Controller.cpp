@@ -209,6 +209,15 @@ DatabaseController* Controller::getDatabaseController()
     return mDatabaseController;
 }
 
+TaskController* Controller::getTaskController()
+{
+    if (!mTaskController)
+    {
+        mTaskController = new TaskController(mCoreFramework, this);
+    }
+    return mTaskController;
+}
+
 
 
 

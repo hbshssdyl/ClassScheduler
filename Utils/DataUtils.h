@@ -70,6 +70,7 @@ namespace ClassScheduler
         //OneToOne task
         GetOneToOneTasksSuccess,
         AddOneToOneTaskSuccess,
+        UpdateOneToOneTaskSuccess,
 
         //Other
         CurlNotOK,
@@ -90,6 +91,7 @@ namespace ClassScheduler
     struct Task {
         int id;
         bool shouldShow;
+        bool isOverdue;
 
         std::string title;
         std::string category;
@@ -1208,6 +1210,12 @@ namespace ClassScheduler
                 return;
             }
 
+            if (response.find(toString(ResultStatus::UpdateOneToOneTaskSuccess), Qt::CaseSensitive) != std::string::npos) {
+                status = ResultStatus::UpdateOneToOneTaskSuccess;
+                statusStr = toString(ResultStatus::UpdateOneToOneTaskSuccess);
+                return;
+            }
+
             // Other cases
             if (response.find(toString(ResultStatus::CurlNotOK), Qt::CaseSensitive) != std::string::npos) {
                 status = ResultStatus::CurlNotOK;
@@ -1276,9 +1284,11 @@ namespace ClassScheduler
 
                 // OneToOne task
                 case ClassScheduler::ResultStatus::GetOneToOneTasksSuccess:
-                    return "getOneToOneTasksSuccess";
+                    return "GetOneToOneTasksSuccess";
                 case ClassScheduler::ResultStatus::AddOneToOneTaskSuccess:
-                    return "addOneToOneTaskSuccess";
+                    return "AddOneToOneTaskSuccess";
+                case ClassScheduler::ResultStatus::UpdateOneToOneTaskSuccess:
+                    return "UpdateOneToOneTaskSuccess";
 
                 // Other
                 case ResultStatus::CurlNotOK:

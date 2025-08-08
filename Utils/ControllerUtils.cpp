@@ -447,6 +447,27 @@ void CUtils::updateScheduleClassResultsList(QList<QList<QVariantMap>>& data, Sch
     }
 }
 
+// for TaskController
+void CUtils::updateTasksList(QVariantList& data, Tasks& tasks)
+{
+    for(const auto& task : tasks)
+    {
+        data.append(QVariantMap{
+            { "title", QString::fromStdString(task.title) },
+            { "category", QString::fromStdString(task.category) },
+            { "description", QString::fromStdString(task.description) },
+            { "publish", QString::fromStdString(task.publish) },
+            { "due", QString::fromStdString(task.due) },
+            { "rating", QString::fromStdString(task.rating) },
+            { "finishStatus", QString::fromStdString(task.finishStatus) },
+            { "comment", QString::fromStdString(task.comment) },
+            { "reviewString", QString::fromStdString(task.reviewString) },
+            { "resultRating", QString::fromStdString(task.resultRating) },
+            { "reviewStatus", QString::fromStdString(task.reviewStatus) }
+        });
+    }
+}
+
 //Others
 std::string CUtils::toRoleString(QString& role)
 {

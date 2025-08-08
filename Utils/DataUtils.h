@@ -89,6 +89,8 @@ namespace ClassScheduler
 
     struct Task {
         int id;
+        bool shouldShow;
+
         std::string title;
         std::string category;
         std::string description;
@@ -1109,25 +1111,24 @@ namespace ClassScheduler
 
                 nlohmann::json taskArray = nlohmann::json::parse(response);
                 // 确保 tasks 是数组
-                if (taskArray.contains("tasks") && taskArray["tasks"].is_array()) {
-                    for (const auto& item : taskArray["tasks"]) {
-                        Task task;
-                        task.id = item.at("id").get<int>();
-                        task.title = item.at("title").get<std::string>();
-                        task.category = item.at("category").get<std::string>();
-                        task.description = item.at("description").get<std::string>();
-                        task.publish = item.at("publish").get<std::string>();
-                        task.due = item.at("due").get<std::string>();
-                        task.rating = item.at("rating").get<std::string>();
-                        task.finishStatus = item.at("finishStatus").get<std::string>();
-                        task.comment = item.at("comment").get<std::string>();
-                        task.reviewString = item.at("reviewString").get<std::string>();
-                        task.resultRating = item.at("resultRating").get<std::string>();
-                        task.reviewStatus = item.at("reviewStatus").get<std::string>();
+                for (const auto& item : taskArray["tasks"]) {
+                    Task task;
+                    task.id = item.at("id").get<int>();
+                    task.title = item.at("title").get<std::string>();
+                    task.category = item.at("category").get<std::string>();
+                    task.description = item.at("description").get<std::string>();
+                    task.publish = item.at("publish").get<std::string>();
+                    task.due = item.at("due").get<std::string>();
+                    task.rating = item.at("rating").get<std::string>();
+                    task.finishStatus = item.at("finishStatus").get<std::string>();
+                    task.comment = item.at("comment").get<std::string>();
+                    task.reviewString = item.at("reviewString").get<std::string>();
+                    task.resultRating = item.at("resultRating").get<std::string>();
+                    task.reviewStatus = item.at("reviewStatus").get<std::string>();
 
-                        oneToOneTasks.push_back(task);
-                    }
+                    oneToOneTasks.push_back(task);
                 }
+                return;
             }
 
 

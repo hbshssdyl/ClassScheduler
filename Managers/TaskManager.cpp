@@ -81,6 +81,25 @@ void TaskManager::initDailyTasks()
     }
 }
 
+void TaskManager::refreshShowStatus()
+{
+    const std::string currentDate = getCurrentDate(); // 替换为实际当前日期
+    const std::string startOfWeek = "2000-01-01"; // 本周第一天（假设和当前日期相同）
+    const std::string startOfMonth = "2000-01-01"; // 本月第一天（假设和当前日期相同）
+
+    for (auto& task : mTasks) {
+        if (task.category == "本日") {
+            task.shouldShow = (task.publish >= currentDate); // publish 不早于今日才显示
+        } else if (task.category == "本周") {
+            task.shouldShow = (task.publish >= startOfWeek); // publish 不早于本周才显示
+        } else if (task.category == "本月") {
+            task.shouldShow = (task.publish >= startOfMonth); // publish 不早于本月才显示
+        } else {
+            task.shouldShow = true; // 其他情况默认显示
+        }
+    }
+}
+
 Tasks TaskManager::getTaskFromServer()
 {
     if(auto coreFramework = mCoreFramework.lock())

@@ -17,6 +17,7 @@ public:
 private:
     void initTasks();
     void initDailyTasks();
+    void refreshShowStatus();
     Tasks getTaskFromServer();
     std::string getCurrentDate();
     Task createTask(const TaskTemplate& tmpl, const std::string& date);

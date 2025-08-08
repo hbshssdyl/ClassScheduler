@@ -35,6 +35,9 @@ namespace ClassScheduler
         static bool isTimeOverlap(const QString& timeRange1, const QString& timeRange2);
         static void updateScheduleClassResultsList(QList<QList<QVariantMap>>& data, ScheduleClassInputInfo& inputInfos, ClassInfos& classInfosList);
 
+        //For TaskController.cpp
+        static void updateTasksList(QVariantList& data, Tasks& tasks);
+
         //Others
         static std::string toRoleString(QString& role);
     };

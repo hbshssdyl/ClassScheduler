@@ -26,39 +26,54 @@ OperateModes UserManager::getModsByUserRole(UserRole& role)
                     OperateMode::SearchTeacherInfo,
                     OperateMode::SearchStudentInfo,
                     OperateMode::ScheduleClass,
-                    OperateMode::TeacherEvaluation};
+                    OperateMode::TeacherEvaluation,
+                    OperateMode::FeedbackApp,
+                    OperateMode::FeedbackCompany,
+                    OperateMode::AccountView };
         case UserRole::Boss:
             return { OperateMode::SearchClassInfo,
                     OperateMode::SearchTeacherInfo,
                     OperateMode::SearchStudentInfo,
-                    OperateMode::ScheduleClass};
+                    OperateMode::ScheduleClass,
+                    OperateMode::FeedbackApp,
+                    OperateMode::FeedbackCompany};
         case UserRole::Manager:
             return { OperateMode::SearchClassInfo,
                     OperateMode::SearchTeacherInfo,
                     OperateMode::SearchStudentInfo,
-                    OperateMode::ScheduleClass};
+                    OperateMode::ScheduleClass,
+                    OperateMode::FeedbackApp,
+                    OperateMode::FeedbackCompany};
         case UserRole::SeniorStaff:
             return { OperateMode::SearchClassInfo,
                     OperateMode::SearchTeacherInfo,
                     OperateMode::SearchStudentInfo,
-                    OperateMode::ScheduleClass};
+                    OperateMode::ScheduleClass,
+                    OperateMode::FeedbackApp,
+                    OperateMode::FeedbackCompany};
         case UserRole::Staff:
             return { OperateMode::SearchClassInfo,
                     OperateMode::SearchTeacherInfo,
                     OperateMode::SearchStudentInfo,
-                    OperateMode::ScheduleClass};
+                    OperateMode::ScheduleClass,
+                    OperateMode::FeedbackApp,
+                    OperateMode::FeedbackCompany};
         case UserRole::OneToOneAssistant:
             return { OperateMode::TaskAssistantView,
                     OperateMode::SearchClassInfo,
                     OperateMode::SearchTeacherInfo,
                     OperateMode::SearchStudentInfo,
-                    OperateMode::ScheduleClass};
+                    OperateMode::ScheduleClass,
+                    OperateMode::FeedbackApp,
+                    OperateMode::FeedbackCompany};
         case UserRole::OneToOneManager:
             return { OperateMode::TaskManagerView,
                     OperateMode::SearchClassInfo,
                     OperateMode::SearchTeacherInfo,
                     OperateMode::SearchStudentInfo,
-                    OperateMode::ScheduleClass};
+                    OperateMode::ScheduleClass,
+                    OperateMode::FeedbackApp,
+                    OperateMode::FeedbackCompany};
         default:
             return {};
             break;

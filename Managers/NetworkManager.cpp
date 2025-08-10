@@ -476,3 +476,32 @@ ResponseResult NetworkManager::getAllOneToOneTasks() {
     return result;
 }
 
+ResponseResult NetworkManager::getOneToOneTaskById(int taskId) {
+    CURL* curl;
+    CURLcode res;
+    std::string responseStr;
+    ResponseResult result;
+
+    std::string url = SERVER_URL + "tasks/one-to-one/" + std::to_string(taskId);
+
+    curl = curl_easy_init();
+    if (curl) {
+        // 配置GET请求（默认方法，无需设置CUSTOMREQUEST）
+        curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeCallback);
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &responseStr);
+
+        // 执行请求
+        res = curl_easy_perform(curl);
+        if (res != CURLE_OK) {
+            result.rawResponse = curl_easy_strerror(res);
+        } else {
+            std::cout << "Response: " << responseStr << std::endl;
+            result.refreshResult(responseStr);
+        }
+
+        curl_easy_cleanup(curl);
+    }
+
+    return result;
+}

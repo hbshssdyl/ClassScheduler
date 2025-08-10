@@ -72,11 +72,15 @@ qt_add_qml_module(appClassScheduler
     QML_FILES Qml/BasicComponent/SearchBar.qml
     QML_FILES Qml/BasicComponent/DateSelector.qml
     QML_FILES Qml/BasicComponent/MButton.qml
+    QML_FILES Qml/BasicComponent/MCheckButton.qml
     QML_FILES Qml/SearchTeacherInfo/SearchTeacherInfo.qml
     QML_FILES Qml/SearchTeacherInfo/SearchTeacherInfoDelegate.qml
     QML_FILES Qml/UserInfo/UserInfo.qml
     QML_FILES Qml/TaskManagerView/TaskManagerView.qml
     QML_FILES Qml/TaskAssistantView/TaskAssistantView.qml
+    QML_FILES Qml/FeedbackApp/FeedbackApp.qml
+    QML_FILES Qml/FeedbackCompany/FeedbackCompany.qml
+    QML_FILES Qml/AccountView/AccountView.qml
 
     # 源文件
     SOURCES Utils/DataUtils.h
@@ -99,6 +103,10 @@ qt_add_qml_module(appClassScheduler
     SOURCES Controller/TaskController.cpp
     SOURCES Controller/DatabaseController.cpp
     SOURCES Controller/DatabaseController.h
+    SOURCES Controller/FeedbackController.h
+    SOURCES Controller/FeedbackController.cpp
+    SOURCES Controller/AccountViewController.h
+    SOURCES Controller/AccountViewController.cpp
 
     SOURCES Managers/CoreFramework.h
     SOURCES Managers/CoreFramework.cpp
@@ -110,6 +118,10 @@ qt_add_qml_module(appClassScheduler
     SOURCES Managers/DataManager.cpp
     SOURCES Managers/TaskManager.h
     SOURCES Managers/TaskManager.cpp
+    SOURCES Managers/FeedbackManager.h
+    SOURCES Managers/FeedbackManager.cpp
+    SOURCES Managers/AccountManager.h
+    SOURCES Managers/AccountManager.cpp
 
     # 资源文件
     RESOURCES Resource/Avatar-self.jpg
@@ -130,6 +142,9 @@ qt_add_qml_module(appClassScheduler
     RESOURCES Resource/notification.svg
     RESOURCES Resource/task.svg
     RESOURCES Resource/manage.svg
+    RESOURCES Resource/question.svg
+    RESOURCES Resource/dianzan.svg
+    RESOURCES Resource/phone.svg
 )
 
 #============================================

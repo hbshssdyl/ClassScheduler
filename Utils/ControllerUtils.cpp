@@ -29,6 +29,12 @@ QString toOperateModeString(OperateMode mode)
         return "一对一助理";
     case OperateMode::TaskManagerView:
         return "一对一管理";
+    case OperateMode::FeedbackApp:
+        return "吐槽软件";
+    case OperateMode::FeedbackCompany:
+        return "吐槽公司";
+    case OperateMode::AccountView:
+        return "账号信息";
     default:
         return "default";
     }
@@ -57,6 +63,12 @@ QString getIconNameByOperateMode(OperateMode mode)
         return "task.svg";
     case OperateMode::TaskManagerView:
         return "manage.svg";
+    case OperateMode::FeedbackApp:
+        return "question.svg";
+    case OperateMode::FeedbackCompany:
+        return "notification.svg";
+    case OperateMode::AccountView:
+        return "phone.svg";
     default:
         return "default";
     }
@@ -133,6 +145,12 @@ QString CUtils::toString(OperateMode mode)
         return "TaskManagerView";
     case OperateMode::TeacherEvaluation:
         return "TeacherEvaluation";
+    case OperateMode::FeedbackApp:
+        return "FeedbackApp";
+    case OperateMode::FeedbackCompany:
+        return "FeedbackCompany";
+    case OperateMode::AccountView:
+        return "AccountView";
     default:
         return "default";
     }
@@ -454,7 +472,6 @@ void CUtils::updateTasksList(QVariantList& data, Tasks& tasks)
     {
         data.append(QVariantMap{
             { "taskId", task.id },
-            { "shouldShow", task.shouldShow },
             { "isOverdue", task.isOverdue },
             { "title", QString::fromStdString(task.title) },
             { "category", QString::fromStdString(task.category) },

@@ -19,6 +19,8 @@ private:
 
 public slots:
     void onTaskFinished(int taskId, QString commentString);
+    void onTaskReviewed(int taskId, QString resultRating, QString reviewString);
+    void onTaskAdded(QVariantMap task);
 
 signals:
     void taskListChanged();

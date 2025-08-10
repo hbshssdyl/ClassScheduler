@@ -14,11 +14,15 @@ public:
     Tasks getTasks();
     void initialize();
 
+    bool addTask(Task task);
     bool updateTaskFinishStatus(int taskId, std::string commentString);
+    bool updateTaskReviewStatus(int taskId, std::string resultRating, std::string reviewString);
 
 private:
     void initTasks();
     void initDailyTasks();
+    void initWeeklyTasks();
+    void initMonthlyTasks();
     void refreshTaskStatus();
     Tasks getTaskFromServer();
     Task createTask(const TaskTemplate& tmpl, const std::string& publishDate, const std::string& dueDate);

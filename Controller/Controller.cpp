@@ -55,6 +55,9 @@ void Controller::refreshOperateMode(OperateMode mode)
         case OperateMode::FileView:
         case OperateMode::TaskAssistantView:
         case OperateMode::TaskManagerView:
+        case OperateMode::FeedbackApp:
+        case OperateMode::FeedbackCompany:
+        case OperateMode::AccountView:
         case OperateMode::TeacherEvaluation:
         {
             mShowActions = true;

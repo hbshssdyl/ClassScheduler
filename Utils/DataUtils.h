@@ -42,7 +42,10 @@ namespace ClassScheduler
         ScheduleClass,
         TaskAssistantView,
         TaskManagerView,
-        TeacherEvaluation
+        TeacherEvaluation,
+        FeedbackApp,
+        FeedbackCompany,
+        AccountView
     };
     using OperateModes = std::vector<OperateMode>;
 
@@ -68,6 +71,7 @@ namespace ClassScheduler
         DatabaseFileDownloadFailed,
 
         //OneToOne task
+        GetOneToOneTaskSuccess,
         GetOneToOneTasksSuccess,
         AddOneToOneTaskSuccess,
         UpdateOneToOneTaskSuccess,
@@ -90,7 +94,6 @@ namespace ClassScheduler
 
     struct Task {
         int id;
-        bool shouldShow;
         bool isOverdue;
 
         std::string title;
@@ -99,11 +102,11 @@ namespace ClassScheduler
         std::string publish;
         std::string due;
         std::string rating;
-        std::string finishStatus;
+        std::string finishStatus;//未完成，已完成，已过期
         std::string comment;
         std::string reviewString;
         std::string resultRating;
-        std::string reviewStatus;
+        std::string reviewStatus;//已审核，未审核
 
         Task() = default;
 
@@ -114,6 +117,24 @@ namespace ClassScheduler
              const std::string& rr, const std::string& rv)
             : title(t), category(c), description(d), publish(p), due(du), rating(r),
             finishStatus(fs), comment(cm), reviewString(rs), resultRating(rr), reviewStatus(rv) {}
+
+        void print() const {
+            std::cerr << "Task Details:\n";
+            std::cerr << std::setw(15) << std::left << "ID: " << id << "\n";
+            std::cerr << std::setw(15) << "Title: " << title << "\n";
+            std::cerr << std::setw(15) << "Category: " << category << "\n";
+            std::cerr << std::setw(15) << "Description: " << description << "\n";
+            std::cerr << std::setw(15) << "Publish Date: " << publish << "\n";
+            std::cerr << std::setw(15) << "Due Date: " << due << "\n";
+            std::cerr << std::setw(15) << "Rating: " << rating << "\n";
+            std::cerr << std::setw(15) << "Status: " << finishStatus << "\n";
+            std::cerr << std::setw(15) << "Comment: " << comment << "\n";
+            std::cerr << std::setw(15) << "Review: " << reviewString << "\n";
+            std::cerr << std::setw(15) << "Result Rating: " << resultRating << "\n";
+            std::cerr << std::setw(15) << "Review Status: " << reviewStatus << "\n";
+            std::cerr << std::setw(15) << "Is Overdue: " << (isOverdue ? "Yes" : "No") << "\n";
+            std::cerr << "-----------------------------\n";
+        }
     };
     using Tasks = std::vector<Task>;
 
@@ -1133,6 +1154,32 @@ namespace ClassScheduler
                 return;
             }
 
+            if(response.find(toString(ResultStatus::GetOneToOneTaskSuccess), Qt::CaseSensitive) != std::string::npos)
+            {
+                status = ResultStatus::GetOneToOneTaskSuccess;
+                statusStr = toString(ResultStatus::GetOneToOneTaskSuccess);
+
+                nlohmann::json httpTask = nlohmann::json::parse(response);
+                auto& item = httpTask["task"];
+
+                Task task;
+                task.id = item.at("id").get<int>();
+                task.title = item.at("title").get<std::string>();
+                task.category = item.at("category").get<std::string>();
+                task.description = item.at("description").get<std::string>();
+                task.publish = item.at("publish").get<std::string>();
+                task.due = item.at("due").get<std::string>();
+                task.rating = item.at("rating").get<std::string>();
+                task.finishStatus = item.at("finishStatus").get<std::string>();
+                task.comment = item.at("comment").get<std::string>();
+                task.reviewString = item.at("reviewString").get<std::string>();
+                task.resultRating = item.at("resultRating").get<std::string>();
+                task.reviewStatus = item.at("reviewStatus").get<std::string>();
+
+                oneToOneTasks.push_back(task);
+                return;
+            }
+
 
             // Register cases
             if(response.find(toString(ResultStatus::RegisterSuccess), Qt::CaseSensitive) != std::string::npos){
@@ -1283,6 +1330,8 @@ namespace ClassScheduler
                     return "DatabaseFileDownloadFailed";
 
                 // OneToOne task
+                case ClassScheduler::ResultStatus::GetOneToOneTaskSuccess:
+                    return "GetOneToOneTaskSuccess";
                 case ClassScheduler::ResultStatus::GetOneToOneTasksSuccess:
                     return "GetOneToOneTasksSuccess";
                 case ClassScheduler::ResultStatus::AddOneToOneTaskSuccess:

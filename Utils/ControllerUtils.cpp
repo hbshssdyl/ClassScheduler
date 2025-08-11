@@ -488,24 +488,4 @@ void CUtils::updateTasksList(QVariantList& data, Tasks& tasks)
     }
 }
 
-//Others
-std::string CUtils::toRoleString(QString& role)
-{
-    if(role == "普通员工")
-        return "Staff";
-    if(role == "高级员工")
-        return "SeniorStaff";
-    if(role == "管理者")
-        return "Manager";
-    if(role == "老板")
-        return "Boss";
-    if(role == "一对一助理")
-        return "OneToOneAssistant";
-    if(role == "一对一管理")
-        return "OneToOneManager";
-    if(role == "超级管理员")
-        return "SuperAdmin";
-    return "Staff";
-}
-
 } // namespace PictureManager

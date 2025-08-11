@@ -3,6 +3,7 @@
 #include "UserManager.h"
 #include "NetworkManager.h"
 #include "TaskManager.h"
+#include "AccountManager.h"
 
 CoreFramework::CoreFramework() {}
 
@@ -18,8 +19,10 @@ void CoreFramework::initManagers()
     mUserManager = std::make_shared<UserManager>(shared_from_this());
     mNetworkManager = std::make_shared<NetworkManager>(shared_from_this());
     mTaskManager = std::make_shared<TaskManager>(shared_from_this());
+    mAccountManager = std::make_shared<AccountManager>(shared_from_this());
 
     mTaskManager->initialize();
+    mAccountManager->initialize();
 }
 
 void CoreFramework::initAppData()
@@ -64,4 +67,9 @@ NetworkManagerPtr CoreFramework::getNetworkManager()
 TaskManagerPtr CoreFramework::getTaskManager()
 {
     return mTaskManager;
+}
+
+AccountManagerPtr CoreFramework::getAccountManager()
+{
+    return mAccountManager;
 }

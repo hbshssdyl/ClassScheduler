@@ -17,6 +17,7 @@ namespace ClassScheduler
     static const QString TEACHER_INFOS_TABLE_NAME = "teacherInfos";
     static const QString STUDENT_INFOS_TABLE_NAME = "studentInfos";
     static const QString APP_TOGGLE_INFOS_TABLE_NAME = "toggleInfos";
+    static const std::string ADMIN_USER_NAME = "Dylandu";
 
     static const QString DATABASE_NAME = "InfoDatabase.db";
     static const QString DATABASE_PATH_DIR = QDir::currentPath();
@@ -52,9 +53,24 @@ namespace ClassScheduler
     enum class ResultStatus {
         //Register
         RegisterSuccess,
+        RegisterPending,
         UserExist,
         EmailExist,
         EmailInvalid,
+
+        //User
+        GetAllUsersSuccess,
+        GetAllUsersFailed,
+        AddUserSuccess,
+        AddUserFailed,
+        ApproveUserSuccess,
+        ApproveUserFailed,
+        RejectUserSuccess,
+        RejectUserFailed,
+        BlacklistUserSuccess,
+        BlacklistUserFailed,
+        DeleteUserSuccess,
+        DeleteUserFailed,
 
         //Login
         LoginSuccess,
@@ -89,6 +105,8 @@ namespace ClassScheduler
         Boss,
         OneToOneAssistant,
         OneToOneManager,
+        OneToMultiAssistant,
+        OneToMultiManager,
         SuperAdmin
     };
 
@@ -147,10 +165,17 @@ namespace ClassScheduler
 
 
     struct UserInfo{
+        int id;
         std::string name;
+        std::string password;
+        std::string email;
+        std::string roleStr;
+        std::string accountStatus;
+
         UserRole role;
         OperateModes mods;
     };
+    using UserInfos = std::vector<UserInfo>;
 
     struct Setting {
         QString key;
@@ -1083,6 +1108,9 @@ namespace ClassScheduler
         UserRole role;
         std::string username;
 
+        //User
+        UserInfos userInfos;
+
         //OneToOneTasks
         Tasks oneToOneTasks;
         int taskId;
@@ -1123,6 +1151,94 @@ namespace ClassScheduler
                         username = value;
                     }
                 }
+                return;
+            }
+
+            // User case
+            if (response.find(toString(ResultStatus::GetAllUsersSuccess), Qt::CaseSensitive) != std::string::npos) {
+                status = ResultStatus::GetAllUsersSuccess;
+                statusStr = toString(ResultStatus::GetAllUsersSuccess);
+
+                nlohmann::json taskArray = nlohmann::json::parse(response);
+                // 确保 tasks 是数组
+                for (const auto& item : taskArray["users"]) {
+                    UserInfo userInfo;
+                    userInfo.id = item.at("id").get<int>();
+                    userInfo.name = item.at("username").get<std::string>();
+                    userInfo.email = item.at("email").get<std::string>();
+                    userInfo.password = item.at("password").get<std::string>();
+                    userInfo.roleStr = item.at("role").get<std::string>();
+                    userInfo.accountStatus = item.at("account_status").get<std::string>();
+
+                    userInfos.push_back(userInfo);
+                }
+
+                return;
+            }
+
+            if (response.find(toString(ResultStatus::GetAllUsersFailed), Qt::CaseSensitive) != std::string::npos) {
+                status = ResultStatus::GetAllUsersFailed;
+                statusStr = toString(ResultStatus::GetAllUsersFailed);
+                return;
+            }
+
+            if (response.find(toString(ResultStatus::AddUserSuccess), Qt::CaseSensitive) != std::string::npos) {
+                status = ResultStatus::AddUserSuccess;
+                statusStr = toString(ResultStatus::AddUserSuccess);
+                return;
+            }
+
+            if (response.find(toString(ResultStatus::AddUserFailed), Qt::CaseSensitive) != std::string::npos) {
+                status = ResultStatus::AddUserFailed;
+                statusStr = toString(ResultStatus::AddUserFailed);
+                return;
+            }
+
+            if (response.find(toString(ResultStatus::ApproveUserSuccess), Qt::CaseSensitive) != std::string::npos) {
+                status = ResultStatus::ApproveUserSuccess;
+                statusStr = toString(ResultStatus::ApproveUserSuccess);
+                return;
+            }
+
+            if (response.find(toString(ResultStatus::ApproveUserFailed), Qt::CaseSensitive) != std::string::npos) {
+                status = ResultStatus::ApproveUserFailed;
+                statusStr = toString(ResultStatus::ApproveUserFailed);
+                return;
+            }
+
+            if (response.find(toString(ResultStatus::RejectUserSuccess), Qt::CaseSensitive) != std::string::npos) {
+                status = ResultStatus::RejectUserSuccess;
+                statusStr = toString(ResultStatus::RejectUserSuccess);
+                return;
+            }
+
+            if (response.find(toString(ResultStatus::RejectUserFailed), Qt::CaseSensitive) != std::string::npos) {
+                status = ResultStatus::RejectUserFailed;
+                statusStr = toString(ResultStatus::RejectUserFailed);
+                return;
+            }
+
+            if (response.find(toString(ResultStatus::BlacklistUserSuccess), Qt::CaseSensitive) != std::string::npos) {
+                status = ResultStatus::BlacklistUserSuccess;
+                statusStr = toString(ResultStatus::BlacklistUserSuccess);
+                return;
+            }
+
+            if (response.find(toString(ResultStatus::BlacklistUserFailed), Qt::CaseSensitive) != std::string::npos) {
+                status = ResultStatus::BlacklistUserFailed;
+                statusStr = toString(ResultStatus::BlacklistUserFailed);
+                return;
+            }
+
+            if (response.find(toString(ResultStatus::DeleteUserSuccess), Qt::CaseSensitive) != std::string::npos) {
+                status = ResultStatus::DeleteUserSuccess;
+                statusStr = toString(ResultStatus::DeleteUserSuccess);
+                return;
+            }
+
+            if (response.find(toString(ResultStatus::DeleteUserFailed), Qt::CaseSensitive) != std::string::npos) {
+                status = ResultStatus::DeleteUserFailed;
+                statusStr = toString(ResultStatus::DeleteUserFailed);
                 return;
             }
 
@@ -1185,6 +1301,11 @@ namespace ClassScheduler
             if(response.find(toString(ResultStatus::RegisterSuccess), Qt::CaseSensitive) != std::string::npos){
                 status = ResultStatus::RegisterSuccess;
                 statusStr = toString(ResultStatus::RegisterSuccess);
+                return;
+            }
+            if(response.find(toString(ResultStatus::RegisterPending), Qt::CaseSensitive) != std::string::npos){
+                status = ResultStatus::RegisterPending;
+                statusStr = toString(ResultStatus::RegisterPending);
                 return;
             }
             if (response.find(toString(ResultStatus::UserExist), Qt::CaseSensitive) != std::string::npos) {
@@ -1300,12 +1421,41 @@ namespace ClassScheduler
                 // Register
                 case ResultStatus::RegisterSuccess:
                     return "RegisterSuccess";
+                case ResultStatus::RegisterPending:
+                    return "RegisterPending";
                 case ResultStatus::UserExist:
                     return "UserExist";
                 case ResultStatus::EmailExist:
                     return "EmailExist";
                 case ResultStatus::EmailInvalid:
                     return "EmailInvalid";
+
+                // User
+                case ResultStatus::GetAllUsersSuccess:
+                    return "GetAllUsersSuccess";
+                case ResultStatus::GetAllUsersFailed:
+                    return "GetAllUsersFailed";
+                case ResultStatus::AddUserSuccess:
+                    return "AddUserSuccess";
+                case ResultStatus::AddUserFailed:
+                    return "AddUserFailed";
+                case ResultStatus::ApproveUserSuccess:
+                    return "ApproveUserSuccess";
+                case ResultStatus::ApproveUserFailed:
+                    return "ApproveUserFailed";
+                case ResultStatus::RejectUserSuccess:
+                    return "RejectUserSuccess";
+                case ResultStatus::RejectUserFailed:
+                    return "RejectUserFailed";
+                case ResultStatus::BlacklistUserSuccess:
+                    return "BlacklistUserSuccess";
+                case ResultStatus::BlacklistUserFailed:
+                    return "BlacklistUserFailed";
+                case ResultStatus::DeleteUserSuccess:
+                    return "DeleteUserSuccess";
+                case ResultStatus::DeleteUserFailed:
+                    return "DeleteUserFailed";
+
 
                 // Login
                 case ResultStatus::LoginSuccess:

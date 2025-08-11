@@ -30,7 +30,7 @@ ResponseResult NetworkManager::sendRegisterRequest(const std::string& email, con
     payload["email"] = email;
     payload["username"] = username;
     payload["password"] = password;
-    payload["role"] = role;  // 例如 "普通员工" 或 "高级员工"
+    payload["role"] = role;  // 例如 "员工" 或 "高级员工"
 
     std::string jsonData = payload.dump();
 
@@ -58,6 +58,205 @@ ResponseResult NetworkManager::sendRegisterRequest(const std::string& email, con
         curl_easy_cleanup(curl);
     } else {
         result.updateToCurlError();
+    }
+    return result;
+}
+
+// PUT /admin/users/{user_id}/approve
+ResponseResult NetworkManager::approveUserRequest(int userId) {
+    CURL* curl;
+    CURLcode res;
+    std::string responseStr;
+    ResponseResult result;
+
+    curl = curl_easy_init();
+    if (curl) {
+        std::string url = SERVER_URL + "admin/users/" + std::to_string(userId) + "/approve";
+        struct curl_slist* headers = nullptr;
+        headers = curl_slist_append(headers, "Content-Type: application/json");
+        headers = curl_slist_append(headers, ("X-Username: " + ADMIN_USER_NAME).c_str());
+
+        curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "PUT");
+        curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+        curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeCallback);
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &responseStr);
+
+        res = curl_easy_perform(curl);
+        if (res != CURLE_OK)
+            result.rawResponse = curl_easy_strerror(res);
+        else
+            result.refreshResult(responseStr);
+
+        curl_slist_free_all(headers);
+        curl_easy_cleanup(curl);
+    }
+    return result;
+}
+
+// 其他 PUT 类接口（reject / blacklist）
+ResponseResult NetworkManager::rejectUserRequest(int userId) {
+    // 和 approveUserRequest 基本一致，只是 URL 改为 "/reject"
+    CURL* curl;
+    CURLcode res;
+    std::string responseStr;
+    ResponseResult result;
+
+    curl = curl_easy_init();
+    if (curl) {
+        std::string url = SERVER_URL + "admin/users/" + std::to_string(userId) + "/reject";
+        struct curl_slist* headers = nullptr;
+        headers = curl_slist_append(headers, "Content-Type: application/json");
+        headers = curl_slist_append(headers, ("X-Username: " + ADMIN_USER_NAME).c_str());
+
+        curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "PUT");
+        curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+        curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeCallback);
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &responseStr);
+
+        res = curl_easy_perform(curl);
+        if (res != CURLE_OK)
+            result.rawResponse = curl_easy_strerror(res);
+        else
+            result.refreshResult(responseStr);
+
+        curl_slist_free_all(headers);
+        curl_easy_cleanup(curl);
+    }
+    return result;
+}
+
+ResponseResult NetworkManager::blacklistUserRequest(int userId) {
+    CURL* curl;
+    CURLcode res;
+    std::string responseStr;
+    ResponseResult result;
+
+    curl = curl_easy_init();
+    if (curl) {
+        std::string url = SERVER_URL + "admin/users/" + std::to_string(userId) + "/blacklist";
+        struct curl_slist* headers = nullptr;
+        headers = curl_slist_append(headers, "Content-Type: application/json");
+        headers = curl_slist_append(headers, ("X-Username: " + ADMIN_USER_NAME).c_str());
+
+        curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "PUT");
+        curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+        curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeCallback);
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &responseStr);
+
+        res = curl_easy_perform(curl);
+        if (res != CURLE_OK)
+            result.rawResponse = curl_easy_strerror(res);
+        else
+            result.refreshResult(responseStr);
+
+        curl_slist_free_all(headers);
+        curl_easy_cleanup(curl);
+    }
+    return result;
+}
+
+// DELETE /admin/users/{user_id}
+ResponseResult NetworkManager::deleteUserRequest(int userId) {
+    CURL* curl;
+    CURLcode res;
+    std::string responseStr;
+    ResponseResult result;
+
+    curl = curl_easy_init();
+    if (curl) {
+        std::string url = SERVER_URL + "admin/users/" + std::to_string(userId);
+        struct curl_slist* headers = nullptr;
+        headers = curl_slist_append(headers, ("X-Username: " + ADMIN_USER_NAME).c_str());
+
+        curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "DELETE");
+        curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+        curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeCallback);
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &responseStr);
+
+        res = curl_easy_perform(curl);
+        if (res != CURLE_OK)
+            result.rawResponse = curl_easy_strerror(res);
+        else
+            result.refreshResult(responseStr);
+
+        curl_slist_free_all(headers);
+        curl_easy_cleanup(curl);
+    }
+    return result;
+}
+
+// POST /admin/users
+ResponseResult NetworkManager::addUserRequest(const std::string& email, const std::string& username,
+                                              const std::string& password, const std::string& role) {
+    CURL* curl;
+    CURLcode res;
+    std::string responseStr;
+    ResponseResult result;
+
+    json payload;
+    payload["email"] = email;
+    payload["username"] = username;
+    payload["password"] = password;
+    payload["role"] = role;
+
+    std::string jsonData = payload.dump();
+
+    curl = curl_easy_init();
+    if (curl) {
+        std::string url = SERVER_URL + "admin/users";
+        struct curl_slist* headers = nullptr;
+        headers = curl_slist_append(headers, "Content-Type: application/json");
+        headers = curl_slist_append(headers, ("X-Username: " + ADMIN_USER_NAME).c_str());
+
+        curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+        curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+        curl_easy_setopt(curl, CURLOPT_POSTFIELDS, jsonData.c_str());
+        curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, jsonData.size());
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeCallback);
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &responseStr);
+
+        res = curl_easy_perform(curl);
+        if (res != CURLE_OK)
+            result.rawResponse = curl_easy_strerror(res);
+        else
+            result.refreshResult(responseStr);
+
+        curl_slist_free_all(headers);
+        curl_easy_cleanup(curl);
+    }
+    return result;
+}
+
+// GET /admin/users
+ResponseResult NetworkManager::getAllUsersRequest() {
+    CURL* curl;
+    CURLcode res;
+    std::string responseStr;
+    ResponseResult result;
+
+    curl = curl_easy_init();
+    if (curl) {
+        std::string url = SERVER_URL + "admin/users";
+        struct curl_slist* headers = nullptr;
+        headers = curl_slist_append(headers, ("X-Username: " + ADMIN_USER_NAME).c_str());
+
+        curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+        curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeCallback);
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &responseStr);
+
+        res = curl_easy_perform(curl);
+        if (res != CURLE_OK)
+            result.rawResponse = curl_easy_strerror(res);
+        else
+            result.refreshResult(responseStr);
+
+        curl_slist_free_all(headers);
+        curl_easy_cleanup(curl);
     }
     return result;
 }

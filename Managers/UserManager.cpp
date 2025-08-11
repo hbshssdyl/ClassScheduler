@@ -45,18 +45,11 @@ OperateModes UserManager::getModsByUserRole(UserRole& role)
                     OperateMode::FeedbackApp,
                     OperateMode::FeedbackCompany};
         case UserRole::SeniorStaff:
-            return { OperateMode::SearchClassInfo,
-                    OperateMode::SearchTeacherInfo,
-                    OperateMode::SearchStudentInfo,
-                    OperateMode::ScheduleClass,
+            return { OperateMode::ScheduleClass,
                     OperateMode::FeedbackApp,
                     OperateMode::FeedbackCompany};
         case UserRole::Staff:
-            return { OperateMode::SearchClassInfo,
-                    OperateMode::SearchTeacherInfo,
-                    OperateMode::SearchStudentInfo,
-                    OperateMode::ScheduleClass,
-                    OperateMode::FeedbackApp,
+            return { OperateMode::FeedbackApp,
                     OperateMode::FeedbackCompany};
         case UserRole::OneToOneAssistant:
             return { OperateMode::TaskAssistantView,
@@ -71,6 +64,16 @@ OperateModes UserManager::getModsByUserRole(UserRole& role)
                     OperateMode::SearchClassInfo,
                     OperateMode::SearchTeacherInfo,
                     OperateMode::SearchStudentInfo,
+                    OperateMode::ScheduleClass,
+                    OperateMode::FeedbackApp,
+                    OperateMode::FeedbackCompany};
+        case UserRole::OneToMultiAssistant:
+            return { OperateMode::TaskAssistantView,
+                    OperateMode::ScheduleClass,
+                    OperateMode::FeedbackApp,
+                    OperateMode::FeedbackCompany};
+        case UserRole::OneToMultiManager:
+            return { OperateMode::TaskManagerView,
                     OperateMode::ScheduleClass,
                     OperateMode::FeedbackApp,
                     OperateMode::FeedbackCompany};

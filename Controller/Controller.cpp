@@ -95,20 +95,10 @@ void Controller::onTryToRegister(QString email, QString username, QString passwo
 
     if(auto networkManager = mCoreFramework->getNetworkManager())
     {
-        auto result = networkManager->sendRegisterRequest(email.toStdString(), username.toStdString(), password.toStdString(), CUtils::toRoleString(role));
+        auto result = networkManager->sendRegisterRequest(email.toStdString(), username.toStdString(), password.toStdString(), role.toStdString());
         cout << result.statusStr << endl;
         cout << result.rawResponse << endl;
-        if(result.status == ResultStatus::RegisterSuccess) {
-            emit registerOrLoginResult("RegisterSuccess");
-        } else if(result.status == ResultStatus::UserExist) {
-            emit registerOrLoginResult("UserExist");
-        } else if(result.status == ResultStatus::EmailExist) {
-            emit registerOrLoginResult("EmailExist");
-        } else if(result.status == ResultStatus::EmailInvalid) {
-            emit registerOrLoginResult("EmailInvalid");
-        } else {
-            emit registerOrLoginResult("RegisterFailed");
-        }
+        emit registerOrLoginResult(QString::fromStdString(result.statusStr));
     }
 }
 
@@ -125,7 +115,7 @@ void Controller::onTryToLogin(QString login, QString password)
     // cout << result.rawResponse << endl;
 
     ResponseResult result;
-    result.username = "Dylan";
+    result.username = "Dylandu";
     result.status = ResultStatus::LoginSuccess;
     result.role = UserRole::SuperAdmin;
 

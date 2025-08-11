@@ -38,6 +38,9 @@ Rectangle {
                 if (statusStr === "RegisterSuccess") {
                     feedbackMessage = "注册成功";
                     authMode = "success";
+                } else if (statusStr === "RegisterPending") {
+                    feedbackMessage = "注册申请已发出，等待管理员同意";
+                    authMode = "success";
                 } else if (statusStr === "UserExist") {
                     feedbackMessage = "该用户名已存在";
                     authMode = "failed";
@@ -212,7 +215,7 @@ Rectangle {
                     ComboBox {
                         id: roleCombo
                         anchors.fill: parent
-                        model: ["普通员工", "高级员工"]
+                        model: ["员工", "高级员工", "经理", "一对一助理", "一对一经理", "一对多助理", "一对多经理", "老板"]
                         font.pixelSize: 16
 
                         // 自定义 ComboBox 的背景

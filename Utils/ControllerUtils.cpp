@@ -488,4 +488,28 @@ void CUtils::updateTasksList(QVariantList& data, Tasks& tasks)
     }
 }
 
+// for AccountViewController
+void CUtils::updateAccountsList(QVariantList& pendingData, QVariantList& finishedData, UserInfos& accounts)
+{
+    for(const auto& account : accounts)
+    {
+        auto data = QVariantMap{
+                { "accountId", account.id },
+                { "username", QString::fromStdString(account.name) },
+                { "email", QString::fromStdString(account.email) },
+                { "password", QString::fromStdString(account.password) },
+                { "role", QString::fromStdString(account.roleStr) },
+                { "account_status", QString::fromStdString(account.accountStatus) }};
+        if(account.accountStatus == "已注册")
+        {
+            pendingData.append(data);
+        }
+        else
+        {
+            finishedData.append(data);
+        }
+
+    }
+}
+
 } // namespace PictureManager

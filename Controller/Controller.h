@@ -13,6 +13,7 @@
 #include "ScheduleClassController.h"
 #include "DatabaseController.h"
 #include "TaskController.h"
+#include "AccountViewController.h"
 
 using namespace std;
 
@@ -36,6 +37,7 @@ public:
     Q_INVOKABLE virtual ScheduleClassController* getScheduleClassController();
     Q_INVOKABLE virtual DatabaseController* getDatabaseController();
     Q_INVOKABLE virtual TaskController* getTaskController();
+    Q_INVOKABLE virtual AccountViewController* getAccountViewController();
 
 public slots:
     void onOperateModeSelected(OperateMode mode);
@@ -82,5 +84,6 @@ private:
     QPointer<ScheduleClassController> mScheduleClassController;
     QPointer<DatabaseController> mDatabaseController;
     QPointer<TaskController> mTaskController;
+    QPointer<AccountViewController> mAccountViewController;
 };
 

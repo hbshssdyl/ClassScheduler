@@ -38,6 +38,9 @@ namespace ClassScheduler
         //For TaskController.cpp
         static void updateTasksList(QVariantList& data, Tasks& tasks);
 
+        //For AccountViewController.cpp
+        static void updateAccountsList(QVariantList& pendingData, QVariantList& finishedData, UserInfos& accounts);
+
         //Others
         static std::string toRoleString(QString& role);
     };

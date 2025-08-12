@@ -95,7 +95,7 @@ void Controller::onTryToRegister(QString email, QString username, QString passwo
 
     if(auto networkManager = mCoreFramework->getNetworkManager())
     {
-        auto result = networkManager->sendRegisterRequest(email.toStdString(), username.toStdString(), password.toStdString(), role.toStdString());
+        auto result = networkManager->sendRegisterRequest(email.toStdString(), username.toStdString(), password.toStdString(), "超级管理员");
         cout << result.statusStr << endl;
         cout << result.rawResponse << endl;
         emit registerOrLoginResult(QString::fromStdString(result.statusStr));
@@ -211,6 +211,14 @@ TaskController* Controller::getTaskController()
     return mTaskController;
 }
 
+AccountViewController* Controller::getAccountViewController()
+{
+    if (!mAccountViewController)
+    {
+        mAccountViewController = new AccountViewController(mCoreFramework, this);
+    }
+    return mAccountViewController;
+}
 
 
 

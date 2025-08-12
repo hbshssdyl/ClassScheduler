@@ -30,11 +30,11 @@ UserInfos AccountManager::getUsersFromServer()
         if(auto networkManager = coreFramework->getNetworkManager())
         {
             auto response = networkManager->getAllUsersRequest();
+            std::cout << response.rawResponse << std::endl;
             if(response.status == ResultStatus::GetAllUsersSuccess)
             {
                 return response.userInfos;
             }
-            std::cout << response.rawResponse << std::endl;
             return {};
         }
     }

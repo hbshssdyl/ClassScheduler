@@ -1,73 +1,16 @@
 ﻿import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
-import QtQuick.Window 2.15
 
 Page {
     id: root
 
     property var operateMode
     property var rootController
+    property var controller: rootController.getAccountViewController()
     property string viewName
 
     background: Rectangle { color: "#e8f5e9" }
-
-    // 模拟数据
-    ListModel {
-        id: pendingUsersModel
-        ListElement {
-            username: "new_user1"
-            password: "123456"
-            email: "new1@example.com"
-            role: "普通用户"
-        }
-        ListElement {
-            username: "new_user2"
-            password: "654321"
-            email: "new2@example.com"
-            role: "管理员"
-        }
-        ListElement {
-            username: "new_user1"
-            password: "123456"
-            email: "new1@example.com"
-            role: "普通用户"
-        }
-        ListElement {
-            username: "new_user2"
-            password: "654321"
-            email: "new2@example.com"
-            role: "管理员"
-        }
-        ListElement {
-            username: "new_user1"
-            password: "123456"
-            email: "new1@example.com"
-            role: "普通用户"
-        }
-        ListElement {
-            username: "new_user2"
-            password: "654321"
-            email: "new2@example.com"
-            role: "管理员"
-        }
-    }
-
-    ListModel {
-        id: registeredUsersModel
-        ListElement {
-            username: "admin"
-            password: "admin123"
-            email: "admin@example.com"
-            role: "超级管理员"
-        }
-        ListElement {
-            username: "user1"
-            password: "user1123"
-            email: "user1@example.com"
-            role: "普通用户"
-        }
-    }
 
     // 添加账号弹窗
     Popup {
@@ -196,12 +139,7 @@ Page {
                             return
                         }
 
-                        registeredUsersModel.append({
-                            username: newUsername.text,
-                            password: newPassword.text,
-                            email: newEmail.text,
-                            role: newRole.currentText
-                        })
+                        console.debug("添加账号");
 
                         // 清空输入
                         newUsername.text = ""
@@ -263,7 +201,7 @@ Page {
             background: Rectangle { color: "transparent" }
 
             TabButton {
-                text: "新用户审核 (" + pendingUsersModel.count + ")"
+                text: "新用户审核 (" + controller.pendingAccountList.length + ")"
                 Layout.fillWidth: true  // 改为使用布局属性
 
                 background: Rectangle {
@@ -280,7 +218,7 @@ Page {
             }
 
             TabButton {
-                text: "已注册用户 (" + registeredUsersModel.count + ")"
+                text: "已注册用户 (" + controller.finishedAccountList.length + ")"
                 Layout.fillWidth: true  // 改为使用布局属性
 
                 background: Rectangle {
@@ -311,7 +249,7 @@ Page {
 
                 ListView {
                     id: pendingUsersList
-                    model: pendingUsersModel
+                    model: controller.pendingAccountList
                     spacing: 10
                     boundsBehavior: Flickable.StopAtBounds
 
@@ -329,21 +267,54 @@ Page {
                             spacing: 5
 
                             GridLayout {
+                                id: pendingAccoundLayout
+
+                                property bool showPassword: false
                                 columns: 2
                                 columnSpacing: 15
                                 rowSpacing: 10
 
                                 Label { text: "用户名:"; color: "#999999" }
-                                Label { text: username; color: "#333333"; font.bold: true }
+                                Label { text: modelData.username; color: "#333333"; font.bold: true }
 
                                 Label { text: "密码:"; color: "#999999" }
-                                Label { text: password; color: "#333333" }
+                                RowLayout {
+                                    spacing: 5
+                                    Layout.fillWidth: true
+
+                                    Text {
+                                        id: passwordLabel
+                                        text: pendingAccoundLayout.showPassword ? modelData.password : "*".repeat(modelData.password.length)
+                                        color: "#333333"
+                                        font.bold: true
+                                        Layout.alignment: Qt.AlignVCenter
+                                    }
+
+                                    ToolButton {
+                                        text: pendingAccoundLayout.showPassword ? "🙈" : "👁"
+                                        font.pixelSize: 14
+                                        onClicked: pendingAccoundLayout.showPassword = !pendingAccoundLayout.showPassword
+                                    }
+                                }
 
                                 Label { text: "邮箱:"; color: "#999999" }
-                                Label { text: email; color: "#333333" }
+                                Label { text: modelData.email; color: "#333333" }
 
                                 Label { text: "申请权限:"; color: "#999999" }
-                                Label { text: role; color: "#3A4A6B"; font.bold: true }
+                                Label {
+                                    text: modelData.role
+                                    color: modelData.role === "超级管理员" ? "#FF6B6B" :
+                                                                        ((modelData.role.includes("员工") || modelData.role.includes("助理")) ? "#3A4A6B" : "#4CAF50")
+                                    font.bold: true
+                                }
+
+                                Label { text: "账号状态:"; color: "#999999" }
+                                Label {
+                                    text: modelData.account_status
+                                    color: modelData.account_status === "已通过" ? "#4CAF50" :
+                                                                                modelData.account_status === "已注册" ? "#3A4A6B" : "#FF6B6B"
+                                    font.bold: true
+                                }
                             }
 
                             RowLayout {
@@ -357,7 +328,7 @@ Page {
                                         color: "transparent"
                                         border.color: "#E0E0E0"
                                     }
-                                    onClicked: pendingUsersModel.remove(index)
+                                    onClicked: {console.debug("拒绝")}
                                 }
 
                                 Button {
@@ -372,13 +343,7 @@ Page {
                                         horizontalAlignment: Text.AlignHCenter
                                     }
                                     onClicked: {
-                                        registeredUsersModel.append({
-                                            username: username,
-                                            password: password,
-                                            email: email,
-                                            role: role
-                                        })
-                                        pendingUsersModel.remove(index)
+                                        console.debug("同意")
                                     }
                                 }
                             }
@@ -394,7 +359,7 @@ Page {
 
                 ListView {
                     id: registeredUsersList
-                    model: registeredUsersModel
+                    model: controller.finishedAccountList
                     spacing: 10
                     boundsBehavior: Flickable.StopAtBounds
 
@@ -412,24 +377,52 @@ Page {
                             spacing: 5
 
                             GridLayout {
+                                id: finishedAccoundLayout
+
                                 columns: 2
                                 columnSpacing: 15
                                 rowSpacing: 10
 
+                                property bool showPassword: false
+
                                 Label { text: "用户名:"; color: "#999999" }
-                                Label { text: username; color: "#333333"; font.bold: true }
+                                Label { text: modelData.username; color: "#333333"; font.bold: true }
 
                                 Label { text: "密码:"; color: "#999999" }
-                                Label { text: password; color: "#333333" }
+                                RowLayout {
+                                    spacing: 5
+                                    Layout.fillWidth: true
+
+                                    Text {
+                                        text: finishedAccoundLayout.showPassword ? modelData.password : "*".repeat(modelData.password.length)
+                                        color: "#333333"
+                                        font.bold: true
+                                        Layout.alignment: Qt.AlignVCenter
+                                    }
+
+                                    ToolButton {
+                                        text: finishedAccoundLayout.showPassword ? "\u{1F513}" : "\u{1F512}"
+                                        font.pixelSize: 14
+                                        onClicked: finishedAccoundLayout.showPassword = !finishedAccoundLayout.showPassword
+                                    }
+                                }
 
                                 Label { text: "邮箱:"; color: "#999999" }
-                                Label { text: email; color: "#333333" }
+                                Label { text: modelData.email; color: "#333333" }
 
                                 Label { text: "权限:"; color: "#999999" }
                                 Label {
-                                    text: role
-                                    color: role === "超级管理员" ? "#FF6B6B" :
-                                          (role === "管理员" ? "#4CAF50" : "#3A4A6B")
+                                    text: modelData.role
+                                    color: modelData.role === "超级管理员" ? "#FF6B6B" :
+                                                                        ((modelData.role.includes("员工") || modelData.role.includes("助理")) ? "#3A4A6B" : "#4CAF50")
+                                    font.bold: true
+                                }
+
+                                Label { text: "账号状态:"; color: "#999999" }
+                                Label {
+                                    text: modelData.account_status
+                                    color: modelData.account_status === "已通过" ? "#4CAF50" :
+                                                                                modelData.account_status === "已注册" ? "#3A4A6B" : "#FF6B6B"
                                     font.bold: true
                                 }
                             }
@@ -449,7 +442,7 @@ Page {
                                         color: "#FF6B6B"
                                         horizontalAlignment: Text.AlignHCenter
                                     }
-                                    onClicked: registeredUsersModel.remove(index)
+                                    onClicked: {console.debug("删除账号")}
                                 }
                             }
                         }

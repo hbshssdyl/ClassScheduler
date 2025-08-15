@@ -29,8 +29,6 @@ namespace ClassScheduler
     static std::vector validStudentHeader{"学生姓名", "就读学校", "手机号", "教过该生的老师", "科目及费用（每小时）"};
     static std::vector allTableNameForDB{"classInfos", "teacherInfos", "studentInfos"};
 
-
-
     enum class OperateMode
     {
         None,
@@ -76,6 +74,9 @@ namespace ClassScheduler
         LoginSuccess,
         UserOrEmailNotFound,
         PasswordIncorrect,
+        AccountPending,
+        AccountRejected,
+        AccountBlacklisted,
 
         //Upload DB file
         DatabaseUploadSuccess,
@@ -96,6 +97,24 @@ namespace ClassScheduler
         CurlNotOK,
         UnknownError
     };
+
+    enum class AccountStatus {
+        REGISTERED,
+        APPROVED,
+        REJECTED,
+        BLACKLISTED
+    };
+
+    inline const std::unordered_map<AccountStatus, std::string> AccountStatusNames = {
+        { AccountStatus::REGISTERED,  "已注册" },
+        { AccountStatus::APPROVED,    "已通过" },
+        { AccountStatus::REJECTED,    "已拒绝" },
+        { AccountStatus::BLACKLISTED, "黑名单" }
+    };
+
+    inline std::string toAccountStatus(AccountStatus status) {
+        return AccountStatusNames.at(status);
+    }
 
     enum class UserRole {
         None,
@@ -1335,6 +1354,21 @@ namespace ClassScheduler
                 statusStr = toString(ResultStatus::PasswordIncorrect);
                 return;
             }
+            if (response.find(toString(ResultStatus::AccountPending), Qt::CaseSensitive) != std::string::npos) {
+                status = ResultStatus::AccountPending;
+                statusStr = toString(ResultStatus::AccountPending);
+                return;
+            }
+            if (response.find(toString(ResultStatus::AccountRejected), Qt::CaseSensitive) != std::string::npos) {
+                status = ResultStatus::AccountRejected;
+                statusStr = toString(ResultStatus::AccountRejected);
+                return;
+            }
+            if (response.find(toString(ResultStatus::AccountBlacklisted), Qt::CaseSensitive) != std::string::npos) {
+                status = ResultStatus::AccountBlacklisted;
+                statusStr = toString(ResultStatus::AccountBlacklisted);
+                return;
+            }
 
             // Database upload cases
             if (response.find(toString(ResultStatus::DatabaseUploadSuccess), Qt::CaseSensitive) != std::string::npos) {
@@ -1464,6 +1498,12 @@ namespace ClassScheduler
                     return "UserOrEmailNotFound";
                 case ResultStatus::PasswordIncorrect:
                     return "PasswordIncorrect";
+                case ResultStatus::AccountPending:
+                    return "AccountPending";
+                case ResultStatus::AccountRejected:
+                    return "AccountRejected";
+                case ResultStatus::AccountBlacklisted:
+                    return "AccountBlacklisted";
 
                 // Upload DB file
                 case ResultStatus::DatabaseUploadSuccess:

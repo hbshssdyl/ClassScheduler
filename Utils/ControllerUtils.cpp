@@ -489,7 +489,7 @@ void CUtils::updateTasksList(QVariantList& data, Tasks& tasks)
 }
 
 // for AccountViewController
-void CUtils::updateAccountsList(QVariantList& pendingData, QVariantList& finishedData, UserInfos& accounts)
+void CUtils::updateAccountsList(QVariantList& pendingData, QVariantList& finishedData, QVariantList& blacklistData, UserInfos& accounts)
 {
     for(const auto& account : accounts)
     {
@@ -500,9 +500,13 @@ void CUtils::updateAccountsList(QVariantList& pendingData, QVariantList& finishe
                 { "password", QString::fromStdString(account.password) },
                 { "role", QString::fromStdString(account.roleStr) },
                 { "account_status", QString::fromStdString(account.accountStatus) }};
-        if(account.accountStatus == "已注册")
+        if(account.accountStatus == toAccountStatus(AccountStatus::REGISTERED))
         {
             pendingData.append(data);
+        }
+        else if(account.accountStatus == toAccountStatus(AccountStatus::BLACKLISTED))
+        {
+            blacklistData.append(data);
         }
         else
         {

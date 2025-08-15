@@ -135,11 +135,11 @@ Page {
                     }
                     onClicked: {
                         if(newPassword.text !== confirmPassword.text) {
-                            passwordError.text = "两次输入的密码不一致"
-                            return
+                            passwordError.text = "两次输入的密码不一致";
+                            return;
                         }
 
-                        console.debug("添加账号");
+                        controller.addAccount(newUsername.text, newPassword.text, newEmail.text);
 
                         // 清空输入
                         newUsername.text = ""
@@ -233,6 +233,23 @@ Page {
                     verticalAlignment: Text.AlignVCenter
                 }
             }
+
+            TabButton {
+                text: "黑名单用户 (" + controller.blacklistAccountList.length + ")"
+                Layout.fillWidth: true  // 改为使用布局属性
+
+                background: Rectangle {
+                    color: tabBar.currentIndex === 2 ? "#4CAF50" : "#E0E0E0"
+                    radius: 5
+                }
+
+                contentItem: Text {
+                    text: parent.text
+                    color: tabBar.currentIndex === 2 ? "white" : "#333333"
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                }
+            }
         }
 
         StackLayout {
@@ -291,7 +308,7 @@ Page {
                                     }
 
                                     ToolButton {
-                                        text: pendingAccoundLayout.showPassword ? "🙈" : "👁"
+                                        text: pendingAccoundLayout.showPassword ? "\u{1F513}" : "\u{1F512}"
                                         font.pixelSize: 14
                                         onClicked: pendingAccoundLayout.showPassword = !pendingAccoundLayout.showPassword
                                     }
@@ -328,7 +345,9 @@ Page {
                                         color: "transparent"
                                         border.color: "#E0E0E0"
                                     }
-                                    onClicked: {console.debug("拒绝")}
+                                    onClicked: {
+                                        controller.rejectAccount(modelData.accountId);
+                                    }
                                 }
 
                                 Button {
@@ -343,7 +362,7 @@ Page {
                                         horizontalAlignment: Text.AlignHCenter
                                     }
                                     onClicked: {
-                                        console.debug("同意")
+                                        controller.approveAccount(modelData.accountId);
                                     }
                                 }
                             }
@@ -431,6 +450,23 @@ Page {
                                 Layout.alignment: Qt.AlignRight
 
                                 Button {
+                                    text: "拉黑账号"
+                                    background: Rectangle {
+                                        radius: 5
+                                        color: "transparent"
+                                        border.color: "#FF6B6B"
+                                    }
+                                    contentItem: Text {
+                                        text: parent.text
+                                        color: "#FF6B6B"
+                                        horizontalAlignment: Text.AlignHCenter
+                                    }
+                                    onClicked: {
+                                        controller.blacklistAccount(modelData.accountId);
+                                    }
+                                }
+
+                                Button {
                                     text: "删除账号"
                                     background: Rectangle {
                                         radius: 5
@@ -442,7 +478,109 @@ Page {
                                         color: "#FF6B6B"
                                         horizontalAlignment: Text.AlignHCenter
                                     }
-                                    onClicked: {console.debug("删除账号")}
+                                    onClicked: {
+                                        controller.deleteAccount(modelData.accountId);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // 已注册用户页面
+            ScrollView {
+                clip: true
+                background: Rectangle { color: "transparent" }
+
+                ListView {
+                    id: blacklistUsersList
+                    model: controller.blacklistAccountList
+                    spacing: 10
+                    boundsBehavior: Flickable.StopAtBounds
+
+                    delegate: Rectangle {
+                        width: registeredUsersList.width
+                        implicitHeight: contentColumn3.implicitHeight + 20
+                        radius: 10
+                        color: "white"
+                        border.color: "#E0E0E0"
+
+                        ColumnLayout {
+                            id: contentColumn3
+                            anchors.fill: parent
+                            anchors.margins: 15
+                            spacing: 5
+
+                            GridLayout {
+                                id: blacklistAccoundLayout
+
+                                columns: 2
+                                columnSpacing: 15
+                                rowSpacing: 10
+
+                                property bool showPassword: false
+
+                                Label { text: "用户名:"; color: "#999999" }
+                                Label { text: modelData.username; color: "#333333"; font.bold: true }
+
+                                Label { text: "密码:"; color: "#999999" }
+                                RowLayout {
+                                    spacing: 5
+                                    Layout.fillWidth: true
+
+                                    Text {
+                                        text: blacklistAccoundLayout.showPassword ? modelData.password : "*".repeat(modelData.password.length)
+                                        color: "#333333"
+                                        font.bold: true
+                                        Layout.alignment: Qt.AlignVCenter
+                                    }
+
+                                    ToolButton {
+                                        text: blacklistAccoundLayout.showPassword ? "\u{1F513}" : "\u{1F512}"
+                                        font.pixelSize: 14
+                                        onClicked: blacklistAccoundLayout.showPassword = !blacklistAccoundLayout.showPassword
+                                    }
+                                }
+
+                                Label { text: "邮箱:"; color: "#999999" }
+                                Label { text: modelData.email; color: "#333333" }
+
+                                Label { text: "权限:"; color: "#999999" }
+                                Label {
+                                    text: modelData.role
+                                    color: modelData.role === "超级管理员" ? "#FF6B6B" :
+                                                                        ((modelData.role.includes("员工") || modelData.role.includes("助理")) ? "#3A4A6B" : "#4CAF50")
+                                    font.bold: true
+                                }
+
+                                Label { text: "账号状态:"; color: "#999999" }
+                                Label {
+                                    text: modelData.account_status
+                                    color: modelData.account_status === "已通过" ? "#4CAF50" :
+                                                                                modelData.account_status === "已注册" ? "#3A4A6B" : "#FF6B6B"
+                                    font.bold: true
+                                }
+                            }
+
+                            RowLayout {
+                                Layout.alignment: Qt.AlignRight
+
+                                Button {
+                                    text: "删除账号"
+                                    background: Rectangle {
+                                        radius: 5
+                                        color: "transparent"
+                                        border.color: "#FF6B6B"
+                                    }
+                                    contentItem: Text {
+                                        text: parent.text
+                                        color: "#FF6B6B"
+                                        horizontalAlignment: Text.AlignHCenter
+                                    }
+                                    onClicked: {
+                                        controller.deleteAccount(modelData.accountId);
+                                    }
                                 }
                             }
                         }

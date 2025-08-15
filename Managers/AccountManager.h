@@ -14,7 +14,11 @@ public:
     UserInfos getUsers();
     void initialize();
 
-    bool addUser(UserInfo user);
+    bool approveUser(int userId);
+    bool rejectUser(int userId);
+    bool blacklistUser(int userId);
+    bool deleteUser(int userId);
+    bool addUser(std::string username, std::string password, std::string email);
 
 private:
     void initUsers();

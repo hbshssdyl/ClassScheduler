@@ -100,11 +100,11 @@ void AccountViewController::deleteAccount(int accountId)
     }
 }
 
-void AccountViewController::addAccount(QString username, QString password, QString email)
+void AccountViewController::addAccount(QString username, QString password, QString email, QString role)
 {
     if(auto accountManager = mCoreFramework->getAccountManager())
     {
-        auto result = accountManager->addUser(username.toStdString(), password.toStdString(), email.toStdString());
+        auto result = accountManager->addUser(username.toStdString(), password.toStdString(), email.toStdString(), role.toStdString());
         cout << "add account: " << result << endl;
         if(result)
         {

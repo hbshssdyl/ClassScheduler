@@ -15,8 +15,8 @@ public:
     ResponseResult rejectUserRequest(int userId);
     ResponseResult blacklistUserRequest(int userId);
     ResponseResult deleteUserRequest(int userId);
-    ResponseResult addUserRequest(const std::string& email, const std::string& username,
-                                  const std::string& password, const std::string& role);
+    ResponseResult addUserRequest(const std::string& username, const std::string& password,
+                                  const std::string& email, const std::string& role);
     ResponseResult getAllUsersRequest();
     ResponseResult sendLoginRequest(const std::string& login, const std::string& password);
     ResponseResult sendDeleteUserRequest(const std::string& username);

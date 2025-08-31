@@ -190,8 +190,8 @@ ResponseResult NetworkManager::deleteUserRequest(int userId) {
 }
 
 // POST /admin/users
-ResponseResult NetworkManager::addUserRequest(const std::string& email, const std::string& username,
-                                              const std::string& password, const std::string& role) {
+ResponseResult NetworkManager::addUserRequest(const std::string& username, const std::string& password,
+                                              const std::string& email, const std::string& role) {
     CURL* curl;
     CURLcode res;
     std::string responseStr;

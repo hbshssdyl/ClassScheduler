@@ -18,7 +18,7 @@ public:
     bool rejectUser(int userId);
     bool blacklistUser(int userId);
     bool deleteUser(int userId);
-    bool addUser(std::string username, std::string password, std::string email);
+    bool addUser(std::string username, std::string password, std::string email, std::string role);
 
 private:
     void initUsers();

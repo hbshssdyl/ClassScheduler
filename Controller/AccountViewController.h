@@ -24,7 +24,7 @@ public slots:
     void rejectAccount(int accountId);
     void blacklistAccount(int accountId);
     void deleteAccount(int accountId);
-    void addAccount(QString username, QString password, QString email);
+    void addAccount(QString username, QString password, QString email, QString role);
 
 signals:
     void accountListChanged();

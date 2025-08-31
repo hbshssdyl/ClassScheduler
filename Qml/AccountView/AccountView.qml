@@ -92,7 +92,7 @@ Page {
                     id: newRole
                     Layout.fillWidth: true
                     height: newEmail.height
-                    model: ["普通用户", "管理员", "超级管理员"]
+                    model: ["员工", "高级员工", "经理", "老板", "一对一助理", "一对一经理", "一对多助理", "一对多经理", "超级管理员"]
                     background: Rectangle {
                         radius: 5;
                         border.color: "#E0E0E0"
@@ -139,7 +139,7 @@ Page {
                             return;
                         }
 
-                        controller.addAccount(newUsername.text, newPassword.text, newEmail.text);
+                        controller.addAccount(newUsername.text, newPassword.text, newEmail.text, newRole.currentText);
 
                         // 清空输入
                         newUsername.text = ""

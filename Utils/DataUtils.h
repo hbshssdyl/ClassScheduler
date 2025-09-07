@@ -98,6 +98,62 @@ namespace ClassScheduler
         UnknownError
     };
 
+    enum class FeedbackType {
+        AppIssue,     // APP问题
+        CompanyIssue  // 公司问题
+    };
+
+    enum class FeedbackUserType {
+        RealName,     // 实名用户
+        Anonymous     // 匿名用户
+    };
+
+    enum class FeedbackStatus {
+        Submitted,    // 已提交
+        Approved,     // 已通过
+        Rejected      // 已拒绝
+    };
+
+    // ---- 映射为后端需要的中文字符串 ----
+    inline std::string to_string(FeedbackType v) {
+        switch (v) {
+        case FeedbackType::AppIssue:     return "APP问题";
+        case FeedbackType::CompanyIssue: return "公司问题";
+        }
+        return "APP问题";
+    }
+
+    inline std::string to_string(FeedbackUserType v) {
+        switch (v) {
+        case FeedbackUserType::RealName: return "实名用户";
+        case FeedbackUserType::Anonymous:return "匿名用户";
+        }
+        return "匿名用户";
+    }
+
+    inline std::string to_string(FeedbackStatus v) {
+        switch (v) {
+        case FeedbackStatus::Submitted: return "已提交";
+        case FeedbackStatus::Approved:  return "已通过";
+        case FeedbackStatus::Rejected:  return "已拒绝";
+        }
+        return "已提交";
+    }
+
+    struct FeedbackCreateReq {
+        FeedbackType type;                  // 反馈类型
+        FeedbackUserType userType;          // 用户类型（实名/匿名）
+        std::string message;                // 反馈信息
+        std::optional<std::string> feedbackUsername; // 展示用昵称（可选）
+        std::optional<std::string> realUsername;     // 真实用户名（实名时可带）
+        std::optional<std::string> realEmail;        // 真实邮箱（实名时可带）
+    };
+
+    struct FeedbackUpdateStatusReq {
+        int id;
+        FeedbackStatus newStatus;
+    };
+
     enum class AccountStatus {
         REGISTERED,
         APPROVED,

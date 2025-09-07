@@ -31,6 +31,14 @@ public:
     ResponseResult getAllOneToOneTasks();
     ResponseResult getOneToOneTaskById(int taskId);
 
+    // Feedback APIs
+    ResponseResult createFeedback(const FeedbackCreateReq& req);
+    ResponseResult updateFeedbackStatus(const FeedbackUpdateStatusReq& req);
+    ResponseResult deleteFeedback(int feedbackId);
+    ResponseResult getFeedbackById(int feedbackId);
+    ResponseResult getAllFeedbacks();
+    ResponseResult likeFeedback(int feedbackId);
+
 private:
     std::weak_ptr<CoreFramework> mCoreFramework;
 };

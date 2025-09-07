@@ -704,3 +704,184 @@ ResponseResult NetworkManager::getOneToOneTaskById(int taskId) {
 
     return result;
 }
+
+// 小工具：URL 编码（避免中文枚举在查询字符串里乱码）
+static std::string urlEncode(CURL* curl, const std::string& s) {
+    char* out = curl_easy_escape(curl, s.c_str(), static_cast<int>(s.size()));
+    std::string encoded = out ? out : "";
+    if (out) curl_free(out);
+    return encoded;
+}
+
+// 1) 新增反馈  POST /feedbacks/add
+ResponseResult NetworkManager::createFeedback(const FeedbackCreateReq& req) {
+    CURL* curl = curl_easy_init();
+    std::string responseStr;
+    ResponseResult result;
+
+    if (!curl) { result.updateToCurlError(); return result; }
+
+    json payload = {
+        {"feedbackType",   to_string(req.type)},
+        {"userType",       to_string(req.userType)},
+        {"feedbackMessage",req.message}
+    };
+    if (req.feedbackUsername && !req.feedbackUsername->empty())
+        payload["feedbackUsername"] = *req.feedbackUsername;
+    if (req.realUsername && !req.realUsername->empty())
+        payload["realUsername"] = *req.realUsername;
+    if (req.realEmail && !req.realEmail->empty())
+        payload["realEmail"] = *req.realEmail;
+
+    std::string jsonData = payload.dump();
+
+    struct curl_slist* headers = nullptr;
+    headers = curl_slist_append(headers, "Content-Type: application/json");
+
+    curl_easy_setopt(curl, CURLOPT_URL, (SERVER_URL + "feedbacks/add").c_str());
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, jsonData.c_str());
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeCallback);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &responseStr);
+
+    CURLcode res = curl_easy_perform(curl);
+    if (res != CURLE_OK) result.rawResponse = curl_easy_strerror(res);
+    else                 result.refreshResult(responseStr);
+
+    curl_slist_free_all(headers);
+    curl_easy_cleanup(curl);
+    return result;
+}
+
+// 2) 更新状态  PUT /feedbacks/update-status
+//   （后端若使用 /update-status/{id} 也行，把 URL 换一下并去掉 payload.id）
+ResponseResult NetworkManager::updateFeedbackStatus(const FeedbackUpdateStatusReq& req) {
+    CURL* curl = curl_easy_init();
+    std::string responseStr;
+    ResponseResult result;
+
+    if (!curl) { result.updateToCurlError(); return result; }
+
+    json payload = {
+        {"id", req.id},
+        {"newStatus", to_string(req.newStatus)}
+    };
+    std::string jsonData = payload.dump();
+
+    struct curl_slist* headers = nullptr;
+    headers = curl_slist_append(headers, "Content-Type: application/json");
+
+    curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "PUT");
+    curl_easy_setopt(curl, CURLOPT_URL, (SERVER_URL + "feedbacks/update-status").c_str());
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, jsonData.c_str());
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeCallback);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &responseStr);
+
+    CURLcode res = curl_easy_perform(curl);
+    if (res != CURLE_OK) result.rawResponse = curl_easy_strerror(res);
+    else                 result.refreshResult(responseStr);
+
+    curl_slist_free_all(headers);
+    curl_easy_cleanup(curl);
+    return result;
+}
+
+// 3) 删除反馈  POST /feedbacks/delete  { "id": x }
+ResponseResult NetworkManager::deleteFeedback(int feedbackId) {
+    CURL* curl = curl_easy_init();
+    std::string responseStr;
+    ResponseResult result;
+
+    if (!curl) { result.updateToCurlError(); return result; }
+
+    json payload = { {"id", feedbackId} };
+    std::string jsonData = payload.dump();
+
+    struct curl_slist* headers = nullptr;
+    headers = curl_slist_append(headers, "Content-Type: application/json");
+
+    curl_easy_setopt(curl, CURLOPT_URL, (SERVER_URL + "feedbacks/delete").c_str());
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, jsonData.c_str());
+    curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "POST");
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeCallback);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &responseStr);
+
+    CURLcode res = curl_easy_perform(curl);
+    if (res != CURLE_OK) result.rawResponse = curl_easy_strerror(res);
+    else                 result.refreshResult(responseStr);
+
+    curl_slist_free_all(headers);
+    curl_easy_cleanup(curl);
+    return result;
+}
+
+// 4) 获取所有反馈
+ResponseResult NetworkManager::getAllFeedbacks() {
+    ResponseResult result;
+    CURL* curl = curl_easy_init();
+    if (!curl) {
+        result.updateToCurlError();
+        return result;
+    }
+
+    std::string responseStr;
+    curl_easy_setopt(curl, CURLOPT_URL, (SERVER_URL + "feedbacks/all").c_str());
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeCallback);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &responseStr);
+
+    CURLcode res = curl_easy_perform(curl);
+    if (res != CURLE_OK)
+        result.rawResponse = curl_easy_strerror(res);
+    else
+        result.refreshResult(responseStr);
+
+    curl_easy_cleanup(curl);
+    return result;
+}
+
+// 5) 获取单条  GET /feedbacks/{id}
+ResponseResult NetworkManager::getFeedbackById(int feedbackId) {
+    CURL* curl = curl_easy_init();
+    std::string responseStr;
+    ResponseResult result;
+
+    if (!curl) { result.updateToCurlError(); return result; }
+
+    std::string url = SERVER_URL + "feedbacks/" + std::to_string(feedbackId);
+
+    curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeCallback);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &responseStr);
+
+    CURLcode res = curl_easy_perform(curl);
+    if (res != CURLE_OK) result.rawResponse = curl_easy_strerror(res);
+    else                 result.refreshResult(responseStr);
+
+    curl_easy_cleanup(curl);
+    return result;
+}
+
+// 6) 点赞  POST /feedbacks/like/{id}
+ResponseResult NetworkManager::likeFeedback(int feedbackId) {
+    CURL* curl = curl_easy_init();
+    std::string responseStr;
+    ResponseResult result;
+
+    if (!curl) { result.updateToCurlError(); return result; }
+
+    std::string url = SERVER_URL + "feedbacks/like/" + std::to_string(feedbackId);
+
+    curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+    curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "POST");
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeCallback);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &responseStr);
+
+    CURLcode res = curl_easy_perform(curl);
+    if (res != CURLE_OK) result.rawResponse = curl_easy_strerror(res);
+    else                 result.refreshResult(responseStr);
+
+    curl_easy_cleanup(curl);
+    return result;
+}

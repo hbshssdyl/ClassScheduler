@@ -516,4 +516,47 @@ void CUtils::updateAccountsList(QVariantList& pendingData, QVariantList& finishe
     }
 }
 
+// for FeedbackController
+void CUtils::updatefeedbackInfosList(QVariantList& feedbackAppList, QVariantList& feedbackCompanyList, FeedbackInfos& feedbackInfos, bool isSupperAdmin)
+{
+    for(const auto& feedbackInfo : feedbackInfos)
+    {
+        if(feedbackInfo.type == FeedbackType::AppIssue)
+        {
+            auto data = QVariantMap{
+                { "feedbackId", feedbackInfo.id },
+                { "username", QString::fromStdString(feedbackInfo.feedbackUsername) },
+                { "isAnonymous", feedbackInfo.userType == FeedbackUserType::Anonymous },
+                { "likeCount", feedbackInfo.likeCount },
+
+                { "showAdminInfo", isSupperAdmin },
+                { "feedbackStatus", QString::fromStdString(to_string(feedbackInfo.feedbackStatus)) },
+                { "realUsername", QString::fromStdString(feedbackInfo.realUsername) },
+                { "realEmail", QString::fromStdString(feedbackInfo.realEmail) },
+
+                { "dataAndTime", QString::fromStdString(feedbackInfo.dataAndTime) },
+                { "message", QString::fromStdString(feedbackInfo.message) }};
+            feedbackAppList.append(data);
+        }
+
+        if(feedbackInfo.type == FeedbackType::CompanyIssue)
+        {
+            auto data = QVariantMap{
+                { "feedbackId", feedbackInfo.id },
+                { "username", QString::fromStdString(feedbackInfo.feedbackUsername) },
+                { "isAnonymous", feedbackInfo.userType == FeedbackUserType::Anonymous },
+                { "likeCount", feedbackInfo.likeCount },
+
+                { "showAdminInfo", isSupperAdmin },
+                { "feedbackStatus", QString::fromStdString(to_string(feedbackInfo.feedbackStatus)) },
+                { "realUsername", QString::fromStdString(feedbackInfo.realUsername) },
+                { "realEmail", QString::fromStdString(feedbackInfo.realEmail) },
+
+                { "dataAndTime", QString::fromStdString(feedbackInfo.dataAndTime) },
+                { "message", QString::fromStdString(feedbackInfo.message) }};
+            feedbackCompanyList.append(data);
+        }
+    }
+}
+
 } // namespace PictureManager

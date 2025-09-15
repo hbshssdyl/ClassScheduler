@@ -56,7 +56,7 @@ void TaskManager::initDailyTasks()
     bool needNewDailyTasks = true;
     for(auto& task : mTasks)
     {
-        std::cout << task.publish << " " << data << std::endl;
+        //std::cout << task.publish << " " << data << std::endl;
         if(task.publish == data && task.category == "今日")
         {
             needNewDailyTasks = false;
@@ -92,7 +92,7 @@ void TaskManager::initWeeklyTasks()
     bool needNewWeeklyTasks = true;
     for(auto& task : mTasks)
     {
-        std::cout << task.publish << " " << weekStart << std::endl;
+        //std::cout << task.publish << " " << weekStart << std::endl;
         if(task.publish == weekStart && task.category == "本周")
         {
             needNewWeeklyTasks = false;
@@ -128,7 +128,7 @@ void TaskManager::initMonthlyTasks()
     bool needNewMonthlyTasks = true;
     for(auto& task : mTasks)
     {
-        std::cout << task.publish << " " << monthStart << std::endl;
+        //std::cout << task.publish << " " << monthStart << std::endl;
         if(task.publish == monthStart && task.category == "本月")
         {
             needNewMonthlyTasks = false;

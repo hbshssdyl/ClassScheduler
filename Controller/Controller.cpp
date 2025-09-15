@@ -119,6 +119,7 @@ void Controller::onTryToLogin(QString login, QString password)
     result.status = ResultStatus::LoginSuccess;
     result.role = UserRole::SuperAdmin;
 
+    mCoreFramework->saveLoginUserInfo(result.username);
     if(auto userManager = mCoreFramework->getUserManager())
     {
         if(result.status == ResultStatus::LoginSuccess) {
@@ -218,6 +219,15 @@ AccountViewController* Controller::getAccountViewController()
         mAccountViewController = new AccountViewController(mCoreFramework, this);
     }
     return mAccountViewController;
+}
+
+FeedbackController* Controller::getFeedbackController()
+{
+    if (!mFeedbackController)
+    {
+        mFeedbackController = new FeedbackController(mCoreFramework, this);
+    }
+    return mFeedbackController;
 }
 
 

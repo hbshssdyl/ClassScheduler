@@ -10,28 +10,35 @@ using UserManagerPtr = std::shared_ptr<class UserManager>;
 using NetworkManagerPtr = std::shared_ptr<class NetworkManager>;
 using TaskManagerPtr = std::shared_ptr<class TaskManager>;
 using AccountManagerPtr = std::shared_ptr<class AccountManager>;
+using FeedbackManagerPtr = std::shared_ptr<class FeedbackManager>;
 
 class CoreFramework : public std::enable_shared_from_this<CoreFramework>
 {
 public:
     CoreFramework();
     void initialize();
+    void saveLoginUserInfo(std::string username);
+    UserInfo getLoginUserInfo();
     DataManagerPtr getDataManager();
     UserManagerPtr getUserManager();
     NetworkManagerPtr getNetworkManager();
     TaskManagerPtr getTaskManager();
     AccountManagerPtr getAccountManager();
+    FeedbackManagerPtr getFeedbackManager();
 
 private:
     void initAppData();
     void initManagers();
 
 private:
+    UserInfo mLoginUserInfo;
+
     DataManagerPtr mDataManager;
     UserManagerPtr mUserManager;
     NetworkManagerPtr mNetworkManager;
     TaskManagerPtr mTaskManager;
     AccountManagerPtr mAccountManager;
+    FeedbackManagerPtr mFeedbackManager;
 };
 
 #endif // COREFRAMEWORK_H

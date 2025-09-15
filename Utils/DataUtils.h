@@ -93,6 +93,18 @@ namespace ClassScheduler
         AddOneToOneTaskSuccess,
         UpdateOneToOneTaskSuccess,
 
+        //Feedback
+        CreateFeedbackSuccess,
+        CreateFeedbackFailed,
+        UpdateFeedbackStatusSuccess,
+        UpdateFeedbackStatusFailed,
+        DeleteFeedbackSuccess,
+        DeleteFeedbackFailed,
+        GetAllFeedbacksSuccess,
+        GetAllFeedbacksFailed,
+        LikeFeedbackSuccess,
+        LikeFeedbackFailed,
+
         //Other
         CurlNotOK,
         UnknownError
@@ -114,7 +126,13 @@ namespace ClassScheduler
         Rejected      // 已拒绝
     };
 
-    // ---- 映射为后端需要的中文字符串 ----
+    // --- FeedbackType ---
+    inline FeedbackType toFeedbackType(const std::string& str) {
+        if (str == "APP问题") return FeedbackType::AppIssue;
+        if (str == "公司问题") return FeedbackType::CompanyIssue;
+        throw std::invalid_argument("Unknown FeedbackType: " + str);
+    }
+
     inline std::string to_string(FeedbackType v) {
         switch (v) {
         case FeedbackType::AppIssue:     return "APP问题";
@@ -123,12 +141,27 @@ namespace ClassScheduler
         return "APP问题";
     }
 
+    // --- FeedbackUserType ---
+    inline FeedbackUserType toFeedbackUserType(const std::string& str) {
+        if (str == "实名用户") return FeedbackUserType::RealName;
+        if (str == "匿名用户") return FeedbackUserType::Anonymous;
+        throw std::invalid_argument("Unknown FeedbackUserType: " + str);
+    }
+
     inline std::string to_string(FeedbackUserType v) {
         switch (v) {
         case FeedbackUserType::RealName: return "实名用户";
         case FeedbackUserType::Anonymous:return "匿名用户";
         }
         return "匿名用户";
+    }
+
+    // --- FeedbackStatus ---
+    inline FeedbackStatus toFeedbackStatus(const std::string& str) {
+        if (str == "已提交") return FeedbackStatus::Submitted;
+        if (str == "已通过") return FeedbackStatus::Approved;
+        if (str == "已拒绝") return FeedbackStatus::Rejected;
+        throw std::invalid_argument("Unknown FeedbackStatus: " + str);
     }
 
     inline std::string to_string(FeedbackStatus v) {
@@ -147,12 +180,27 @@ namespace ClassScheduler
         std::optional<std::string> feedbackUsername; // 展示用昵称（可选）
         std::optional<std::string> realUsername;     // 真实用户名（实名时可带）
         std::optional<std::string> realEmail;        // 真实邮箱（实名时可带）
+        std::optional<std::string> dateAndTime;        // 真实邮箱（实名时可带）
     };
 
     struct FeedbackUpdateStatusReq {
         int id;
         FeedbackStatus newStatus;
     };
+
+    struct FeedbackInfo {
+        int id;
+        FeedbackType type;                  // 反馈类型
+        FeedbackUserType userType;          // 用户类型（实名/匿名）
+        int likeCount;
+        FeedbackStatus feedbackStatus;                // 反馈状态
+        std::string message;                // 反馈信息
+        std::string feedbackUsername; // 展示用昵称（可选）
+        std::string realUsername;     // 真实用户名（实名时可带）
+        std::string realEmail;        // 真实邮箱（实名时可带）
+        std::string dataAndTime;
+    };
+    using FeedbackInfos = std::vector<FeedbackInfo>;
 
     enum class AccountStatus {
         REGISTERED,
@@ -1190,6 +1238,9 @@ namespace ClassScheduler
         Tasks oneToOneTasks;
         int taskId;
 
+        //FeedbackInfos
+        FeedbackInfos feedbackInfos;
+
         ResponseResult()
         {
             rawResponse = "ResponseResult: init rawResponse";
@@ -1226,6 +1277,87 @@ namespace ClassScheduler
                         username = value;
                     }
                 }
+                return;
+            }
+
+            // Feedback case
+            if (response.find(toString(ResultStatus::GetAllFeedbacksSuccess), Qt::CaseSensitive) != std::string::npos) {
+                status = ResultStatus::GetAllFeedbacksSuccess;
+                statusStr = toString(ResultStatus::GetAllFeedbacksSuccess);
+
+                nlohmann::json feedbackArray = nlohmann::json::parse(response);
+
+                for (const auto& item : feedbackArray["feedbacks"]) {
+                    FeedbackInfo feedback;
+
+                    feedback.type = toFeedbackType(item.at("feedbackType").get<std::string>());
+                    feedback.userType = toFeedbackUserType(item.at("userType").get<std::string>());
+                    feedback.feedbackStatus = toFeedbackStatus(item.at("feedbackStatus").get<std::string>());
+                    feedback.likeCount = item.at("likeCount").get<int>();
+
+                    feedback.message = item.at("feedbackMessage").get<std::string>();
+                    feedback.feedbackUsername = item.value("feedbackUsername", "");
+                    feedback.realUsername = item.value("realUsername", "");
+                    feedback.realEmail = item.value("realEmail", "");
+                    feedback.dataAndTime = item.value("dataAndTime", "");
+
+                    feedbackInfos.push_back(feedback);
+                }
+
+                return;
+            }
+
+            if (response.find(toString(ResultStatus::GetAllFeedbacksFailed), Qt::CaseSensitive) != std::string::npos) {
+                status = ResultStatus::GetAllFeedbacksFailed;
+                statusStr = toString(ResultStatus::GetAllFeedbacksFailed);
+                return;
+            }
+
+            if (response.find(toString(ResultStatus::CreateFeedbackSuccess), Qt::CaseSensitive) != std::string::npos) {
+                status = ResultStatus::CreateFeedbackSuccess;
+                statusStr = toString(ResultStatus::CreateFeedbackSuccess);
+                return;
+            }
+
+            if (response.find(toString(ResultStatus::CreateFeedbackFailed), Qt::CaseSensitive) != std::string::npos) {
+                status = ResultStatus::CreateFeedbackFailed;
+                statusStr = toString(ResultStatus::CreateFeedbackFailed);
+                return;
+            }
+
+            if (response.find(toString(ResultStatus::UpdateFeedbackStatusSuccess), Qt::CaseSensitive) != std::string::npos) {
+                status = ResultStatus::UpdateFeedbackStatusSuccess;
+                statusStr = toString(ResultStatus::UpdateFeedbackStatusSuccess);
+                return;
+            }
+
+            if (response.find(toString(ResultStatus::UpdateFeedbackStatusFailed), Qt::CaseSensitive) != std::string::npos) {
+                status = ResultStatus::UpdateFeedbackStatusFailed;
+                statusStr = toString(ResultStatus::UpdateFeedbackStatusFailed);
+                return;
+            }
+
+            if (response.find(toString(ResultStatus::DeleteFeedbackSuccess), Qt::CaseSensitive) != std::string::npos) {
+                status = ResultStatus::DeleteFeedbackSuccess;
+                statusStr = toString(ResultStatus::DeleteFeedbackSuccess);
+                return;
+            }
+
+            if (response.find(toString(ResultStatus::DeleteFeedbackFailed), Qt::CaseSensitive) != std::string::npos) {
+                status = ResultStatus::DeleteFeedbackFailed;
+                statusStr = toString(ResultStatus::DeleteFeedbackFailed);
+                return;
+            }
+
+            if (response.find(toString(ResultStatus::LikeFeedbackSuccess), Qt::CaseSensitive) != std::string::npos) {
+                status = ResultStatus::LikeFeedbackSuccess;
+                statusStr = toString(ResultStatus::LikeFeedbackSuccess);
+                return;
+            }
+
+            if (response.find(toString(ResultStatus::LikeFeedbackFailed), Qt::CaseSensitive) != std::string::npos) {
+                status = ResultStatus::LikeFeedbackFailed;
+                statusStr = toString(ResultStatus::LikeFeedbackFailed);
                 return;
             }
 

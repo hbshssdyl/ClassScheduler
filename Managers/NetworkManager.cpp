@@ -724,8 +724,12 @@ ResponseResult NetworkManager::createFeedback(const FeedbackCreateReq& req) {
     json payload = {
         {"feedbackType",   to_string(req.type)},
         {"userType",       to_string(req.userType)},
-        {"feedbackMessage",req.message}
+        {"feedbackMessage",req.message},
+        {"dateAndTime",    req.dateAndTime}
     };
+
+    std::cout << req.dateAndTime.value() << std::endl;
+
     if (req.feedbackUsername && !req.feedbackUsername->empty())
         payload["feedbackUsername"] = *req.feedbackUsername;
     if (req.realUsername && !req.realUsername->empty())

@@ -2,30 +2,14 @@
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
 
-Page {
+Rectangle {
     id: root
-    width: 400
-    height: 700
-    background: Rectangle { color: "#f5f5f5" }
 
-    // --- 数据模型 ---
-    ListModel {
-        id: complaintsModel
-        ListElement {
-            username: "暴躁老哥"
-            isAnonymous: false
-            content: "这破系统慢得像蜗牛！能不能修修？"
-            likes: 42
-            timestamp: "刚刚"
-        }
-        ListElement {
-            username: "匿名怂包"
-            isAnonymous: true
-            content: "领导画的饼太大，吃不下..."
-            likes: 99
-            timestamp: "1小时前"
-        }
-    }
+    property var operateMode
+    property var rootController
+    property var controller: rootController.getFeedbackController()
+
+    color: "#f5f5f5"
 
     // --- 主布局 ---
     ColumnLayout {
@@ -136,14 +120,9 @@ Page {
 
                         var name = anonymousRadio.checked ? "匿名怂包" :
                               (usernameInput.text.trim() || "暴躁网友");
+                        var dateAndTime = Qt.formatDateTime(new Date(), "yyyy年MM月dd日 - hh:mm");
 
-                        complaintsModel.insert(0, {
-                            username: name,
-                            isAnonymous: anonymousRadio.checked,
-                            content: complaintInput.text,
-                            likes: 0,
-                            timestamp: "刚刚"
-                        });
+                        controller.addFeedback("APP问题", name, anonymousRadio.checked, complaintInput.text, dateAndTime);
 
                         complaintInput.clear();
                         if(!anonymousRadio.checked) {
@@ -162,7 +141,7 @@ Page {
             clip: true
 
             ListView {
-                model: complaintsModel
+                model: controller.feedbackAppList
                 spacing: 10
                 delegate: Rectangle {
                     width: ListView.view.width
@@ -188,10 +167,10 @@ Page {
                                 width: 30
                                 height: 30
                                 radius: 15
-                                color: isAnonymous ? "#bdbdbd" : "#ff5722"
+                                color: modelData.isAnonymous ? "#bdbdbd" : "#ff5722"
                                 Text {
                                     anchors.centerIn: parent
-                                    text: isAnonymous ? "?" : username.charAt(0)
+                                    text: modelData.isAnonymous ? "?" : modelData.username.charAt(0)
                                     color: "white"
                                     font.bold: true
                                 }
@@ -200,15 +179,15 @@ Page {
                             ColumnLayout {
                                 spacing: 2
                                 Text {
-                                    text: username
+                                    text: modelData.username
                                     font {
-                                        bold: !isAnonymous
+                                        bold: !modelData.isAnonymous
                                         pixelSize: 14
                                     }
-                                    color: isAnonymous ? "#757575" : "#d84315"
+                                    color: modelData.isAnonymous ? "#757575" : "#d84315"
                                 }
                                 Text {
-                                    text: timestamp
+                                    text: modelData.dataAndTime
                                     font.pixelSize: 10
                                     color: "#9e9e9e"
                                 }
@@ -231,20 +210,20 @@ Page {
                                         Layout.alignment: Qt.AlignVCenter
                                     }
                                     Text {
-                                        text: likes
+                                        text: modelData.likes
                                         color: "#ff5722"
                                         font.pixelSize: 14
                                         Layout.alignment: Qt.AlignVCenter
                                     }
                                 }
-                                onClicked: complaintsModel.setProperty(index, "likes", likes + 1)
+                                //onClicked: complaintsModel.setProperty(index, "likes", modelData.likes + 1)
                             }
                         }
 
                         // 吐槽内容
                         Text {
                             Layout.fillWidth: true
-                            text: content
+                            text: modelData.message
                             wrapMode: Text.Wrap
                             font.pixelSize: 14
                             color: "#424242"

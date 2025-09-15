@@ -14,6 +14,7 @@
 #include "DatabaseController.h"
 #include "TaskController.h"
 #include "AccountViewController.h"
+#include "FeedbackController.h"
 
 using namespace std;
 
@@ -38,6 +39,7 @@ public:
     Q_INVOKABLE virtual DatabaseController* getDatabaseController();
     Q_INVOKABLE virtual TaskController* getTaskController();
     Q_INVOKABLE virtual AccountViewController* getAccountViewController();
+    Q_INVOKABLE virtual FeedbackController* getFeedbackController();
 
 public slots:
     void onOperateModeSelected(OperateMode mode);
@@ -85,5 +87,6 @@ private:
     QPointer<DatabaseController> mDatabaseController;
     QPointer<TaskController> mTaskController;
     QPointer<AccountViewController> mAccountViewController;
+    QPointer<FeedbackController> mFeedbackController;
 };
 

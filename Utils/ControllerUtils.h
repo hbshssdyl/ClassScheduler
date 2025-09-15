@@ -41,6 +41,9 @@ namespace ClassScheduler
         //For AccountViewController.cpp
         static void updateAccountsList(QVariantList& pendingData, QVariantList& finishedData, QVariantList& blacklistData, UserInfos& accounts);
 
+        //For FeedbackController.cpp
+        static void updatefeedbackInfosList(QVariantList& feedbackAppList, QVariantList& feedbackCompanyList, FeedbackInfos& feedbackInfos, bool isSupperAdmin);
+
         //Others
         static std::string toRoleString(QString& role);
     };

@@ -3,14 +3,14 @@ import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.12
 import QtQuick.Window 2.15
 
-Page {
+Rectangle {
     id: root
 
     property var operateMode
     property var rootController
-    property string viewName
+    property var controller: rootController.getFeedbackController()
 
-    background: Rectangle { color: "#e8f5e9" }
+    color: "#f5f5f5"
 
     // --- 数据模型：存储吐槽内容 ---
     ListModel {

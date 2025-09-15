@@ -2,7 +2,7 @@
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
 
-Page {
+Rectangle {
     id: root
 
     property var operateMode
@@ -10,7 +10,7 @@ Page {
     property var controller: rootController.getAccountViewController()
     property string viewName
 
-    background: Rectangle { color: "#e8f5e9" }
+    color: "#e8f5e9"
 
     // 添加账号弹窗
     Popup {

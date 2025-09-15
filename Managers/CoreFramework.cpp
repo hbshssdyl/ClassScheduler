@@ -4,6 +4,7 @@
 #include "NetworkManager.h"
 #include "TaskManager.h"
 #include "AccountManager.h"
+#include "FeedbackManager.h"
 
 CoreFramework::CoreFramework() {}
 
@@ -20,9 +21,30 @@ void CoreFramework::initManagers()
     mNetworkManager = std::make_shared<NetworkManager>(shared_from_this());
     mTaskManager = std::make_shared<TaskManager>(shared_from_this());
     mAccountManager = std::make_shared<AccountManager>(shared_from_this());
+    mFeedbackManager = std::make_shared<FeedbackManager>(shared_from_this());
 
     mTaskManager->initialize();
     mAccountManager->initialize();
+    mFeedbackManager->initialize();
+}
+
+void CoreFramework::saveLoginUserInfo(std::string username)
+{
+    auto userInfos = mAccountManager->getUsers();
+    for(auto& userInfo : userInfos)
+    {
+        if(userInfo.name == username)
+        {
+            mLoginUserInfo = userInfo;
+            return;
+        }
+    }
+    std::cout << "Can not find this user info, username: " << username << std::endl;
+}
+
+UserInfo CoreFramework::getLoginUserInfo()
+{
+    return mLoginUserInfo;
 }
 
 void CoreFramework::initAppData()
@@ -72,4 +94,9 @@ TaskManagerPtr CoreFramework::getTaskManager()
 AccountManagerPtr CoreFramework::getAccountManager()
 {
     return mAccountManager;
+}
+
+FeedbackManagerPtr CoreFramework::getFeedbackManager()
+{
+    return mFeedbackManager;
 }

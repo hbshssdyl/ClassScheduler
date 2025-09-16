@@ -88,17 +88,42 @@ void Controller::onOperateModeSelected(OperateMode mode)
 
 void Controller::onTryToRegister(QString email, QString username, QString password, QString role)
 {
-    if(email.isEmpty() || username.isEmpty() || password.isEmpty()) {
-        emit registerOrLoginResult("EmptyInfo");
-        return;
-    }
+    // if(email.isEmpty() || username.isEmpty() || password.isEmpty()) {
+    //     emit registerOrLoginResult("EmptyInfo");
+    //     return;
+    // }
 
-    if(auto networkManager = mCoreFramework->getNetworkManager())
+    // if(auto networkManager = mCoreFramework->getNetworkManager())
+    // {
+    //     auto result = networkManager->sendRegisterRequest(email.toStdString(), username.toStdString(), password.toStdString(), role.toStdString());
+    //     cout << result.statusStr << endl;
+    //     cout << result.rawResponse << endl;
+    //     emit registerOrLoginResult(QString::fromStdString(result.statusStr));
+    // }
+    ResponseResult result;
+    result.username = "boss";
+    result.status = ResultStatus::LoginSuccess;
+    result.role = UserRole::Boss;
+
+    mCoreFramework->saveLoginUserInfo(result.username);
+    if(auto userManager = mCoreFramework->getUserManager())
     {
-        auto result = networkManager->sendRegisterRequest(email.toStdString(), username.toStdString(), password.toStdString(), "超级管理员");
-        cout << result.statusStr << endl;
-        cout << result.rawResponse << endl;
-        emit registerOrLoginResult(QString::fromStdString(result.statusStr));
+        if(result.status == ResultStatus::LoginSuccess) {
+            mUserInfo = userManager->getUserInfoByLoginInfo(result.username, result.role);
+            if(!mUserInfo.name.empty())
+            {
+                mName = QString::fromStdString(mUserInfo.name);
+                refreshActionItems();
+                emit nameChanged();
+            }
+            onOperateModeSelected(OperateMode::WelcomePage);
+        } else if(result.status == ResultStatus::UserOrEmailNotFound) {
+            emit registerOrLoginResult("UserOrEmailNotFound");
+        } else if(result.status == ResultStatus::PasswordIncorrect) {
+            emit registerOrLoginResult("PasswordIncorrect");
+        } else {
+            emit registerOrLoginResult("LoginFailed");
+        }
     }
 }
 

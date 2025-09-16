@@ -83,14 +83,14 @@ bool FeedbackManager::likeFeedback(int feedbackId)
                 std::cout << "feedbackInfos.id: " << feedbackInfo.id << ", feedbackId: " << feedbackId << ", feedbackInfos.Status: " << to_string(feedbackInfo.feedbackStatus) << std::endl;
                 if(feedbackInfo.id == feedbackId && feedbackInfo.feedbackStatus == FeedbackStatus::Approved)
                 {
-                    feedbackInfo.likeCount = feedbackInfo.likeCount + 1;
                     auto result = networkManager->likeFeedback(feedbackId);
                     std::cout << result.statusStr << std::endl;
                     std::cout << result.rawResponse << std::endl;
                     if(result.status == ResultStatus::LikeFeedbackSuccess)
                     {
-                        return true;
+                        feedbackInfo.likeCount = feedbackInfo.likeCount + 1;
                     }
+                    return true;
                 }
             }
         }
@@ -110,7 +110,6 @@ bool FeedbackManager::approveFeedback(int feedbackId)
                 std::cout << "feedbackInfos.id: " << feedbackInfo.id << ", feedbackId: " << feedbackId << ", feedbackInfos.Status: " << to_string(feedbackInfo.feedbackStatus) << std::endl;
                 if(feedbackInfo.id == feedbackId && feedbackInfo.feedbackStatus == FeedbackStatus::Submitted)
                 {
-                    feedbackInfo.feedbackStatus = FeedbackStatus::Approved;
                     FeedbackUpdateStatusReq requestInfo;
                     requestInfo.id = feedbackId;
                     requestInfo.newStatus = FeedbackStatus::Approved;
@@ -119,8 +118,9 @@ bool FeedbackManager::approveFeedback(int feedbackId)
                     std::cout << result.rawResponse << std::endl;
                     if(result.status == ResultStatus::UpdateFeedbackStatusSuccess)
                     {
-                        return true;
+                        feedbackInfo.feedbackStatus = FeedbackStatus::Approved;
                     }
+                    return true;
                 }
             }
         }
@@ -140,7 +140,6 @@ bool FeedbackManager::rejectFeedback(int feedbackId)
                 std::cout << "feedbackInfos.id: " << feedbackInfo.id << ", feedbackId: " << feedbackId << ", feedbackInfos.Status: " << to_string(feedbackInfo.feedbackStatus) << std::endl;
                 if(feedbackInfo.id == feedbackId && feedbackInfo.feedbackStatus == FeedbackStatus::Submitted)
                 {
-                    feedbackInfo.feedbackStatus = FeedbackStatus::Rejected;
                     FeedbackUpdateStatusReq requestInfo;
                     requestInfo.id = feedbackId;
                     requestInfo.newStatus = FeedbackStatus::Rejected;
@@ -149,6 +148,7 @@ bool FeedbackManager::rejectFeedback(int feedbackId)
                     std::cout << result.rawResponse << std::endl;
                     if(result.status == ResultStatus::UpdateFeedbackStatusSuccess)
                     {
+                        feedbackInfo.feedbackStatus = FeedbackStatus::Rejected;
                         return true;
                     }
                 }

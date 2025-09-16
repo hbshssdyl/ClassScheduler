@@ -30,7 +30,7 @@ void FeedbackController::refreshfeedbackList()
     QVariantList feedbackAppList;
     QVariantList feedbackCompanyList;
     bool isSupperAdmin = mCoreFramework->getLoginUserInfo().role == UserRole::SuperAdmin;
-
+    cout << isSupperAdmin << " " << mCoreFramework->getLoginUserInfo().name << endl;
     CUtils::updatefeedbackInfosList(feedbackAppList, feedbackCompanyList, mFeedbackInfos, isSupperAdmin);
 
     if (mFeedbackAppList != feedbackAppList)

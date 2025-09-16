@@ -31,11 +31,13 @@ void CoreFramework::initManagers()
 void CoreFramework::saveLoginUserInfo(std::string username)
 {
     auto userInfos = mAccountManager->getUsers();
+    std::cout << "saveLoginUserInfo, userInfos: " << userInfos.size() << std::endl;
     for(auto& userInfo : userInfos)
     {
         if(userInfo.name == username)
         {
             mLoginUserInfo = userInfo;
+            std::cout << "saveLoginUserInfo, username: " << username << std::endl;
             return;
         }
     }

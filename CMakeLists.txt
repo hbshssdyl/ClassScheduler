@@ -145,6 +145,8 @@ qt_add_qml_module(appClassScheduler
     RESOURCES Resource/question.svg
     RESOURCES Resource/dianzan.svg
     RESOURCES Resource/phone.svg
+    RESOURCES Resource/close.svg
+    RESOURCES Resource/update.svg
 )
 
 #============================================

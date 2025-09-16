@@ -889,3 +889,4 @@ ResponseResult NetworkManager::likeFeedback(int feedbackId) {
     curl_easy_cleanup(curl);
     return result;
 }
+

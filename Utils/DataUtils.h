@@ -198,7 +198,7 @@ namespace ClassScheduler
         std::string feedbackUsername; // 展示用昵称（可选）
         std::string realUsername;     // 真实用户名（实名时可带）
         std::string realEmail;        // 真实邮箱（实名时可带）
-        std::string dataAndTime;
+        std::string dateAndTime;
     };
     using FeedbackInfos = std::vector<FeedbackInfo>;
 
@@ -232,6 +232,36 @@ namespace ClassScheduler
         OneToMultiManager,
         SuperAdmin
     };
+
+    inline std::string to_string(UserRole v) {
+        switch(v) {
+        case UserRole::None: return "无";
+        case UserRole::Staff: return "员工";
+        case UserRole::SeniorStaff: return "高级员工";
+        case UserRole::Manager: return "经理";
+        case UserRole::Boss: return "老板";
+        case UserRole::OneToOneAssistant: return "一对一助理";
+        case UserRole::OneToOneManager: return "一对一经理";
+        case UserRole::OneToMultiAssistant: return "一对多助理";
+        case UserRole::OneToMultiManager: return "一对多经理";
+        case UserRole::SuperAdmin: return "超级管理员";
+        default: return "未知角色";
+        }
+    }
+
+    inline UserRole toUserRole(const std::string& str) {
+        if (str == "无") return UserRole::None;
+        if (str == "员工") return UserRole::Staff;
+        if (str == "高级员工") return UserRole::SeniorStaff;
+        if (str == "经理") return UserRole::Manager;
+        if (str == "老板") return UserRole::Boss;
+        if (str == "一对一助理") return UserRole::OneToOneAssistant;
+        if (str == "一对一经理") return UserRole::OneToOneManager;
+        if (str == "一对多助理") return UserRole::OneToMultiAssistant;
+        if (str == "一对多经理") return UserRole::OneToMultiManager;
+        if (str == "超级管理员") return UserRole::SuperAdmin;
+        throw std::invalid_argument("Unknown UserRole: " + str);
+    }
 
     struct Task {
         int id;
@@ -1255,6 +1285,12 @@ namespace ClassScheduler
             statusStr = toString(ResultStatus::CurlNotOK);
         }
 
+        void sortFeedbackByDateTime(FeedbackInfos& feedbacks) {
+            std::sort(feedbacks.begin(), feedbacks.end(), [](const FeedbackInfo& a, const FeedbackInfo& b) {
+                return a.dateAndTime > b.dateAndTime;
+            });
+        }
+
         void refreshResult(std::string response)
         {
             //std::cout << response << std::endl;
@@ -1290,6 +1326,7 @@ namespace ClassScheduler
                 for (const auto& item : feedbackArray["feedbacks"]) {
                     FeedbackInfo feedback;
 
+                    feedback.id = item.at("id").get<int>();
                     feedback.type = toFeedbackType(item.at("feedbackType").get<std::string>());
                     feedback.userType = toFeedbackUserType(item.at("userType").get<std::string>());
                     feedback.feedbackStatus = toFeedbackStatus(item.at("feedbackStatus").get<std::string>());
@@ -1299,10 +1336,12 @@ namespace ClassScheduler
                     feedback.feedbackUsername = item.value("feedbackUsername", "");
                     feedback.realUsername = item.value("realUsername", "");
                     feedback.realEmail = item.value("realEmail", "");
-                    feedback.dataAndTime = item.value("dataAndTime", "");
+                    feedback.dateAndTime = item.value("dateAndTime", "");
 
                     feedbackInfos.push_back(feedback);
                 }
+
+                sortFeedbackByDateTime(feedbackInfos);
 
                 return;
             }
@@ -1376,7 +1415,7 @@ namespace ClassScheduler
                     userInfo.password = item.at("password").get<std::string>();
                     userInfo.roleStr = item.at("role").get<std::string>();
                     userInfo.accountStatus = item.at("account_status").get<std::string>();
-
+                    userInfo.role = toUserRole(userInfo.roleStr);
                     userInfos.push_back(userInfo);
                 }
 
@@ -1618,25 +1657,6 @@ namespace ClassScheduler
             statusStr = toString(ResultStatus::UnknownError);
         }
 
-        UserRole toUserRole(std::string role)
-        {
-            if(role == "Staff")
-                return UserRole::Staff;
-            if(role == "SeniorStaff")
-                return UserRole::SeniorStaff;
-            if(role == "Manager")
-                return UserRole::Manager;
-            if(role == "Boss")
-                return UserRole::Boss;
-            if(role == "OneToOneAssistant")
-                return UserRole::OneToOneAssistant;
-            if(role == "OneToOneManager")
-                return UserRole::OneToOneManager;
-            if(role == "SuperAdmin")
-                return UserRole::SuperAdmin;
-            return UserRole::None;
-        }
-
         std::string toString(ResultStatus status)
         {
             switch (status) {
@@ -1716,6 +1736,28 @@ namespace ClassScheduler
                     return "AddOneToOneTaskSuccess";
                 case ClassScheduler::ResultStatus::UpdateOneToOneTaskSuccess:
                     return "UpdateOneToOneTaskSuccess";
+
+                // Feedback
+                case ClassScheduler::ResultStatus::CreateFeedbackSuccess:
+                    return "CreateFeedbackSuccess";
+                case ClassScheduler::ResultStatus::CreateFeedbackFailed:
+                    return "CreateFeedbackFailed";
+                case ClassScheduler::ResultStatus::UpdateFeedbackStatusSuccess:
+                    return "UpdateFeedbackStatusSuccess";
+                case ClassScheduler::ResultStatus::UpdateFeedbackStatusFailed:
+                    return "UpdateFeedbackStatusFailed";
+                case ClassScheduler::ResultStatus::DeleteFeedbackSuccess:
+                    return "DeleteFeedbackSuccess";
+                case ClassScheduler::ResultStatus::DeleteFeedbackFailed:
+                    return "DeleteFeedbackFailed";
+                case ClassScheduler::ResultStatus::GetAllFeedbacksSuccess:
+                    return "GetAllFeedbacksSuccess";
+                case ClassScheduler::ResultStatus::GetAllFeedbacksFailed:
+                    return "GetAllFeedbacksFailed";
+                case ClassScheduler::ResultStatus::LikeFeedbackSuccess:
+                    return "LikeFeedbackSuccess";
+                case ClassScheduler::ResultStatus::LikeFeedbackFailed:
+                    return "LikeFeedbackFailed";
 
                 // Other
                 case ResultStatus::CurlNotOK:

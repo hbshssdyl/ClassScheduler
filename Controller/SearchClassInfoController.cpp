@@ -35,7 +35,7 @@ void SearchClassInfoController::refreshSearchClassInfo()
 
     if(mClassInfosFromDB.size() == 0)
     {
-        cout << "Fail to get class infos from DB" << endl;
+        LOG_INFO("Fail to get class infos from DB");
         return;
     }
 

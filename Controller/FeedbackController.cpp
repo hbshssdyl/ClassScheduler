@@ -23,14 +23,14 @@ void FeedbackController::refreshfeedbackList()
 
     if(mFeedbackInfos.empty())
     {
-        cout << "mFeedbackInfos is empty" << endl;
+        LOG_INFO("mFeedbackInfos is empty");
         return;
     }
 
     QVariantList feedbackAppList;
     QVariantList feedbackCompanyList;
     bool isSupperAdmin = mCoreFramework->getLoginUserInfo().role == UserRole::SuperAdmin;
-    cout << isSupperAdmin << " " << mCoreFramework->getLoginUserInfo().name << endl;
+    LOG_INFO(isSupperAdmin +" " +mCoreFramework->getLoginUserInfo().name);
     CUtils::updatefeedbackInfosList(feedbackAppList, feedbackCompanyList, mFeedbackInfos, isSupperAdmin);
 
     if (mFeedbackAppList != feedbackAppList)
@@ -51,7 +51,7 @@ void FeedbackController::addFeedback(QString feedbackType, QString username, boo
     if(auto feedbackManager = mCoreFramework->getFeedbackManager())
     {
         auto result = feedbackManager->addFeedback(feedbackType.toStdString(), username.toStdString(), isAnonymous, feedbackMessage.toStdString(), dateAndTime.toStdString());
-        cout << "add Feedback: " << result << endl;
+        LOG_INFO("add Feedback: " +result);
         if(result)
         {
             refreshfeedbackList();
@@ -64,7 +64,7 @@ void FeedbackController::likeFeedback(int feedbackId)
     if(auto feedbackManager = mCoreFramework->getFeedbackManager())
     {
         auto result = feedbackManager->likeFeedback(feedbackId);
-        cout << "like Feedback: " << result << endl;
+        LOG_INFO("like Feedback: " +result);
         if(result)
         {
             refreshfeedbackList();
@@ -77,7 +77,7 @@ void FeedbackController::approveFeedback(int feedbackId)
     if(auto feedbackManager = mCoreFramework->getFeedbackManager())
     {
         auto result = feedbackManager->approveFeedback(feedbackId);
-        cout << "approve Feedback: " << result << endl;
+        LOG_INFO("approve Feedback: " +result);
         if(result)
         {
             refreshfeedbackList();
@@ -90,7 +90,7 @@ void FeedbackController::rejectFeedback(int feedbackId)
     if(auto feedbackManager = mCoreFramework->getFeedbackManager())
     {
         auto result = feedbackManager->rejectFeedback(feedbackId);
-        cout << "reject Feedback: " << result << endl;
+        LOG_INFO("reject Feedback: " +result);
         if(result)
         {
             refreshfeedbackList();
@@ -103,7 +103,7 @@ void FeedbackController::deleteFeedback(int feedbackId)
     if(auto feedbackManager = mCoreFramework->getFeedbackManager())
     {
         auto result = feedbackManager->deleteFeedback(feedbackId);
-        cout << "delete Feedback: " << result << endl;
+        LOG_INFO("delete Feedback: " +result);
         if(result)
         {
             refreshfeedbackList();

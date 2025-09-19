@@ -31,17 +31,17 @@ void CoreFramework::initManagers()
 void CoreFramework::saveLoginUserInfo(std::string username)
 {
     auto userInfos = mAccountManager->getUsers();
-    std::cout << "saveLoginUserInfo, userInfos: " << userInfos.size() << std::endl;
+    LOG_INFO("saveLoginUserInfo, userInfos: " +userInfos.size());
     for(auto& userInfo : userInfos)
     {
         if(userInfo.name == username)
         {
             mLoginUserInfo = userInfo;
-            std::cout << "saveLoginUserInfo, username: " << username << std::endl;
+            LOG_INFO("saveLoginUserInfo, username: " +username);
             return;
         }
     }
-    std::cout << "Can not find this user info, username: " << username << std::endl;
+    LOG_INFO("Can not find this user info, username: " +username);
 }
 
 UserInfo CoreFramework::getLoginUserInfo()
@@ -52,15 +52,15 @@ UserInfo CoreFramework::getLoginUserInfo()
 void CoreFramework::initAppData()
 {
     if (!mDataManager || !mNetworkManager) {
-        qWarning() << "DataManager 或 mNetworkManager 为空，无法处理数据";
+        LOG_INFO("DataManager 或 mNetworkManager 为空，无法处理数据");
         return;
     }
 
     // 使用 std::async 异步运行任务
     auto future = std::async(std::launch::async, [this]() {
         auto result = mNetworkManager->downloadDbFile();
-        std::cout << result.statusStr << std::endl;
-        std::cout << result.rawResponse << std::endl;
+        LOG_INFO(result.statusStr);
+        LOG_INFO(result.rawResponse);
         if(result.status == ResultStatus::DatabaseFileDownloadSucess)
         {
             mDataManager->refreshAllDataFromDB();
@@ -69,7 +69,7 @@ void CoreFramework::initAppData()
 
     std::thread([this, future = std::move(future)]() mutable {
         future.wait();
-        std::cout << "initAppData 数据初始化完成" << std::endl;
+        LOG_INFO("initAppData 数据初始化完成");
     }).detach();
 }
 

@@ -489,7 +489,7 @@ ResponseResult NetworkManager::downloadDbFile() {
         result.statusStr = result.toString(ResultStatus::CreateDatabaseFileFailed);
         return result;
     }
-    std::cout << "test: " << DATABASE_FULL_PATH.toStdString() << std::endl;
+    LOG_INFO("test: " +DATABASE_FULL_PATH.toStdString());
 
     curl = curl_easy_init();
     if (curl) {
@@ -665,7 +665,7 @@ ResponseResult NetworkManager::getAllOneToOneTasks() {
         if (res != CURLE_OK) {
             result.rawResponse = curl_easy_strerror(res);
         } else {
-            std::cout << responseStr << std::endl;
+            LOG_INFO(responseStr);
             result.refreshResult(responseStr);
         }
 
@@ -695,7 +695,7 @@ ResponseResult NetworkManager::getOneToOneTaskById(int taskId) {
         if (res != CURLE_OK) {
             result.rawResponse = curl_easy_strerror(res);
         } else {
-            std::cout << "Response: " << responseStr << std::endl;
+            LOG_INFO("Response: " +responseStr);
             result.refreshResult(responseStr);
         }
 
@@ -728,7 +728,7 @@ ResponseResult NetworkManager::createFeedback(const FeedbackCreateReq& req) {
         {"dateAndTime",    req.dateAndTime}
     };
 
-    std::cout << req.dateAndTime.value() << std::endl;
+    LOG_INFO(req.dateAndTime.value());
 
     if (req.feedbackUsername && !req.feedbackUsername->empty())
         payload["feedbackUsername"] = *req.feedbackUsername;

@@ -122,6 +122,8 @@ qt_add_qml_module(appClassScheduler
     SOURCES Managers/FeedbackManager.cpp
     SOURCES Managers/AccountManager.h
     SOURCES Managers/AccountManager.cpp
+    SOURCES Managers/Logger.cpp
+    SOURCES Managers/Logger.h
 
     # 资源文件
     RESOURCES Resource/Avatar-self.jpg

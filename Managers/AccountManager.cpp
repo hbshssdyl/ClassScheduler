@@ -30,7 +30,7 @@ UserInfos AccountManager::getUsersFromServer()
         if(auto networkManager = coreFramework->getNetworkManager())
         {
             auto response = networkManager->getAllUsersRequest();
-            std::cout << response.rawResponse << std::endl;
+            LOG_INFO(response.rawResponse);
             if(response.status == ResultStatus::GetAllUsersSuccess)
             {
                 return response.userInfos;
@@ -38,7 +38,7 @@ UserInfos AccountManager::getUsersFromServer()
             return {};
         }
     }
-    std::cout << "no coreFramework or no networkManager" << std::endl;
+    LOG_INFO("no coreFramework or no networkManager");
     return {};
 }
 
@@ -48,16 +48,16 @@ bool AccountManager::approveUser(int userId)
     {
         if(auto networkManager = coreFramework->getNetworkManager())
         {
-            std::cout << "Users size: " << mUsers.size() << std::endl;
+            LOG_INFO("Users size: " + std::to_string(mUsers.size()));
             for(auto& user : mUsers)
             {
-                std::cout << "user.id: " << user.id << ", userId: " << userId << ", user.accountStatus: " << user.accountStatus << std::endl;
+                LOG_INFO("user.id: " + std::to_string(user.id) +", userId: " + std::to_string(userId) +", user.accountStatus: " +user.accountStatus);
                 if(user.id == userId && user.accountStatus == toAccountStatus(AccountStatus::REGISTERED))
                 {
                     user.accountStatus = toAccountStatus(AccountStatus::APPROVED);
                     auto result = networkManager->approveUserRequest(userId);
-                    std::cout << result.statusStr << std::endl;
-                    std::cout << result.rawResponse << std::endl;
+                    LOG_INFO(result.statusStr);
+                    LOG_INFO(result.rawResponse);
                     if(result.status == ResultStatus::ApproveUserSuccess)
                     {
                         return true;
@@ -75,16 +75,16 @@ bool AccountManager::rejectUser(int userId)
     {
         if(auto networkManager = coreFramework->getNetworkManager())
         {
-            std::cout << "Users size: " << mUsers.size() << std::endl;
+            LOG_INFO("Users size: " +std::to_string(mUsers.size()));
             for(auto& user : mUsers)
             {
-                std::cout << "user.id: " << user.id << ", userId: " << userId << ", user.accountStatus: " << user.accountStatus << std::endl;
+                LOG_INFO("user.id: " + std::to_string(user.id) +", userId: " + std::to_string(userId) +", user.accountStatus: " +user.accountStatus);
                 if(user.id == userId && user.accountStatus == toAccountStatus(AccountStatus::REGISTERED))
                 {
                     user.accountStatus = toAccountStatus(AccountStatus::REJECTED);
                     auto result = networkManager->rejectUserRequest(userId);
-                    std::cout << result.statusStr << std::endl;
-                    std::cout << result.rawResponse << std::endl;
+                    LOG_INFO(result.statusStr);
+                    LOG_INFO(result.rawResponse);
                     if(result.status == ResultStatus::RejectUserSuccess)
                     {
                         return true;
@@ -102,16 +102,16 @@ bool AccountManager::blacklistUser(int userId)
     {
         if(auto networkManager = coreFramework->getNetworkManager())
         {
-            std::cout << "Users size: " << mUsers.size() << std::endl;
+            LOG_INFO("Users size: " +std::to_string(mUsers.size()));
             for(auto& user : mUsers)
             {
-                std::cout << "user.id: " << user.id << ", userId: " << userId << ", user.accountStatus: " << user.accountStatus << std::endl;
+                LOG_INFO("user.id: " + std::to_string(user.id) +", userId: " + std::to_string(userId) +", user.accountStatus: " +user.accountStatus);
                 if(user.id == userId && user.accountStatus == toAccountStatus(AccountStatus::APPROVED))
                 {
                     user.accountStatus = toAccountStatus(AccountStatus::BLACKLISTED);
                     auto result = networkManager->blacklistUserRequest(userId);
-                    std::cout << result.statusStr << std::endl;
-                    std::cout << result.rawResponse << std::endl;
+                    LOG_INFO(result.statusStr);
+                    LOG_INFO(result.rawResponse);
                     if(result.status == ResultStatus::BlacklistUserSuccess)
                     {
                         return true;
@@ -129,15 +129,15 @@ bool AccountManager::deleteUser(int userId)
     {
         if(auto networkManager = coreFramework->getNetworkManager())
         {
-            std::cout << "Users size: " << mUsers.size() << std::endl;
+            LOG_INFO("Users size: " +std::to_string(mUsers.size()));
             for(auto& user : mUsers)
             {
-                std::cout << "user.id: " << user.id << ", userId: " << userId << ", user.accountStatus: " << user.accountStatus << std::endl;
+                LOG_INFO("user.id: " + std::to_string(user.id) +", userId: " + std::to_string(userId) +", user.accountStatus: " +user.accountStatus);
                 if(user.id == userId && (user.accountStatus == toAccountStatus(AccountStatus::APPROVED) || user.accountStatus == toAccountStatus(AccountStatus::BLACKLISTED)))
                 {
                     auto result = networkManager->deleteUserRequest(userId);
-                    std::cout << result.statusStr << std::endl;
-                    std::cout << result.rawResponse << std::endl;
+                    LOG_INFO(result.statusStr);
+                    LOG_INFO(result.rawResponse);
                     if(result.status == ResultStatus::DeleteUserSuccess)
                     {
                         initUsers();
@@ -157,8 +157,8 @@ bool AccountManager::addUser(std::string username, std::string password, std::st
         if(auto networkManager = coreFramework->getNetworkManager())
         {
             auto result = networkManager->addUserRequest(username, password, email, role);
-            std::cout << result.statusStr << std::endl;
-            std::cout << result.rawResponse << std::endl;
+            LOG_INFO(result.statusStr);
+            LOG_INFO(result.rawResponse);
             if(result.status == ResultStatus::AddUserSuccess)
             {
                 initUsers();

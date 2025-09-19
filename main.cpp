@@ -3,6 +3,7 @@
 #include <QQuickStyle>
 #include "Controller/Controller.h"
 #include "Utils/ControllerUtils.h"
+#include "Managers/Logger.h"
 
 void initQmlComponent()
 {
@@ -18,7 +19,7 @@ void initQmlComponent()
     //     std::string qml = qmlFile.substr(qmlFile.rfind(".")); // .qml
     //     std::string qmlName = qmlFile.substr(qmlFile.rfind("/") + 1); // WelcomePage.qml
     //     std::string qmlType = qmlName.substr(0, qmlName.length() - qml.length()); // WelcomePage
-    //     cout << qmlPathName << " " << qmlType << endl;
+    //     LOG_INFO(qmlPathName +" " +qmlType);
     //     qmlRegisterType(QUrl(QString("qrc:/Qml/%1").arg(QString::fromStdString(qmlPathName))), "ClassScheduler", 1, 0, qmlType.c_str());
     // }
 }
@@ -49,8 +50,10 @@ int main(int argc, char *argv[])
         Qt::QueuedConnection);
     engine.loadFromModule("ClassScheduler", "Main");
 
-    // auto controller = engine.rootObjects().at(0)->findChild<Controller *>("controller");
-    // controller->initialize();
+    Logger::instance().init("logs/application.log", LOG_INFO, LOG_DEBUG);
+    // 更改日志级别
+    Logger::instance().setConsoleLogLevel(LOG_DEBUG);
+    LOG_DEBUG("现在调试信息也会显示在控制台");
 
     return app.exec();
 }

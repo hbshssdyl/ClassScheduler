@@ -36,7 +36,7 @@ void SearchStudentInfoController::refreshSearchStudentInfo()
 
     if(mStudentInfosFromDB.size() == 0)
     {
-        cout << "Fail to get teacher infos from DB" << endl;
+        LOG_INFO("Fail to get teacher infos from DB");
     }
 
     updateStudentInfosList(mStudentInfosFromDB);

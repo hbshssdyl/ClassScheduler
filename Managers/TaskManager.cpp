@@ -8,19 +8,19 @@
 void printTasks(const std::vector<Task>& tasks) {
     for (size_t i = 0; i < tasks.size(); ++i) {
         const auto& task = tasks[i];
-        std::cout << "任务 " << (i + 1) << ":\n";
-        std::cout << " 标题: " << task.title << "\n";
-        std::cout << " 类别: " << task.category << "\n";
-        std::cout << " 描述: " << task.description << "\n";
-        std::cout << " 发布日期: " << task.publish << "\n";
-        std::cout << " 截止日期: " << task.due << "\n";
-        std::cout << " 评级: " << task.rating << "\n";
-        std::cout << " 完成状态: " << task.finishStatus << "\n";
-        std::cout << " 评论: " << (task.comment.empty() ? "无" : task.comment) << "\n";
-        std::cout << " 审核字符串: " << (task.reviewString.empty() ? "无" : task.reviewString) << "\n";
-        std::cout << " 结果评级: " << (task.resultRating.empty() ? "无" : task.resultRating) << "\n";
-        std::cout << " 审核状态: " << task.reviewStatus << "\n";
-        std::cout << "----------------------------------------\n";
+        LOG_INFO("任务 " + std::to_string(i + 1));
+        LOG_INFO(" 标题: " +task.title);
+        LOG_INFO(" 类别: " +task.category);
+        LOG_INFO(" 描述: " +task.description);
+        LOG_INFO(" 发布日期: " +task.publish);
+        LOG_INFO(" 截止日期: " +task.due);
+        LOG_INFO(" 评级: " +task.rating);
+        LOG_INFO(" 完成状态: " +task.finishStatus);
+        LOG_INFO(" 评论: " +(task.comment.empty() ? "无" : task.comment));
+        LOG_INFO(" 审核字符串: " +(task.reviewString.empty() ? "无" : task.reviewString));
+        LOG_INFO(" 结果评级: " +(task.resultRating.empty() ? "无" : task.resultRating));
+        LOG_INFO(" 审核状态: " +task.reviewStatus);
+        LOG_INFO("----------------------------------------");
     }
 }
 
@@ -56,7 +56,7 @@ void TaskManager::initDailyTasks()
     bool needNewDailyTasks = true;
     for(auto& task : mTasks)
     {
-        //std::cout << task.publish << " " << data << std::endl;
+        //LOG_INFO(task.publish +" " +data);
         if(task.publish == data && task.category == "今日")
         {
             needNewDailyTasks = false;
@@ -69,8 +69,8 @@ void TaskManager::initDailyTasks()
         for(auto& dailyTask : dailyTasks)
         {
             auto result = networkManager->createOneToOneTask(dailyTask);
-            std::cout << result.statusStr << std::endl;
-            std::cout << result.rawResponse << std::endl;
+            LOG_INFO(result.statusStr);
+            LOG_INFO(result.rawResponse);
             if(result.status == ResultStatus::AddOneToOneTaskSuccess)
             {
                 dailyTask.id = result.taskId;
@@ -80,7 +80,7 @@ void TaskManager::initDailyTasks()
     }
     else
     {
-        std::cout << "Daily tasks already exist" << std::endl;
+        LOG_INFO("Daily tasks already exist");
     }
 }
 
@@ -92,7 +92,7 @@ void TaskManager::initWeeklyTasks()
     bool needNewWeeklyTasks = true;
     for(auto& task : mTasks)
     {
-        //std::cout << task.publish << " " << weekStart << std::endl;
+        //LOG_INFO(task.publish +" " +weekStart);
         if(task.publish == weekStart && task.category == "本周")
         {
             needNewWeeklyTasks = false;
@@ -105,8 +105,8 @@ void TaskManager::initWeeklyTasks()
         for(auto& weeklyTask : weeklyTasks)
         {
             auto result = networkManager->createOneToOneTask(weeklyTask);
-            std::cout << result.statusStr << std::endl;
-            std::cout << result.rawResponse << std::endl;
+            LOG_INFO(result.statusStr);
+            LOG_INFO(result.rawResponse);
             if(result.status == ResultStatus::AddOneToOneTaskSuccess)
             {
                 weeklyTask.id = result.taskId;
@@ -116,7 +116,7 @@ void TaskManager::initWeeklyTasks()
     }
     else
     {
-        std::cout << "Weekly tasks already exist" << std::endl;
+        LOG_INFO("Weekly tasks already exist");
     }
 }
 
@@ -128,7 +128,7 @@ void TaskManager::initMonthlyTasks()
     bool needNewMonthlyTasks = true;
     for(auto& task : mTasks)
     {
-        //std::cout << task.publish << " " << monthStart << std::endl;
+        //LOG_INFO(task.publish +" " +monthStart);
         if(task.publish == monthStart && task.category == "本月")
         {
             needNewMonthlyTasks = false;
@@ -141,8 +141,8 @@ void TaskManager::initMonthlyTasks()
         for(auto& monthlyTask : monthlyTasks)
         {
             auto result = networkManager->createOneToOneTask(monthlyTask);
-            std::cout << result.statusStr << std::endl;
-            std::cout << result.rawResponse << std::endl;
+            LOG_INFO(result.statusStr);
+            LOG_INFO(result.rawResponse);
             if(result.status == ResultStatus::AddOneToOneTaskSuccess)
             {
                 monthlyTask.id = result.taskId;
@@ -152,7 +152,7 @@ void TaskManager::initMonthlyTasks()
     }
     else
     {
-        std::cout << "Monthly tasks already exist" << std::endl;
+        LOG_INFO("Monthly tasks already exist");
     }
 }
 
@@ -174,14 +174,14 @@ bool TaskManager::updateTaskFinishStatus(int taskId, std::string commentString)
     auto networkManager = coreFramework->getNetworkManager();
     for(auto& task : mTasks)
     {
-        std::cout << "taskId: " << taskId << "task.id: " << task.id << std::endl;
+        LOG_INFO("taskId: " + std::to_string(taskId) + "task.id: " + std::to_string(task.id));
         if(task.id == taskId)
         {
             task.comment = commentString;
             task.finishStatus = "已完成";
             auto result = networkManager->updateOneToOneTask(task.id, task);
-            std::cout << result.statusStr << std::endl;
-            std::cout << result.rawResponse << std::endl;
+            LOG_INFO(result.statusStr);
+            LOG_INFO(result.rawResponse);
             if(result.status == ResultStatus::UpdateOneToOneTaskSuccess)
             {
                 return true;
@@ -197,15 +197,15 @@ bool TaskManager::updateTaskReviewStatus(int taskId, std::string resultRating, s
     auto networkManager = coreFramework->getNetworkManager();
     for(auto& task : mTasks)
     {
-        std::cout << "taskId: " << taskId << "task.id: " << task.id << std::endl;
+        LOG_INFO("taskId: " + std::to_string(taskId) +"task.id: " + std::to_string(task.id));
         if(task.id == taskId)
         {
             task.resultRating = resultRating;
             task.reviewString = reviewString;
             task.reviewStatus = "已审核";
             auto result = networkManager->updateOneToOneTask(task.id, task);
-            std::cout << result.statusStr << std::endl;
-            std::cout << result.rawResponse << std::endl;
+            LOG_INFO(result.statusStr);
+            LOG_INFO(result.rawResponse);
             if(result.status == ResultStatus::UpdateOneToOneTaskSuccess)
             {
                 return true;
@@ -220,8 +220,8 @@ bool TaskManager::addTask(Task task)
     auto coreFramework = mCoreFramework.lock();
     auto networkManager = coreFramework->getNetworkManager();
     auto result = networkManager->createOneToOneTask(task);
-    std::cout << result.statusStr << std::endl;
-    std::cout << result.rawResponse << std::endl;
+    LOG_INFO(result.statusStr);
+    LOG_INFO(result.rawResponse);
     if(result.status == ResultStatus::AddOneToOneTaskSuccess)
     {
         mTasks.emplace_back(task);
@@ -241,11 +241,11 @@ Tasks TaskManager::getTaskFromServer()
             {
                 return response.oneToOneTasks;
             }
-            std::cout << response.rawResponse << std::endl;
+            LOG_INFO(response.rawResponse);
             return {};
         }
     }
-    std::cout << "no coreFramework or no networkManager" << std::endl;
+    LOG_INFO("no coreFramework or no networkManager");
     return {};
 }
 

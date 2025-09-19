@@ -53,7 +53,7 @@ void AccountViewController::approveAccount(int accountId)
     if(auto accountManager = mCoreFramework->getAccountManager())
     {
         auto result = accountManager->approveUser(accountId);
-        cout << "approve account: " << result << endl;
+        LOG_INFO("approve account: " +result);
         if(result)
         {
             refreshAccountList();
@@ -66,7 +66,7 @@ void AccountViewController::rejectAccount(int accountId)
     if(auto accountManager = mCoreFramework->getAccountManager())
     {
         auto result = accountManager->rejectUser(accountId);
-        cout << "reject account: " << result << endl;
+        LOG_INFO("reject account: " +result);
         if(result)
         {
             refreshAccountList();
@@ -79,7 +79,7 @@ void AccountViewController::blacklistAccount(int accountId)
     if(auto accountManager = mCoreFramework->getAccountManager())
     {
         auto result = accountManager->blacklistUser(accountId);
-        cout << "blacklist account: " << result << endl;
+        LOG_INFO("blacklist account: " +result);
         if(result)
         {
             refreshAccountList();
@@ -92,7 +92,7 @@ void AccountViewController::deleteAccount(int accountId)
     if(auto accountManager = mCoreFramework->getAccountManager())
     {
         auto result = accountManager->deleteUser(accountId);
-        cout << "delete account: " << result << endl;
+        LOG_INFO("delete account: " +result);
         if(result)
         {
             refreshAccountList();
@@ -105,7 +105,7 @@ void AccountViewController::addAccount(QString username, QString password, QStri
     if(auto accountManager = mCoreFramework->getAccountManager())
     {
         auto result = accountManager->addUser(username.toStdString(), password.toStdString(), email.toStdString(), role.toStdString());
-        cout << "add account: " << result << endl;
+        LOG_INFO("add account: " +result);
         if(result)
         {
             refreshAccountList();

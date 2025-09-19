@@ -41,7 +41,7 @@ void TaskController::onTaskFinished(int taskId, QString commentString)
     if(auto taskManager = mCoreFramework->getTaskManager())
     {
         auto result = taskManager->updateTaskFinishStatus(taskId, commentString.toStdString());
-        std::cout << "Update task finish status: " << result << endl;
+        LOG_INFO("Update task finish status: " +result);
         if(result)
         {
             refreshTaskList();
@@ -54,7 +54,7 @@ void TaskController::onTaskReviewed(int taskId, QString resultRating, QString re
     if(auto taskManager = mCoreFramework->getTaskManager())
     {
         auto result = taskManager->updateTaskReviewStatus(taskId, resultRating.toStdString(), reviewString.toStdString());
-        std::cout << "Update task finish status: " << result << endl;
+        LOG_INFO("Update task finish status: " +result);
         if(result)
         {
             refreshTaskList();

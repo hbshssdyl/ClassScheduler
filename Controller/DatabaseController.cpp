@@ -33,10 +33,10 @@ void DatabaseController::onFileUploaded(QString filePath)
     if(dataManager && networkManager)
     {
         auto dataFilePath = QUrl(filePath).toLocalFile();
-        std::cout << "filePath: " << dataFilePath.toStdString() << std::endl;
+        LOG_INFO("filePath: " +dataFilePath.toStdString());
         if(dataFilePath.isEmpty())
         {
-            qWarning() << "filePath 为空，无法处理文件：" << dataFilePath;
+            LOG_INFO("filePath 为空，无法处理文件：" +dataFilePath.toStdString());
             emit refreshDatabaseFinished();
             return;
         }
@@ -45,7 +45,7 @@ void DatabaseController::onFileUploaded(QString filePath)
         QFuture<void> future = QtConcurrent::run([this, dataManager, dataFilePath]() {
             if(dataManager->refreshAllDataFromFile(dataFilePath))
             {
-                std::cout << "Refresh DB data by excel file" << std::endl;
+                LOG_INFO("Refresh DB data by excel file");
             }
         });
 
@@ -53,8 +53,8 @@ void DatabaseController::onFileUploaded(QString filePath)
         disconnect(&mFutureWatcher, nullptr, this, nullptr);
         connect(&mFutureWatcher, &QFutureWatcher<void>::finished, this, [this, networkManager]() {
             auto result = networkManager->uploadDbFile();
-            std::cout << result.statusStr << std::endl;
-            std::cout << result.rawResponse << std::endl;
+            LOG_INFO(result.statusStr);
+            LOG_INFO(result.rawResponse);
             refreshDataCount();
             emit refreshDatabaseFinished();
         });
@@ -64,7 +64,7 @@ void DatabaseController::onFileUploaded(QString filePath)
     }
     else
     {
-        qWarning() << "DataManager 或 NetworkManager 为空，无法处理文件：" << filePath;
+        LOG_INFO("DataManager 或 NetworkManager 为空，无法处理文件：" +filePath.toStdString());
         emit refreshDatabaseFinished();
     }
 

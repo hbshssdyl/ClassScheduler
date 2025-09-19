@@ -24,13 +24,13 @@ void FeedbackManager::initFeedbackInfos()
 
 FeedbackInfos FeedbackManager::getFeedbacksFromServer()
 {
-    std::cout << "getFeedbacksFromServer " << std::endl;
+    LOG_INFO("getFeedbacksFromServer ");
     if(auto coreFramework = mCoreFramework.lock())
     {
         if(auto networkManager = coreFramework->getNetworkManager())
         {
             auto response = networkManager->getAllFeedbacks();
-            std::cout << response.rawResponse << std::endl;
+            LOG_INFO(response.rawResponse);
             if(response.status == ResultStatus::GetAllFeedbacksSuccess)
             {
                 return response.feedbackInfos;
@@ -38,7 +38,7 @@ FeedbackInfos FeedbackManager::getFeedbacksFromServer()
             return {};
         }
     }
-    std::cout << "no coreFramework or no networkManager" << std::endl;
+    LOG_INFO("no coreFramework or no networkManager");
     return {};
 }
 
@@ -59,8 +59,8 @@ bool FeedbackManager::addFeedback(std::string feedbackType, std::string username
             requestInfo.realEmail = loginUserInfo.email;
 
             auto result = networkManager->createFeedback(requestInfo);
-            std::cout << result.statusStr << std::endl;
-            std::cout << result.rawResponse << std::endl;
+            LOG_INFO(result.statusStr);
+            LOG_INFO(result.rawResponse);
             if(result.status == ResultStatus::CreateFeedbackSuccess)
             {
                 initFeedbackInfos();
@@ -77,15 +77,15 @@ bool FeedbackManager::likeFeedback(int feedbackId)
     {
         if(auto networkManager = coreFramework->getNetworkManager())
         {
-            std::cout << "FeedbackInfos size: " << mFeedbackInfos.size() << std::endl;
+            LOG_INFO("FeedbackInfos size: " + std::to_string(mFeedbackInfos.size()));
             for(auto& feedbackInfo : mFeedbackInfos)
             {
-                std::cout << "feedbackInfos.id: " << feedbackInfo.id << ", feedbackId: " << feedbackId << ", feedbackInfos.Status: " << to_string(feedbackInfo.feedbackStatus) << std::endl;
+                LOG_INFO("feedbackInfos.id: " +std::to_string(feedbackInfo.id) +", feedbackId: " + std::to_string(feedbackId) +", feedbackInfos.Status: " +to_string(feedbackInfo.feedbackStatus));
                 if(feedbackInfo.id == feedbackId && feedbackInfo.feedbackStatus == FeedbackStatus::Approved)
                 {
                     auto result = networkManager->likeFeedback(feedbackId);
-                    std::cout << result.statusStr << std::endl;
-                    std::cout << result.rawResponse << std::endl;
+                    LOG_INFO(result.statusStr);
+                    LOG_INFO(result.rawResponse);
                     if(result.status == ResultStatus::LikeFeedbackSuccess)
                     {
                         feedbackInfo.likeCount = feedbackInfo.likeCount + 1;
@@ -104,18 +104,18 @@ bool FeedbackManager::approveFeedback(int feedbackId)
     {
         if(auto networkManager = coreFramework->getNetworkManager())
         {
-            std::cout << "FeedbackInfos size: " << mFeedbackInfos.size() << std::endl;
+            LOG_INFO("FeedbackInfos size: " + std::to_string(mFeedbackInfos.size()));
             for(auto& feedbackInfo : mFeedbackInfos)
             {
-                std::cout << "feedbackInfos.id: " << feedbackInfo.id << ", feedbackId: " << feedbackId << ", feedbackInfos.Status: " << to_string(feedbackInfo.feedbackStatus) << std::endl;
+                LOG_INFO("feedbackInfos.id: " +std::to_string(feedbackInfo.id) +", feedbackId: " +std::to_string(feedbackId) +", feedbackInfos.Status: " +to_string(feedbackInfo.feedbackStatus));
                 if(feedbackInfo.id == feedbackId && feedbackInfo.feedbackStatus == FeedbackStatus::Submitted)
                 {
                     FeedbackUpdateStatusReq requestInfo;
                     requestInfo.id = feedbackId;
                     requestInfo.newStatus = FeedbackStatus::Approved;
                     auto result = networkManager->updateFeedbackStatus(requestInfo);
-                    std::cout << result.statusStr << std::endl;
-                    std::cout << result.rawResponse << std::endl;
+                    LOG_INFO(result.statusStr);
+                    LOG_INFO(result.rawResponse);
                     if(result.status == ResultStatus::UpdateFeedbackStatusSuccess)
                     {
                         feedbackInfo.feedbackStatus = FeedbackStatus::Approved;
@@ -134,18 +134,18 @@ bool FeedbackManager::rejectFeedback(int feedbackId)
     {
         if(auto networkManager = coreFramework->getNetworkManager())
         {
-            std::cout << "FeedbackInfos size: " << mFeedbackInfos.size() << std::endl;
+            LOG_INFO("FeedbackInfos size: " + std::to_string(mFeedbackInfos.size()));
             for(auto& feedbackInfo : mFeedbackInfos)
             {
-                std::cout << "feedbackInfos.id: " << feedbackInfo.id << ", feedbackId: " << feedbackId << ", feedbackInfos.Status: " << to_string(feedbackInfo.feedbackStatus) << std::endl;
+                LOG_INFO("feedbackInfos.id: " +std::to_string(feedbackInfo.id) +", feedbackId: " + std::to_string(feedbackId) +", feedbackInfos.Status: " +to_string(feedbackInfo.feedbackStatus));
                 if(feedbackInfo.id == feedbackId && feedbackInfo.feedbackStatus == FeedbackStatus::Submitted)
                 {
                     FeedbackUpdateStatusReq requestInfo;
                     requestInfo.id = feedbackId;
                     requestInfo.newStatus = FeedbackStatus::Rejected;
                     auto result = networkManager->updateFeedbackStatus(requestInfo);
-                    std::cout << result.statusStr << std::endl;
-                    std::cout << result.rawResponse << std::endl;
+                    LOG_INFO(result.statusStr);
+                    LOG_INFO(result.rawResponse);
                     if(result.status == ResultStatus::UpdateFeedbackStatusSuccess)
                     {
                         feedbackInfo.feedbackStatus = FeedbackStatus::Rejected;
@@ -164,15 +164,15 @@ bool FeedbackManager::deleteFeedback(int feedbackId)
     {
         if(auto networkManager = coreFramework->getNetworkManager())
         {
-            std::cout << "FeedbackInfos size: " << mFeedbackInfos.size() << std::endl;
+            LOG_INFO("FeedbackInfos size: " + std::to_string(mFeedbackInfos.size()));
             for(auto& feedbackInfo : mFeedbackInfos)
             {
-                std::cout << "feedbackInfos.id: " << feedbackInfo.id << ", feedbackId: " << feedbackId << ", feedbackInfos.Status: " << to_string(feedbackInfo.feedbackStatus) << std::endl;
+                LOG_INFO("feedbackInfos.id: " +std::to_string(feedbackInfo.id) +", feedbackId: " + std::to_string(feedbackId) +", feedbackInfos.Status: " +to_string(feedbackInfo.feedbackStatus));
                 if(feedbackInfo.id == feedbackId)
                 {
                     auto result = networkManager->deleteFeedback(feedbackId);
-                    std::cout << result.statusStr << std::endl;
-                    std::cout << result.rawResponse << std::endl;
+                    LOG_INFO(result.statusStr);
+                    LOG_INFO(result.rawResponse);
                     if(result.status == ResultStatus::DeleteFeedbackSuccess)
                     {
                         initFeedbackInfos();

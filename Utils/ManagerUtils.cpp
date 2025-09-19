@@ -3,6 +3,7 @@
 #include <iomanip>
 #include <sstream>
 #include <string>
+#include "Managers/Logger.h"
 
 namespace ClassScheduler
 {

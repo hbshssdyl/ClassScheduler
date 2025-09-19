@@ -73,7 +73,7 @@ void Controller::refreshOperateMode(OperateMode mode)
 
 void Controller::onOperateModeSelected(OperateMode mode)
 {
-    cout << "当前选中的mod: " << CUtils::toString(mode).toStdString() << endl;
+    LOG_INFO("当前选中的mod: " +CUtils::toString(mode).toStdString());
     refreshOperateMode(mode);
 
     QVariantList newActionItemsList;
@@ -96,8 +96,8 @@ void Controller::onTryToRegister(QString email, QString username, QString passwo
     // if(auto networkManager = mCoreFramework->getNetworkManager())
     // {
     //     auto result = networkManager->sendRegisterRequest(email.toStdString(), username.toStdString(), password.toStdString(), role.toStdString());
-    //     cout << result.statusStr << endl;
-    //     cout << result.rawResponse << endl;
+    //     LOG_INFO(result.statusStr);
+    //     LOG_INFO(result.rawResponse);
     //     emit registerOrLoginResult(QString::fromStdString(result.statusStr));
     // }
     ResponseResult result;
@@ -136,8 +136,8 @@ void Controller::onTryToLogin(QString login, QString password)
 
     // auto result = mNetworkManager->sendLoginRequest(login.toStdString(), password.toStdString());
 
-    // cout << result.statusStr << endl;
-    // cout << result.rawResponse << endl;
+    // LOG_INFO(result.statusStr);
+    // LOG_INFO(result.rawResponse);
 
     ResponseResult result;
     result.username = "Dylandu";

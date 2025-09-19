@@ -10,6 +10,7 @@
 #include <algorithm>
 #include <iostream>
 #include <nlohmann/json.hpp>
+#include "Managers/Logger.h"
 
 namespace ClassScheduler
 {
@@ -290,21 +291,22 @@ namespace ClassScheduler
             finishStatus(fs), comment(cm), reviewString(rs), resultRating(rr), reviewStatus(rv) {}
 
         void print() const {
-            std::cerr << "Task Details:\n";
-            std::cerr << std::setw(15) << std::left << "ID: " << id << "\n";
-            std::cerr << std::setw(15) << "Title: " << title << "\n";
-            std::cerr << std::setw(15) << "Category: " << category << "\n";
-            std::cerr << std::setw(15) << "Description: " << description << "\n";
-            std::cerr << std::setw(15) << "Publish Date: " << publish << "\n";
-            std::cerr << std::setw(15) << "Due Date: " << due << "\n";
-            std::cerr << std::setw(15) << "Rating: " << rating << "\n";
-            std::cerr << std::setw(15) << "Status: " << finishStatus << "\n";
-            std::cerr << std::setw(15) << "Comment: " << comment << "\n";
-            std::cerr << std::setw(15) << "Review: " << reviewString << "\n";
-            std::cerr << std::setw(15) << "Result Rating: " << resultRating << "\n";
-            std::cerr << std::setw(15) << "Review Status: " << reviewStatus << "\n";
-            std::cerr << std::setw(15) << "Is Overdue: " << (isOverdue ? "Yes" : "No") << "\n";
-            std::cerr << "-----------------------------\n";
+            LOG_INFO("Task Details:\n");
+            LOG_INFO("ID: " + std::to_string(id));
+            LOG_INFO("Title: " +title);
+            LOG_INFO("Category: " +category);
+            LOG_INFO("Description: " +description);
+            LOG_INFO("Publish Date: " +publish);
+            LOG_INFO("Due Date: " +due);
+            LOG_INFO("Rating: " +rating);
+            LOG_INFO("Status: " +finishStatus);
+            LOG_INFO("Comment: " +comment);
+            LOG_INFO("Review: " +reviewString);
+            LOG_INFO("Result Rating: " +resultRating);
+            LOG_INFO("Review Status: " +reviewStatus);
+            std::string isOverDue = (isOverdue ? "Yes" : "No");
+            LOG_INFO("Is Overdue: " + isOverDue);
+            LOG_INFO("-----------------------------\n");
         }
     };
     using Tasks = std::vector<Task>;
@@ -407,7 +409,7 @@ namespace ClassScheduler
             // 检查日期格式是否正确（yyyy-MM）
             if (minYearMonth.length() != 7 || maxYearMonth.length() != 7 ||
                 minYearMonth[4] != '-' || maxYearMonth[4] != '-') {
-                qWarning() << "Invalid date format! Expected yyyy-MM." << minYearMonth << ", " << maxYearMonth;
+                LOG_INFO("Invalid date format! Expected yyyy-MM." +minYearMonth.toStdString() +", " +maxYearMonth.toStdString());
                 return;
             }
 
@@ -416,7 +418,7 @@ namespace ClassScheduler
 
             // 检查日期是否有效
             if (!minDate.isValid() || !maxDate.isValid()) {
-                qWarning() << "Invalid date range! minDate:" << minDate << "maxDate:" << maxDate;
+                //LOG_INFO("Invalid date range! minDate:" +minDate +"maxDate:" +maxDate);
                 return;
             }
 
@@ -444,7 +446,7 @@ namespace ClassScheduler
 
                 QDate nextDate = currentDate.addMonths(1);
                 if (!nextDate.isValid() || nextDate <= currentDate) {
-                    qWarning() << "Failed to move to next month! currentDate:" << currentDate;
+                    //LOG_INFO("Failed to move to next month! currentDate:" +currentDate);
                     break;
                 }
                 currentDate = nextDate;
@@ -1293,7 +1295,7 @@ namespace ClassScheduler
 
         void refreshResult(std::string response)
         {
-            //std::cout << response << std::endl;
+            //LOG_INFO(response);
             rawResponse = response;
 
             // Login cases

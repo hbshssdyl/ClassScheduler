@@ -15,14 +15,14 @@ bool DataManager::createDBConnection(bool shouldDeleteOldDb)
 
     if (shouldDeleteOldDb && QFile::exists(DATABASE_FULL_PATH)) {
         QFile::remove(DATABASE_FULL_PATH);
-        qDebug() << "Old database deleted.";
+        LOG_INFO("Old database deleted.");
     }
 
     QSqlDatabase::removeDatabase(QSqlDatabase::defaultConnection);
     mDB = QSqlDatabase::addDatabase("QSQLITE");
     mDB.setDatabaseName(DATABASE_FULL_PATH);
     if (!mDB.open()) {
-        std::cout << "Failed to connect database." << std::endl;
+        LOG_INFO("Failed to connect database.");
         return false;
     }
     init();
@@ -41,7 +41,7 @@ bool DataManager::init()
 
     // readAllSettings();
 
-    // std::cout << "DataManager init: " << ret << std::endl;
+    // LOG_INFO("DataManager init: " +ret);
     return ret;
 }
 
@@ -58,19 +58,19 @@ void DataManager::closeDBConnection()
     // 第三步：移除连接
     QSqlDatabase::removeDatabase(connectionName);
 
-    qDebug() << "Database connection closed and removed:" << connectionName;
+    LOG_INFO("Database connection closed and removed:" + connectionName.toStdString());
 }
 
 int DataManager::getTableDataCount(QString tableName)
 {
     if(mDataCount.count(tableName) == 1)
     {
-        std::cout << "table is exist, table name: " << tableName.toStdString() << ", count: " << mDataCount[tableName] << std::endl;
+        LOG_INFO("table is exist, table name: " +tableName.toStdString() +", count: " + std::to_string(mDataCount[tableName]));
         return mDataCount[tableName];
     }
     else
     {
-        std::cout << "table is not exist, table name: " << tableName.toStdString() << std::endl;
+        LOG_INFO("table is not exist, table name: " +tableName.toStdString());
     }
     return 0;
 }
@@ -100,7 +100,7 @@ bool DataManager::createClassInfosTable()
                           "payDate            TEXT"
                           ")");
     if (!ret) {
-        std::cout << "Failed to create table: " << query.lastError().text().toStdString() << std::endl;
+        LOG_INFO("Failed to create table: " +query.lastError().text().toStdString());
         return false;
     }
     return true;
@@ -118,7 +118,7 @@ bool DataManager::createTeacherInfosTable()
                           "teacherSujectsAndGrades   TEXT                   NOT NULL"
                           ")");
     if (!ret) {
-        std::cout << "Failed to create table: " << query.lastError().text().toStdString() << std::endl;
+        LOG_INFO("Failed to create table: " +query.lastError().text().toStdString());
         return false;
     }
     return true;
@@ -136,7 +136,7 @@ bool DataManager::createStudentInfosTable()
                           "studentSujectsAndPays     TEXT                   NOT NULL"
                           ")");
     if (!ret) {
-        std::cout << "Failed to create table: " << query.lastError().text().toStdString() << std::endl;
+        LOG_INFO("Failed to create table: " +query.lastError().text().toStdString());
         return false;
     }
     return true;
@@ -151,7 +151,7 @@ bool DataManager::createAppSettingsTable()
         "value INTEGER NOT NULL)";
 
     if (!query.exec(createSql)) {
-        qWarning() << "Failed to create settings table:" << query.lastError().text();
+        LOG_INFO("Failed to create settings table:" + query.lastError().text().toStdString());
         return false;
     }
 
@@ -168,7 +168,7 @@ bool DataManager::initializeAppSettings()
         query.bindValue(":key", setting.key);
         query.bindValue(":value", setting.value ? 1 : 0);
         if (!query.exec()) {
-            qWarning() << "Failed to insert setting:" << setting.key << query.lastError().text();
+            LOG_INFO("Failed to insert setting:" + query.lastError().text().toStdString());
             return false;
         }
     }
@@ -184,7 +184,7 @@ bool DataManager::setAppSetting(const QString& key, bool value)
     query.bindValue(":value", value ? 1 : 0);
 
     if (!query.exec()) {
-        qWarning() << "Failed to update setting:" << query.lastError().text();
+        LOG_INFO("Failed to update setting:" +query.lastError().text().toStdString());
         return false;
     }
 
@@ -197,7 +197,7 @@ bool DataManager::readAllSettings()
 
     QSqlQuery query("SELECT key, value FROM settings");
     if (!query.exec()) {
-        qWarning() << "Failed to load settings:" << query.lastError().text();
+        LOG_INFO("Failed to load settings:" +query.lastError().text().toStdString());
         return false;
     }
 
@@ -216,7 +216,7 @@ void DataManager::dropTable(QString tableName)
     QSqlQuery query;
     bool ret = query.exec(QString("DROP TABLE '%1'").arg(tableName));
     if (!ret) {
-        std::cout << "Failed to drop table: " << query.lastError().text().toStdString() << std::endl;
+        LOG_INFO("Failed to drop table: " +query.lastError().text().toStdString());
     }
 }
 
@@ -234,7 +234,7 @@ bool DataManager::insertDataToClassInfosTable(ClassInfos& infos)
                           .arg(info.studentTotalFee).arg(info.teacherName).arg(info.teacherFee).arg(info.gotMoney).arg(info.payType).arg(info.payDate);
         bool ret = query.exec(sql);
         if (!ret) {
-            std::cout << "Failed to insert data to classInfos: " << query.lastError().text().toStdString() << std::endl;
+            LOG_INFO("Failed to insert data to classInfos: " +query.lastError().text().toStdString());
             return false;
         }
     }
@@ -251,7 +251,7 @@ bool DataManager::insertDataToTeacherInfosTable(TeacherInfos& infos)
                           .arg(info.teacherName).arg(info.getTeacherNickNames()).arg(info.getTeacherSujectsAndStudents()).arg(info.getTeacherSujectsAndFees()).arg(info.getTeacherSujectsAndGrades());
         bool ret = query.exec(sql);
         if (!ret) {
-            std::cout << "Failed to insert data to teacherInfos: " << query.lastError().text().toStdString() << std::endl;
+            LOG_INFO("Failed to insert data to teacherInfos: " +query.lastError().text().toStdString());
             return false;
         }
     }
@@ -268,7 +268,7 @@ bool DataManager::insertDataToStudentInfosTable(StudentInfos& infos)
                           .arg(info.studentName).arg(info.getStudentSchools()).arg(info.getStudentPhoneNumbers()).arg(info.getStudentTeachers()).arg(info.getStudentSujectsAndPays());
         bool ret = query.exec(sql);
         if (!ret) {
-            std::cout << "Failed to insert data to teacherInfos: " << query.lastError().text().toStdString() << std::endl;
+            LOG_INFO("Failed to insert data to teacherInfos: " +query.lastError().text().toStdString());
             return false;
         }
     }
@@ -295,37 +295,37 @@ bool DataManager::refreshAllDataFromFile(QString filePath)
 
     if(isTableExist(CLASS_INFOS_TABLE_NAME))
     {
-        std::cout << "drop table: " << CLASS_INFOS_TABLE_NAME.toStdString() << std::endl;
+        LOG_INFO("drop table: " +CLASS_INFOS_TABLE_NAME.toStdString());
         dropTable(CLASS_INFOS_TABLE_NAME);
     }
 
     if(isTableExist(TEACHER_INFOS_TABLE_NAME))
     {
-        std::cout << "drop table: " << TEACHER_INFOS_TABLE_NAME.toStdString() << std::endl;
+        LOG_INFO("drop table: " +TEACHER_INFOS_TABLE_NAME.toStdString());
         dropTable(TEACHER_INFOS_TABLE_NAME);
     }
 
     if(isTableExist(STUDENT_INFOS_TABLE_NAME))
     {
-        std::cout << "drop table: " << STUDENT_INFOS_TABLE_NAME.toStdString() << std::endl;
+        LOG_INFO("drop table: " +STUDENT_INFOS_TABLE_NAME.toStdString());
         dropTable(STUDENT_INFOS_TABLE_NAME);
     }
 
     if(!saveDataToClassInfosTable(mClassInfosFromDB))
     {
-        std::cout << "Failed to save data to ClassInfos table" << std::endl;
+        LOG_INFO("Failed to save data to ClassInfos table");
         return false;
     }
 
     if(!saveDataToTeacherInfosTable(mTeacherInfosFromDB))
     {
-        std::cout << "Failed to save data to TeacherInfos table" << std::endl;
+        LOG_INFO("Failed to save data to TeacherInfos table");
         return false;
     }
 
     if(!saveDataToStudentInfosTable(mStudentInfosFromDB))
     {
-        std::cout << "Failed to save data to StudentInfos table" << std::endl;
+        LOG_INFO("Failed to save data to StudentInfos table");
         return false;
     }
 
@@ -587,15 +587,16 @@ void DataManager::storeAllTableDataCount()
     QSqlQuery query;
     for(auto name : allTableNameForDB)
     {
+        std::string tname = name;
         if(!isTableExist(name))
         {
-            std::cout << "Table " << name << " is not exist" << std::endl;
+            LOG_INFO("Table " + tname + " is not exist");
         }
         query.exec(QString("SELECT count(*) FROM '%1'").arg(name));
         query.next();
         auto count = query.value(0).toInt();
         mDataCount[name] = count;
-        std::cout << "All tableDataCount, " << name << ": " << count << std::endl;
+        LOG_INFO("All tableDataCount, " + tname + ": " + std::to_string(count));
     }
 }
 
@@ -671,7 +672,7 @@ bool DataManager::hasValidHeaders(Document& doc)
         }
         QVariant var = cell->value();
         auto str = var.toString();
-        //std::cout << str << std::endl;
+        //LOG_INFO(str);
         if(str.isEmpty())
         {
             break;
@@ -683,7 +684,8 @@ bool DataManager::hasValidHeaders(Document& doc)
     {
         if(!headers[header])
         {
-            std::cout << "无该信息: " << header << std::endl;
+            std::string theader;
+            LOG_INFO("无该信息: " + theader);
             return false;
         }
     }
@@ -791,7 +793,7 @@ void DataManager::generateTeacherStudentInfos()
         }
         if(isNewTeacher)
         {
-            std::cout << "Error: there should not be a new teacher" << std::endl;
+            LOG_INFO("Error: there should not be a new teacher");
         }
     }
 
@@ -846,7 +848,7 @@ void DataManager::generateStudentClassInfos()
         }
         if(isNewStudent)
         {
-            std::cout << "Error: there should not be a new student" << std::endl;
+            LOG_INFO("Error: there should not be a new student");
         }
     }
 

@@ -304,7 +304,7 @@ bool CUtils::isTimeOverlap(const QString& timeRange1, const QString& timeRange2)
     QTime end2 = QTime::fromString(range2[1], "hh:mm");
 
     if (!start1.isValid() || !end1.isValid() || !start2.isValid() || !end2.isValid()) {
-        std::cout << "Invalid time format" << std::endl;
+        LOG_INFO("Invalid time format");
         return false; // Invalid time format
     }
 
@@ -376,7 +376,7 @@ void CUtils::updateScheduleClassResultsList(QList<QList<QVariantMap>>& data, Sch
         {
             if(isTimeOverlap(classInfo.time, inputInfos.timeRange))
             {
-                std::cout << "TimeOverlap: classInfo.time: " << classInfo.time.toStdString() << ", inputInfos.timeRange: " << inputInfos.timeRange.toStdString() << std::endl;
+                LOG_INFO("TimeOverlap: classInfo.time: " +classInfo.time.toStdString() +", inputInfos.timeRange: " +inputInfos.timeRange.toStdString());
                 isValidTeacher[classInfo.teacherName] = false;
             }
         }

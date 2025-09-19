@@ -29,6 +29,10 @@ int main(int argc, char *argv[])
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 #endif
+    Logger::instance().init("logs/application.log", LOG_INFO, LOG_DEBUG);
+    // 更改日志级别
+    Logger::instance().setConsoleLogLevel(LOG_DEBUG);
+    LOG_DEBUG("现在调试信息也会显示在控制台");
 
     QApplication app(argc, argv);
     app.setOrganizationName("Dylan");
@@ -49,11 +53,5 @@ int main(int argc, char *argv[])
         []() { QCoreApplication::exit(-1); },
         Qt::QueuedConnection);
     engine.loadFromModule("ClassScheduler", "Main");
-
-    Logger::instance().init("logs/application.log", LOG_INFO, LOG_DEBUG);
-    // 更改日志级别
-    Logger::instance().setConsoleLogLevel(LOG_DEBUG);
-    LOG_DEBUG("现在调试信息也会显示在控制台");
-
     return app.exec();
 }

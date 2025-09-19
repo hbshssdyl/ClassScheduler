@@ -39,6 +39,10 @@ public:
     ResponseResult getAllFeedbacks();
     ResponseResult likeFeedback(int feedbackId);
 
+    // For installer
+    ResponseResult getLatestVersion();
+    bool downloadInstaller(const std::string& url, const std::string& savePath);
+
 private:
     std::weak_ptr<CoreFramework> mCoreFramework;
 };

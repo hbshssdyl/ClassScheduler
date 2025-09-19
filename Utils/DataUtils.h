@@ -20,9 +20,9 @@ namespace ClassScheduler
     static const QString APP_TOGGLE_INFOS_TABLE_NAME = "toggleInfos";
     static const std::string ADMIN_USER_NAME = "Dylandu";
 
+    static const QString CURRENT_PATH_DIR = QDir::currentPath();
     static const QString DATABASE_NAME = "InfoDatabase.db";
-    static const QString DATABASE_PATH_DIR = QDir::currentPath();
-    static const QString DATABASE_FULL_PATH = DATABASE_PATH_DIR + "/" + DATABASE_NAME;
+    static const QString DATABASE_FULL_PATH = CURRENT_PATH_DIR + "/" + DATABASE_NAME;
 
     static QString nullString = "无该信息";
     static std::vector validExcelClassHeader{"日期", "星期", "姓名", "学校", "电话", "年级", "学科", "时间", "老师", "网课or面授", "课时", "金额/小时", "课酬总计", "老师姓名", "老师工资", "已收金额", "付费方式", "收费日期"};

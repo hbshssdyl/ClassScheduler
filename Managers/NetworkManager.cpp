@@ -890,3 +890,60 @@ ResponseResult NetworkManager::likeFeedback(int feedbackId) {
     return result;
 }
 
+//For installer
+size_t writeFileCallback(void* ptr, size_t size, size_t nmemb, void* stream) {
+    FILE* f = (FILE*)stream;
+    return fwrite(ptr, size, nmemb, f);
+}
+
+size_t progressCallback(void* ptr, curl_off_t totalToDownload, curl_off_t nowDownloaded, curl_off_t, curl_off_t) {
+    if(totalToDownload > 0)
+        std::cout << "Download progress: " << (nowDownloaded * 100 / totalToDownload) << "%" << std::endl;
+    return 0; // 返回非0可以中断下载
+}
+
+ResponseResult NetworkManager::getLatestVersion() {
+    CURL* curl = curl_easy_init();
+    ResponseResult result;
+    if(curl) {
+        std::string responseStr;
+        curl_easy_setopt(curl, CURLOPT_URL, (SERVER_URL + "latest-version").c_str());
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeCallback);
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &responseStr);
+
+        CURLcode res = curl_easy_perform(curl);
+        if(res != CURLE_OK)
+            result.rawResponse = curl_easy_strerror(res);
+        else
+            result.refreshResult(responseStr);
+
+        curl_easy_cleanup(curl);
+    } else {
+        result.updateToCurlError();
+    }
+    return result;
+}
+
+bool NetworkManager::downloadInstaller(const std::string& url, const std::string& savePath) {
+    CURL* curl = curl_easy_init();
+    if(!curl) return false;
+
+    FILE* fp = fopen(savePath.c_str(), "wb");
+    if(!fp) {
+        curl_easy_cleanup(curl);
+        return false;
+    }
+
+    curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeFileCallback);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
+    curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L);
+    curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, progressCallback);
+
+    CURLcode res = curl_easy_perform(curl);
+    fclose(fp);
+    curl_easy_cleanup(curl);
+
+    return (res == CURLE_OK);
+}
+

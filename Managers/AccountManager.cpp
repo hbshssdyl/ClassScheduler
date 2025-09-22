@@ -1,7 +1,6 @@
 ﻿#include "AccountManager.h"
 #include "NetworkManager.h"
 #include "CoreFramework.h"
-#include <iostream>
 
 AccountManager::AccountManager(CoreFrameworkPtr coreFramework)
     : mCoreFramework(coreFramework)

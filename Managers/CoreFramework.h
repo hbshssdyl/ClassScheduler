@@ -18,6 +18,8 @@ public:
     CoreFramework();
     void initialize();
     void saveLoginUserInfo(std::string username);
+    void updateAppToLatestVersion(std::function<void(int)> callback);
+    AppVersionInfo getVersionInformation();
     UserInfo getLoginUserInfo();
     DataManagerPtr getDataManager();
     UserManagerPtr getUserManager();
@@ -28,10 +30,12 @@ public:
 
 private:
     void initAppData();
+    void initAppVersionInfo();
     void initManagers();
 
 private:
     UserInfo mLoginUserInfo;
+    AppVersionInfo mVersionInfo;
 
     DataManagerPtr mDataManager;
     UserManagerPtr mUserManager;

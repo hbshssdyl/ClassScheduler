@@ -1,6 +1,6 @@
 ; -- 应用基本信息（需要修改）--
 #define MyAppName "天明书院"
-#define MyAppVersion "1.0.0"
+#define MyAppVersion "v1.2.0"
 #define MyAppPublisher "Dylandu"
 #define MyAppURL "https://www.baidu.com"
 #define MyAppExeName "appClassScheduler.exe" ; 必须与你的CMake目标名一致！
@@ -78,9 +78,27 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 [Files]
 ; 主执行文件
 Source: "{#BuildPath}\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
-; 递归包含构建目录中的所有文件和子目录
-Source: "{#BuildPath}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
-; 许可文件（可选）
+
+; 包含所有DLL文件，但不包含可能重复的文件
+Source: "{#BuildPath}\*.dll"; DestDir: "{app}"; Flags: ignoreversion
+
+; 包含平台插件
+Source: "{#BuildPath}\platforms\*.dll"; DestDir: "{app}\platforms"; Flags: ignoreversion
+
+; 选择性包含其他插件目录（如果存在）
+#if DirExists(BuildPath + "\styles")
+Source: "{#BuildPath}\styles\*.dll"; DestDir: "{app}\styles"; Flags: ignoreversion
+#endif
+
+#if DirExists(BuildPath + "\imageformats")  
+Source: "{#BuildPath}\imageformats\*.dll"; DestDir: "{app}\imageformats"; Flags: ignoreversion
+#endif
+
+#if DirExists(BuildPath + "\translations")
+Source: "{#BuildPath}\translations\*.qm"; DestDir: "{app}\translations"; Flags: ignoreversion
+#endif
+
+; 许可文件
 Source: "{#LicenseFile}"; DestDir: "{app}"; Flags: ignoreversion; Check: FileExists('{#LicenseFile}')
 
 [Icons]

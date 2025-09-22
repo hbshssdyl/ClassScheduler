@@ -32,50 +32,67 @@ Logger::Logger() : consoleLevel(LOG_DEBUG), fileLevel(LOG_DEBUG), initialized(fa
 Logger::~Logger() {
     shutdown();
 }
-
+fs::path logPath;
 void Logger::init(const std::string &filename, LogLevel consoleLevel, LogLevel fileLevel) {
     {
         std::lock_guard<std::mutex> lock(logMutex);
-
         if (initialized) {
             return;
         }
-
         this->consoleLevel = consoleLevel;
         this->fileLevel = fileLevel;
 
-        fs::path logPath(filename);
-        fs::path dir = logPath.parent_path();   // logs/
-        fs::path file = logPath.filename();     // application.log
-
-        // 构造 last_ 文件名
-        fs::path lastFile = dir / ("last_" + file.string());
-
-        if (fs::exists(logPath)) {
-            if (fs::exists(lastFile)) {
-                fs::remove(lastFile);
-            }
-            try {
-                fs::rename(logPath, lastFile);
-            } catch (const fs::filesystem_error &e) {
-                std::cerr << "Failed to rename old log file: " << e.what() << std::endl;
-            }
+        // 使用 %APPDATA% 作为日志基础路径
+        const char* appDataEnv = std::getenv("APPDATA");
+        if (!appDataEnv) {
+            appDataEnv = std::getenv("LOCALAPPDATA"); // 备用
         }
-
-        // === 创建新日志文件 ===
-        logFile.open(logPath, std::ios::out | std::ios::trunc);
-        if (logFile.is_open()) {
-            logFile << "========================================\n";
-            logFile << "Application started at: " << getCurrentTime() << "\n";
-            logFile << "========================================\n\n";
-            initialized = true;
+        if (!appDataEnv) {
+            std::cerr << "无法获取用户应用数据目录，使用当前目录。" << std::endl;
+            logPath = filename; // 使用类成员 logPath
         } else {
-            std::cerr << "Failed to open log file: " << logPath << std::endl;
-            return;
+            fs::path baseDir(appDataEnv);
+            fs::path appDir = baseDir / "MyAppLogs"; // 自定义主目录
+            fs::path fullDir = appDir / fs::path(filename).parent_path(); // 包括 logs 子目录
+            logPath = fullDir / fs::path(filename).filename(); // 完整路径包括文件名
+
+            // 创建完整目录结构
+            std::error_code ec;
+            fs::create_directories(fullDir, ec);
+            if (ec) {
+                std::cerr << "创建日志目录失败: " << ec.message() << std::endl;
+                return;
+            }
+
+            // 构造 last_ 文件名
+            fs::path lastFile = fullDir / ("last_" + fs::path(filename).filename().string());
+            if (fs::exists(logPath)) {
+                if (fs::exists(lastFile)) {
+                    fs::remove(lastFile, ec);
+                    if (ec) {
+                        std::cerr << "删除旧 last log 失败: " << ec.message() << std::endl;
+                    }
+                }
+                fs::rename(logPath, lastFile, ec);
+                if (ec) {
+                    std::cerr << "重命名旧日志文件失败: " << ec.message() << std::endl;
+                }
+            }
+
+            // 创建新日志文件
+            logFile.open(logPath, std::ios::out | std::ios::trunc);
+            if (logFile.is_open()) {
+                logFile << "========================================\n";
+                logFile << "应用程序启动时间: " << getCurrentTime() << "\n";
+                logFile << "========================================\n\n";
+                initialized = true;
+            } else {
+                std::cerr << "无法打开日志文件: " << logPath << std::endl;
+                return;
+            }
         }
     }
-
-    LOG_INFO("Logger initialized successfully");
+    LOG_INFO("日志系统初始化成功");
 }
 
 void Logger::setConsoleLogLevel(LogLevel level) {

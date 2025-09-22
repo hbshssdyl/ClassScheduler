@@ -44,7 +44,7 @@ add_subdirectory(QXlsx)
 #============================================
 # 可执行文件配置
 #============================================
-qt_add_executable(appClassScheduler
+qt_add_executable(appClassScheduler WIN32
     main.cpp
 )
 

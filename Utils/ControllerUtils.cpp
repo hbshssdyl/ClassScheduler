@@ -119,6 +119,14 @@ void CUtils::updateActionItemsList(QVariantList& data, const OperateMode& select
     }
 }
 
+void CUtils::updateVersionInfoList(QVariantMap& data, const AppVersionInfo& versionInfo)
+{
+    data.insert("currentVersion", QString::fromStdString(versionInfo.currentVersion));
+    data.insert("latestVersion", QString::fromStdString(versionInfo.latestVersion));
+    data.insert("changeLog", QString::fromStdString(versionInfo.changeLog));
+    data.insert("shouldUpdate", versionInfo.showUpdate);
+}
+
 QString CUtils::toString(OperateMode mode)
 {
     switch (mode)

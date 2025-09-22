@@ -111,7 +111,7 @@ Rectangle {
 
                 checkedText: "显示"
                 unCheckedText: "不显示"
-                checked: true
+                checked: false
                 Layout.preferredWidth: 50
                 Layout.alignment: Qt.AlignLeft
             }

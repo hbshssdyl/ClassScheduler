@@ -11,7 +11,7 @@ DataManager::DataManager(CoreFrameworkPtr coreFramework)
 
 bool DataManager::createDBConnection(bool shouldDeleteOldDb)
 {
-    QDir().mkpath(DATABASE_PATH_DIR);
+    QDir().mkpath(CURRENT_PATH_DIR);
 
     if (shouldDeleteOldDb && QFile::exists(DATABASE_FULL_PATH)) {
         QFile::remove(DATABASE_FULL_PATH);

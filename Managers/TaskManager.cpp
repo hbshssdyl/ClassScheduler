@@ -273,8 +273,11 @@ std::vector<Task> TaskManager::generateDailyTasks() {
     std::vector<TaskTemplate> templates = {
         {"登记退课情况", "今日", "登记当天所有学生的退课情况，今日需完成", "5"},
         {"登记新好友名单", "今日", "登记当天新加好友名单及咨询情况", "5"},
-        {"登记当天工作", "今日", "登记当天必须完成的工作，完成后列在下方（如老师测试卷，家长是否做完，收费，催老师或者家长等）", "5"},
-        {"登记明日跟进内容", "今日", "登记明天需要跟进的内容，列在下方（如老师测试卷，家长是否做完，收费，催老师或者家长等）", "5"}
+        {"登记老师停课，换课情况", "今日", "登记当天的所有老师停课，换课情况，不要遗漏", "3"},
+        {"登记家长停课，换课情况", "今日", "登记当天的所有家长停课，换课情况，不要遗漏", "3"},
+        {"总结当天必须完成的工作", "今日", "登记当天必须完成的工作，完成后列在下方（如老师测试卷，家长是否做完，收费，催老师或者家长等）", "2"},
+        {"总结当天未完成的工作", "今日", "登记当天尚未完成的工作，完成后列在下方（如老师测试卷，家长是否做完，收费，催老师或者家长等）", "5"},
+        {"整理明天需要跟进的内容", "今日", "整理明天需要跟进的内容（如老师测试卷，家长是否做完，收费，催老师或者家长等）", "3"}
     };
     std::vector<Task> tasks;
     for (const auto& tmpl : templates) {
@@ -289,7 +292,7 @@ std::vector<Task> TaskManager::generateWeeklyTasks() {
     std::string dueDate = MUtils::getCurrentWeekLastDay();
     // 定义任务模板
     std::vector<TaskTemplate> templates = {
-        {"登记本周跟进内容", "本周", "登记本周需要跟进的内容，列在下方（如老师测试卷，家长是否做完，收费，催老师或者家长等）", "5"}
+        {"整理本周跟进内容", "本周", "整理本周需要跟进的内容，列在下方（如老师测试卷，家长是否做完，收费，催老师或者家长等）", "5"}
     };
     std::vector<Task> tasks;
     for (const auto& tmpl : templates) {
@@ -304,7 +307,7 @@ std::vector<Task> TaskManager::generateMonthlyTasks() {
     std::string dueDate = MUtils::getCurrentMonthLastDay();
     // 定义任务模板
     std::vector<TaskTemplate> templates = {
-        {"登记本月跟进内容", "本月", "登记本月需要跟进的内容，列在下方（如老师测试卷，家长是否做完，收费，催老师或者家长等）", "4"}
+        {"整理本月跟进内容", "本月", "整理本月需要跟进的内容，列在下方（如老师测试卷，家长是否做完，收费，催老师或者家长等）", "4"}
     };
     std::vector<Task> tasks;
     for (const auto& tmpl : templates) {

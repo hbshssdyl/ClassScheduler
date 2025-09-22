@@ -1,6 +1,7 @@
 ﻿#ifndef NETWORKMANAGER_H
 #define NETWORKMANAGER_H
 #include "Utils/DataUtils.h"
+#include <functional>
 
 using namespace ClassScheduler;
 
@@ -41,7 +42,7 @@ public:
 
     // For installer
     ResponseResult getLatestVersion();
-    bool downloadInstaller(const std::string& url, const std::string& savePath);
+    void downloadInstaller(const std::string& url, const std::string& savePath, std::function<void(int)> callback);
 
 private:
     std::weak_ptr<CoreFramework> mCoreFramework;

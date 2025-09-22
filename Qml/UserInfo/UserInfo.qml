@@ -9,10 +9,10 @@ Rectangle {
 
     property var controller
     property string username: "User"
-    property bool hasUpdate: true // 控制是否显示更新图标
-    property string latestVersion: "2.0.0" // 最新版本号
-    property string currentVersion: "1.5.2" // 当前版本号
-    property string releaseNotes: "• 新增课程表导出功能\n• 优化界面性能\n• 修复已知问题" // 更新内容
+    property bool hasUpdate: controller ? controller.versionInfoList["shouldUpdate"] : false// 控制是否显示更新图标
+    property string latestVersion: controller ? controller.versionInfoList["latestVersion"] : "1.0.1" // 最新版本号
+    property string currentVersion: controller ? controller.versionInfoList["currentVersion"] : "1.0.1" // 当前版本号
+    property string releaseNotes: controller ? controller.versionInfoList["changeLog"] : "修复已知问题" // 更新内容
 
     color: ColorUtils.getOperateAreaBackgroundColor()
 
@@ -268,12 +268,18 @@ Rectangle {
                     Layout.fillWidth: true
                     from: 0
                     to: 100
-                    value: 0
+                    value: controller.downloadValue
 
                     background: Rectangle {
                         implicitHeight: 6
                         color: "#E0E0E0"
                         radius: 3
+                    }
+
+                    onValueChanged:{
+                        if (value >= 100) {
+                            btnInstall.visible = true;
+                        }
                     }
 
                     contentItem: Item {
@@ -335,7 +341,7 @@ Rectangle {
                             downloadProgress.visible = true;
                             btnLater.visible = false;
                             btnUpdate.visible = false;
-                            simulateDownload();
+                            controller.onUpdateStarted();
                         }
                     }
 
@@ -356,7 +362,7 @@ Rectangle {
                         }
                         onClicked: {
                             console.log("开始安装新版本...");
-                            Qt.quit(); // 实际应用中应该启动安装程序
+                            controller.installLatestVersion();
                         }
                     }
                 }
@@ -371,7 +377,7 @@ Rectangle {
 
         timer.triggered.connect(function() {
             progress += 2;
-            downloadProgress.value = progress;
+            downloadProgress.value = controller.downloadValue;
 
             if (progress >= 100) {
                 timer.stop();

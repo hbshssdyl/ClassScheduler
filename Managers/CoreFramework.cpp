@@ -11,6 +11,7 @@ CoreFramework::CoreFramework() {}
 void CoreFramework::initialize()
 {
     initManagers();
+    initAppVersionInfo();
     initAppData();
 }
 
@@ -31,7 +32,7 @@ void CoreFramework::initManagers()
 void CoreFramework::saveLoginUserInfo(std::string username)
 {
     auto userInfos = mAccountManager->getUsers();
-    LOG_INFO("saveLoginUserInfo, userInfos: " +userInfos.size());
+    LOG_INFO("saveLoginUserInfo, userInfos: " + std::to_string(userInfos.size()));
     for(auto& userInfo : userInfos)
     {
         if(userInfo.name == username)
@@ -44,9 +45,37 @@ void CoreFramework::saveLoginUserInfo(std::string username)
     LOG_INFO("Can not find this user info, username: " +username);
 }
 
+AppVersionInfo CoreFramework::getVersionInformation()
+{
+    return mVersionInfo;
+}
+
 UserInfo CoreFramework::getLoginUserInfo()
 {
     return mLoginUserInfo;
+}
+
+void CoreFramework::initAppVersionInfo()
+{
+    auto result = mNetworkManager->getLatestVersion();
+    LOG_INFO(result.statusStr);
+    LOG_INFO(result.rawResponse);
+    if(result.status == ResultStatus::GetVersionSuccess)
+    {
+        mVersionInfo = result.versionInfo;
+    }
+    else
+    {
+        LOG_INFO("Failed to get app latest version information");
+    }
+}
+
+void CoreFramework::updateAppToLatestVersion(std::function<void(int)> callback)
+{
+    std::thread([this, callback]() {
+        LOG_INFO("updateAppToLatestVersion");
+        mNetworkManager->downloadInstaller(mVersionInfo.downloadUrl, mVersionInfo.clientSavePath, callback);
+    }).detach();
 }
 
 void CoreFramework::initAppData()

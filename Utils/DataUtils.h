@@ -11,6 +11,7 @@
 #include <iostream>
 #include <nlohmann/json.hpp>
 #include "Managers/Logger.h"
+#include <QStandardPaths>
 
 namespace ClassScheduler
 {
@@ -19,16 +20,45 @@ namespace ClassScheduler
     static const QString STUDENT_INFOS_TABLE_NAME = "studentInfos";
     static const QString APP_TOGGLE_INFOS_TABLE_NAME = "toggleInfos";
     static const std::string ADMIN_USER_NAME = "Dylandu";
+    static const std::string CURRENT_VERSION = "1.0.1";
 
-    static const QString CURRENT_PATH_DIR = QDir::currentPath();
+    static const QString CURRENT_PATH_DIR = QStandardPaths::writableLocation(QStandardPaths::DownloadLocation);
     static const QString DATABASE_NAME = "InfoDatabase.db";
     static const QString DATABASE_FULL_PATH = CURRENT_PATH_DIR + "/" + DATABASE_NAME;
+    static const std::string INSTALLER_BASIC_NAME = "TianMing";
 
     static QString nullString = "无该信息";
     static std::vector validExcelClassHeader{"日期", "星期", "姓名", "学校", "电话", "年级", "学科", "时间", "老师", "网课or面授", "课时", "金额/小时", "课酬总计", "老师姓名", "老师工资", "已收金额", "付费方式", "收费日期"};
     static std::vector validTeacherHeader{"老师姓名", "使用过的昵称", "教过的科目及学生", "科目及工资（每小时）", "科目及年级"};
     static std::vector validStudentHeader{"学生姓名", "就读学校", "手机号", "教过该生的老师", "科目及费用（每小时）"};
     static std::vector allTableNameForDB{"classInfos", "teacherInfos", "studentInfos"};
+
+    struct AppVersionInfo{
+        bool showUpdate;
+        std::string latestVersion;
+        std::string currentVersion;
+        std::string downloadUrl;
+        std::string clientSavePath;
+        std::string changeLog;
+
+        void initInfo()
+        {
+            currentVersion = CURRENT_VERSION;
+            showUpdate = currentVersion != latestVersion;
+            clientSavePath = CURRENT_PATH_DIR.toStdString() + "/" + INSTALLER_BASIC_NAME + "_v" + latestVersion + ".exe";
+            LOG_INFO("clientSavePath: " + clientSavePath);
+        }
+
+        void printInfo()
+        {
+            std::string shouldShow = (showUpdate ? "true" : "false");
+            LOG_INFO("show Update: " + shouldShow);
+            LOG_INFO("latest version: " + latestVersion);
+            LOG_INFO("current version: " + currentVersion);
+            LOG_INFO("change log: " + changeLog);
+            LOG_INFO("download url: " + downloadUrl);
+        }
+    };
 
     enum class OperateMode
     {
@@ -56,6 +86,12 @@ namespace ClassScheduler
         UserExist,
         EmailExist,
         EmailInvalid,
+
+        //Version
+        GetVersionSuccess,
+        GetVersionFailed,
+        DownloadLatestVersionSuccess,
+        DownloadLatestVersionFailed,
 
         //User
         GetAllUsersSuccess,
@@ -1263,6 +1299,9 @@ namespace ClassScheduler
         UserRole role;
         std::string username;
 
+        //Version information
+        AppVersionInfo versionInfo;
+
         //User
         UserInfos userInfos;
 
@@ -1315,6 +1354,47 @@ namespace ClassScheduler
                         username = value;
                     }
                 }
+                return;
+            }
+
+            if(response.find(toString(ResultStatus::GetVersionSuccess), Qt::CaseSensitive) != std::string::npos)
+            {
+                status = ResultStatus::GetVersionSuccess;
+                statusStr = toString(ResultStatus::GetVersionSuccess);
+
+                nlohmann::json j = nlohmann::json::parse(response);
+                std::map<std::string, std::string> result = j.get<std::map<std::string, std::string>>();
+
+                for (const auto& [key, value] : result) {
+                    if(key == "version"){
+                        versionInfo.latestVersion = value;
+                    }
+                    if(key == "url"){
+                        versionInfo.downloadUrl = value;
+                    }
+                    if(key == "changelog"){
+                        versionInfo.changeLog = value;
+                    }
+                }
+                versionInfo.initInfo();
+                return;
+            }
+
+            if (response.find(toString(ResultStatus::GetVersionFailed), Qt::CaseSensitive) != std::string::npos) {
+                status = ResultStatus::GetVersionFailed;
+                statusStr = toString(ResultStatus::GetVersionFailed);
+                return;
+            }
+
+            if (response.find(toString(ResultStatus::DownloadLatestVersionFailed), Qt::CaseSensitive) != std::string::npos) {
+                status = ResultStatus::DownloadLatestVersionFailed;
+                statusStr = toString(ResultStatus::DownloadLatestVersionFailed);
+                return;
+            }
+
+            if (response.find(toString(ResultStatus::DownloadLatestVersionSuccess), Qt::CaseSensitive) != std::string::npos) {
+                status = ResultStatus::DownloadLatestVersionSuccess;
+                statusStr = toString(ResultStatus::DownloadLatestVersionSuccess);
                 return;
             }
 
@@ -1673,6 +1753,16 @@ namespace ClassScheduler
                     return "EmailExist";
                 case ResultStatus::EmailInvalid:
                     return "EmailInvalid";
+
+                // Version
+                case ResultStatus::GetVersionSuccess:
+                    return "GetVersionSuccess";
+                case ResultStatus::GetVersionFailed:
+                    return "GetVersionFailed";
+                case ResultStatus::DownloadLatestVersionSuccess:
+                    return "DownloadLatestVersionSuccess";
+                case ResultStatus::DownloadLatestVersionFailed:
+                    return "DownloadLatestVersionFailed";
 
                 // User
                 case ResultStatus::GetAllUsersSuccess:

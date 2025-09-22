@@ -19,6 +19,20 @@ size_t writeCallback(void* contents, size_t size, size_t nmemb, void* userp) {
     return size * nmemb;
 }
 
+size_t writeFileCallback(void* ptr, size_t size, size_t nmemb, void* stream) {
+    FILE* f = (FILE*)stream;
+    return fwrite(ptr, size, nmemb, f);
+}
+
+std::function<void(int)> downloadProgressCallback;
+int progressCallback(void* ptr, curl_off_t totalToDownload, curl_off_t nowDownloaded, curl_off_t totalToUpload, curl_off_t nowUploaded) {
+    if (totalToDownload > 0 && downloadProgressCallback) {
+        int progress = static_cast<int>((nowDownloaded * 100) / totalToDownload);
+        downloadProgressCallback(progress);
+    }
+    return 0; // 返回非0可中断下载
+}
+
 ResponseResult NetworkManager::sendRegisterRequest(const std::string& email, const std::string& username, const std::string& password, const std::string& role) {
     CURL* curl;
     CURLcode res;
@@ -890,18 +904,6 @@ ResponseResult NetworkManager::likeFeedback(int feedbackId) {
     return result;
 }
 
-//For installer
-size_t writeFileCallback(void* ptr, size_t size, size_t nmemb, void* stream) {
-    FILE* f = (FILE*)stream;
-    return fwrite(ptr, size, nmemb, f);
-}
-
-size_t progressCallback(void* ptr, curl_off_t totalToDownload, curl_off_t nowDownloaded, curl_off_t, curl_off_t) {
-    if(totalToDownload > 0)
-        std::cout << "Download progress: " << (nowDownloaded * 100 / totalToDownload) << "%" << std::endl;
-    return 0; // 返回非0可以中断下载
-}
-
 ResponseResult NetworkManager::getLatestVersion() {
     CURL* curl = curl_easy_init();
     ResponseResult result;
@@ -924,26 +926,29 @@ ResponseResult NetworkManager::getLatestVersion() {
     return result;
 }
 
-bool NetworkManager::downloadInstaller(const std::string& url, const std::string& savePath) {
+void NetworkManager::downloadInstaller(const std::string& url, const std::string& savePath, std::function<void(int)> callback) {
     CURL* curl = curl_easy_init();
-    if(!curl) return false;
+    if(!curl) return;
 
     FILE* fp = fopen(savePath.c_str(), "wb");
     if(!fp) {
         curl_easy_cleanup(curl);
-        return false;
+        return;
     }
+
+    downloadProgressCallback = std::move(callback);
 
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeFileCallback);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
     curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L);
     curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, progressCallback);
+    curl_easy_setopt(curl, CURLOPT_XFERINFODATA, this);
 
     CURLcode res = curl_easy_perform(curl);
     fclose(fp);
     curl_easy_cleanup(curl);
 
-    return (res == CURLE_OK);
+    return;
 }
 

@@ -2,7 +2,6 @@
 #include <QQmlApplicationEngine>
 #include <QQuickStyle>
 #include "Controller/Controller.h"
-#include "Utils/ControllerUtils.h"
 #include "Managers/Logger.h"
 
 void initQmlComponent()
@@ -31,8 +30,8 @@ int main(int argc, char *argv[])
 #endif
     Logger::instance().init("logs/application.log", LOG_INFO, LOG_DEBUG);
     // 更改日志级别
-    Logger::instance().setConsoleLogLevel(LOG_DEBUG);
-    LOG_DEBUG("现在调试信息也会显示在控制台");
+    // Logger::instance().setConsoleLogLevel(LOG_DEBUG);
+    // LOG_DEBUG("现在调试信息也会显示在控制台");
 
     QApplication app(argc, argv);
     app.setOrganizationName("Dylan");

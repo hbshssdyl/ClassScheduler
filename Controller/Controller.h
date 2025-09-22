@@ -5,6 +5,7 @@
 #include <QString>
 #include <QVariant>
 #include <QPointer>
+#include <QProcess>  // 新增：用于启动进程
 
 #include "Managers/CoreFramework.h"
 #include "SearchClassInfoController.h"
@@ -25,8 +26,10 @@ public:
     Q_PROPERTY(bool showActions MEMBER mShowActions NOTIFY operateModeChanged)
     Q_PROPERTY(bool showUserInfo MEMBER mShowUserInfo NOTIFY operateModeChanged)
     Q_PROPERTY(QString name MEMBER mName NOTIFY nameChanged)
+    Q_PROPERTY(int downloadValue MEMBER mDownloadValue NOTIFY downloadValueChanged)
     Q_PROPERTY(QVariantList actionItemsList MEMBER mActionItemsList NOTIFY actionItemsListChanged)
     Q_PROPERTY(QVariantMap appSettings MEMBER mAppSettings NOTIFY appSettingsChanged)
+    Q_PROPERTY(QVariantMap versionInfoList MEMBER mVersionInfoList NOTIFY versionInfoListChanged)
 
 public:
     explicit Controller(QObject* parent = nullptr);
@@ -45,16 +48,18 @@ public slots:
     void onOperateModeSelected(OperateMode mode);
     void onTryToLogin(QString login, QString password);
     void onTryToRegister(QString email, QString username, QString password, QString role);
+    void onUpdateStarted();
+    void installLatestVersion();
 
 signals:
     void registerOrLoginResult(QString statusStr);
     void updateOperateMode(QString mode);
-
-signals:
     void operateModeChanged();
     void actionItemsListChanged();
     void appSettingsChanged();
     void nameChanged();
+    void versionInfoListChanged();
+    void downloadValueChanged();
 
 private:
     QString toOperateModeString(OperateMode mode);
@@ -63,6 +68,8 @@ private:
     void initCoreFramework();
     void refreshActionItems();
     void refreshControllersData();
+    void refreshLatestVersionInfo();
+    void onInstallFinished(int exitCode, QProcess::ExitStatus exitStatus);
 
 private:
     OperateMode mOperateMode { OperateMode::None };
@@ -73,12 +80,15 @@ private:
     QString mName{ "" };
     bool mShowActions;
     bool mShowUserInfo;
+    int mDownloadValue{ 0 };
     QString mDataCount { "" };
     QVariantList mActionItemsList;
+    QVariantMap mVersionInfoList;
     OperateModes mAllOperateMode;
     QVariantMap mAppSettings;
 
     atomic_bool mAllDataIsReady = false;
+    QProcess *m_installProcess = nullptr;  // 新增：进程对象
 
     QPointer<SearchClassInfoController> mSearchClassInfoController;
     QPointer<SearchTeacherInfoController> mSearchTeacherInfoController;
@@ -89,4 +99,3 @@ private:
     QPointer<AccountViewController> mAccountViewController;
     QPointer<FeedbackController> mFeedbackController;
 };
-

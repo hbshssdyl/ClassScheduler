@@ -145,24 +145,3 @@ Name: "{group}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"
 
 [Run]
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
-
-[Code]
-// 安装前检查（简化版，只在出错时提示）
-function InitializeSetup(): Boolean;
-begin
-  if not DirExists(ExpandConstant('{#BuildPath}')) then
-  begin
-    MsgBox('❌ 错误：构建目录不存在！请先编译项目并运行 windeployqt。', mbError, MB_OK);
-    Result := False;
-    Exit;
-  end;
-
-  if not FileExists(ExpandConstant('{#BuildPath}\{#MyAppExeName}')) then
-  begin
-    MsgBox('❌ 错误：未找到主程序文件！请确认已编译并收集依赖。', mbError, MB_OK);
-    Result := False;
-    Exit;
-  end;
-
-  Result := True;
-end;

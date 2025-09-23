@@ -1,6 +1,6 @@
 ; -- 应用基本信息（需要修改）--
 #define MyAppName "天明书院"
-#define MyAppVersion "v1.2.0"
+#define MyAppVersion "v1.0.1"
 #define MyAppPublisher "Dylandu"
 #define MyAppURL "https://www.example.com"
 #define MyAppExeName "appClassScheduler.exe" ; 必须与你的CMake目标名一致！
@@ -70,8 +70,8 @@ PrivilegesRequired=admin
 CloseApplications=yes
 
 [Languages]
-Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "chinesesimplified"; MessagesFile: "compiler:Languages\ChineseSimplified.isl"
+Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Tasks]
 ; 默认勾选桌面图标
@@ -87,35 +87,45 @@ Source: "{#BuildPath}\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
 ; ----------------------------
 ; 所有依赖DLL
 ; ----------------------------
-Source: "{#BuildPath}\*.dll"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#BuildPath}\*.dll"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs
 
 ; ----------------------------
 ; 平台插件（Qt6必需）
 ; ----------------------------
-Source: "{#BuildPath}\platforms\*"; DestDir: "{app}\platforms"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#BuildPath}\platforms\*"; DestDir: "{app}\platforms"; Flags: ignoreversion recursesubdirs
 
 ; ----------------------------
 ; Qt模块插件（可选，按需添加）
 ; ----------------------------
 #if DirExists(BuildPath + "\styles")
-Source: "{#BuildPath}\imageformats\*"; DestDir: "{app}\imageformats"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#BuildPath}\imageformats\*"; DestDir: "{app}\imageformats"; Flags: ignoreversion recursesubdirs
 #endif
 
 #if DirExists(BuildPath + "\imageformats")  
-Source: "{#BuildPath}\styles\*"; DestDir: "{app}\styles"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#BuildPath}\styles\*"; DestDir: "{app}\styles"; Flags: ignoreversion recursesubdirs
 #endif
 
 #if DirExists(BuildPath + "\translations")
-Source: "{#BuildPath}\translations\*"; DestDir: "{app}\translations"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#BuildPath}\translations\*"; DestDir: "{app}\translations"; Flags: ignoreversion recursesubdirs
 #endif
 
 ; ----------------------------
 ; QML模块（关键）
 ; ----------------------------
-; 将整个 ClassScheduler 目录（包含 Main.qml, qmldir, *.qmltypes 等）拷贝到 {app}\qml
-Source: "{#BuildPath}\ClassScheduler\*"; DestDir: "{app}\qml\ClassScheduler"; Flags: ignoreversion recursesubdirs createallsubdirs
-; 把 windeployqt 部署好的 qml 文件夹一起打包
+
+; ----------------------------
+; ClassScheduler 模块的 qmldir 文件（保持目录结构，如果存在的话）
+; ----------------------------
+Source: "{#BuildPath}\ClassScheduler\qmldir"; DestDir: "{app}\ClassScheduler"; Flags: ignoreversion skipifsourcedoesntexist
+Source: "{#BuildPath}\ClassScheduler\*\qmldir"; DestDir: "{app}\ClassScheduler"; Flags: ignoreversion recursesubdirs createallsubdirs skipifsourcedoesntexist
+Source: "{#BuildPath}\ClassScheduler\*\*\qmldir"; DestDir: "{app}\ClassScheduler"; Flags: ignoreversion recursesubdirs createallsubdirs skipifsourcedoesntexist
+Source: "{#BuildPath}\ClassScheduler\*\*\*\qmldir"; DestDir: "{app}\ClassScheduler"; Flags: ignoreversion recursesubdirs createallsubdirs skipifsourcedoesntexist
+
+; ----------------------------
+; windeployqt 部署的 QML（非源码，Qt 自带库的 QML 文件） 
+; ----------------------------
 Source: "{#BuildPath}\qml\*"; DestDir: "{app}\qml"; Flags: ignoreversion recursesubdirs
+
 
 ; 程序图标文件
 Source: "{#AssetsDir}\icons\app_icon.ico"; DestDir: "{app}"; Flags: ignoreversion

@@ -38,9 +38,7 @@ int main(int argc, char *argv[])
         LOG_INFO("Logger 已启动");
 
         // LOG_INFO("ApplicationDirPath: " + QCoreApplication::applicationDirPath().toStdString());
-
-        QString appDir = getAppDir();
-        QString qmlModulePath = QDir(appDir).filePath("qml");
+        QString qmlModulePath = getAppDir();
         qputenv("QML2_IMPORT_PATH", qmlModulePath.toUtf8());
         LOG_INFO("Set QML2_IMPORT_PATH: " + qmlModulePath.toStdString());
 

@@ -2,6 +2,7 @@
 #include "Controller.h"
 #include "Utils/ControllerUtils.h"
 #include "Managers/UserManager.h"
+#include "Managers/NetworkManager.h"
 
 using namespace ClassScheduler;
 
@@ -107,58 +108,85 @@ void Controller::onOperateModeSelected(OperateMode mode)
 
 void Controller::onTryToRegister(QString email, QString username, QString password, QString role)
 {
-    ResponseResult result;
-    result.username = "boss";
-    result.status = ResultStatus::LoginSuccess;
-    result.role = UserRole::Boss;
-
-    mCoreFramework->saveLoginUserInfo(result.username);
-    if(auto userManager = mCoreFramework->getUserManager())
-    {
-        if(result.status == ResultStatus::LoginSuccess) {
-            mUserInfo = userManager->getUserInfoByLoginInfo(result.username, result.role);
-            if(!mUserInfo.name.empty())
-            {
-                mName = QString::fromStdString(mUserInfo.name);
-                refreshActionItems();
-                emit nameChanged();
-            }
-            onOperateModeSelected(OperateMode::WelcomePage);
-        } else if(result.status == ResultStatus::UserOrEmailNotFound) {
-            emit registerOrLoginResult("UserOrEmailNotFound");
-        } else if(result.status == ResultStatus::PasswordIncorrect) {
-            emit registerOrLoginResult("PasswordIncorrect");
-        } else {
-            emit registerOrLoginResult("LoginFailed");
-        }
+    if(email.isEmpty() || username.isEmpty() || password.isEmpty()) {
+        emit registerOrLoginResult("EmptyInfo");
+        return;
     }
+
+    if(auto networkManager = mCoreFramework->getNetworkManager())
+    {
+        auto result = networkManager->sendRegisterRequest(email.toStdString(), username.toStdString(), password.toStdString(), role.toStdString());
+        LOG_INFO(result.statusStr);
+        LOG_INFO(result.rawResponse);
+        emit registerOrLoginResult(QString::fromStdString(result.statusStr));
+    }
+
+    // ResponseResult result;
+    // result.username = "boss";
+    // result.status = ResultStatus::LoginSuccess;
+    // result.role = UserRole::Boss;
+
+    // mCoreFramework->saveLoginUserInfo(result.username);
+    // if(auto userManager = mCoreFramework->getUserManager())
+    // {
+    //     if(result.status == ResultStatus::LoginSuccess) {
+    //         mUserInfo = userManager->getUserInfoByLoginInfo(result.username, result.role);
+    //         if(!mUserInfo.name.empty())
+    //         {
+    //             mName = QString::fromStdString(mUserInfo.name);
+    //             refreshActionItems();
+    //             emit nameChanged();
+    //         }
+    //         onOperateModeSelected(OperateMode::WelcomePage);
+    //     } else if(result.status == ResultStatus::UserOrEmailNotFound) {
+    //         emit registerOrLoginResult("UserOrEmailNotFound");
+    //     } else if(result.status == ResultStatus::PasswordIncorrect) {
+    //         emit registerOrLoginResult("PasswordIncorrect");
+    //     } else {
+    //         emit registerOrLoginResult("LoginFailed");
+    //     }
+    // }
 }
 
 void Controller::onTryToLogin(QString login, QString password)
 {
-    ResponseResult result;
-    result.username = "Dylandu";
-    result.status = ResultStatus::LoginSuccess;
-    result.role = UserRole::SuperAdmin;
+    if(login.isEmpty() || password.isEmpty()) {
+        emit registerOrLoginResult("EmptyInfo");
+        return;
+    }
 
-    mCoreFramework->saveLoginUserInfo(result.username);
-    if(auto userManager = mCoreFramework->getUserManager())
+
+    if(auto networkManager = mCoreFramework->getNetworkManager())
     {
-        if(result.status == ResultStatus::LoginSuccess) {
-            mUserInfo = userManager->getUserInfoByLoginInfo(result.username, result.role);
-            if(!mUserInfo.name.empty())
-            {
-                mName = QString::fromStdString(mUserInfo.name);
-                refreshActionItems();
-                emit nameChanged();
+        auto result = networkManager->sendLoginRequest(login.toStdString(), password.toStdString());
+
+        LOG_INFO(result.statusStr);
+        LOG_INFO(result.rawResponse);
+
+        // ResponseResult result;
+        // result.username = "Dylandu";
+        // result.status = ResultStatus::LoginSuccess;
+        // result.role = UserRole::SuperAdmin;
+
+        mCoreFramework->saveLoginUserInfo(result.username);
+        if(auto userManager = mCoreFramework->getUserManager())
+        {
+            if(result.status == ResultStatus::LoginSuccess) {
+                mUserInfo = userManager->getUserInfoByLoginInfo(result.username, result.role);
+                if(!mUserInfo.name.empty())
+                {
+                    mName = QString::fromStdString(mUserInfo.name);
+                    refreshActionItems();
+                    emit nameChanged();
+                }
+                onOperateModeSelected(OperateMode::WelcomePage);
+            } else if(result.status == ResultStatus::UserOrEmailNotFound) {
+                emit registerOrLoginResult("UserOrEmailNotFound");
+            } else if(result.status == ResultStatus::PasswordIncorrect) {
+                emit registerOrLoginResult("PasswordIncorrect");
+            } else {
+                emit registerOrLoginResult("LoginFailed");
             }
-            onOperateModeSelected(OperateMode::WelcomePage);
-        } else if(result.status == ResultStatus::UserOrEmailNotFound) {
-            emit registerOrLoginResult("UserOrEmailNotFound");
-        } else if(result.status == ResultStatus::PasswordIncorrect) {
-            emit registerOrLoginResult("PasswordIncorrect");
-        } else {
-            emit registerOrLoginResult("LoginFailed");
         }
     }
 }

@@ -604,11 +604,14 @@ ClassInfos DataManager::getClassInfosFromExcelFile(QString filePath)
 {
     ClassInfos infos;
     Document doc(filePath);
-    if (!doc.load())
+    if (!doc.load()){
+        LOG_ERROR("doc.load failed!!!!!!!!!!!!");
         return infos;
+    }
 
     if(!hasValidHeaders(doc))
     {
+        LOG_ERROR("hasValidHeaders is false");
         return infos;
     }
 
@@ -684,8 +687,7 @@ bool DataManager::hasValidHeaders(Document& doc)
     {
         if(!headers[header])
         {
-            std::string theader;
-            LOG_INFO("无该信息: " + theader);
+            LOG_INFO("无该信息: " + header.toStdString());
             return false;
         }
     }

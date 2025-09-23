@@ -51,23 +51,21 @@ namespace ClassScheduler
     // ---------- vector 常量，延迟初始化 ----------
     inline const std::vector<QString>& validExcelClassHeader() {
         static const std::vector<QString> v = {
-            "日期", "星期", "电话", "年级", "学科", "时间", "老师", "明细or面谈",
-            "课时", "金额/小时", "课时统计", "老师姓名", "老师工资", "已收金额",
-            "存款方式", "收款日期"
+            "日期", "星期", "姓名", "学校", "电话", "年级", "学科", "时间", "老师", "网课or面授", "课时", "金额/小时", "课酬总计", "老师姓名", "老师工资", "已收金额", "付费方式", "收费日期"
         };
         return v;
     }
 
     inline const std::vector<QString>& validTeacherHeader() {
         static const std::vector<QString> v = {
-            "教师姓名", "联系电话", "授课学科", "授课年级", "课时费(每小时)", "课时及年级"
+            "老师姓名", "使用过的昵称", "教过的科目及学生", "科目及工资（每小时）", "科目及年级"
         };
         return v;
     }
 
     inline const std::vector<QString>& validStudentHeader() {
         static const std::vector<QString> v = {
-            "学生姓名", "联系电话", "就读学校", "就读年级", "所报学科", "课时及费用(每小时)"
+            "学生姓名", "就读学校", "手机号", "教过该生的老师", "科目及费用（每小时）"
         };
         return v;
     }

@@ -7,7 +7,8 @@
 
 using json = nlohmann::json;
 
-static const std::string SERVER_URL = "http://127.0.0.1:8888/";
+//static const std::string SERVER_URL = "http://127.0.0.1:8888/";
+static const std::string SERVER_URL = "http://8.153.84.30:8888/";
 
 NetworkManager::NetworkManager(CoreFrameworkPtr coreFramework)
     : mCoreFramework(coreFramework)

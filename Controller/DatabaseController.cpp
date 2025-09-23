@@ -52,9 +52,11 @@ void DatabaseController::onFileUploaded(QString filePath)
         // 连接 QFutureWatcher 以处理任务完成
         disconnect(&mFutureWatcher, nullptr, this, nullptr);
         connect(&mFutureWatcher, &QFutureWatcher<void>::finished, this, [this, networkManager]() {
+            LOG_INFO("Ready to update db file to server");
             auto result = networkManager->uploadDbFile();
             LOG_INFO(result.statusStr);
             LOG_INFO(result.rawResponse);
+            LOG_INFO("Finish to update db file to server");
             refreshDataCount();
             emit refreshDatabaseFinished();
         });

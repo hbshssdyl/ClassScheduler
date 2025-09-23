@@ -132,7 +132,7 @@ bool AccountManager::deleteUser(int userId)
             for(auto& user : mUsers)
             {
                 LOG_INFO("user.id: " + std::to_string(user.id) +", userId: " + std::to_string(userId) +", user.accountStatus: " +user.accountStatus);
-                if(user.id == userId && (user.accountStatus == toAccountStatus(AccountStatus::APPROVED) || user.accountStatus == toAccountStatus(AccountStatus::BLACKLISTED)))
+                if(user.id == userId)
                 {
                     auto result = networkManager->deleteUserRequest(userId);
                     LOG_INFO(result.statusStr);

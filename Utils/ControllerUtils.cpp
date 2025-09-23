@@ -172,7 +172,7 @@ void CUtils::updateClassInfoList(QVariantMap& data, ClassInfos& classInfos)
     int id = 1;
 
     classInfoHeader.append("序号");
-    for(auto header : validExcelClassHeader)
+    for(auto header : validExcelClassHeader())
     {
         classInfoHeader.append(header);
     }
@@ -209,7 +209,7 @@ void CUtils::updateTeacherInfoList(QVariantMap& data, TeacherInfos& teacherInfos
 
     //update teacherInfoHeader
     teacherInfoHeader.append("序号");
-    for(auto header : validTeacherHeader)
+    for(auto header : validTeacherHeader())
     {
         teacherInfoHeader.append(header);
     }
@@ -259,7 +259,7 @@ void CUtils::updateStudentInfoList(QVariantMap& data, StudentInfos& studentInfos
 
     //update studentInfoHeader
     studentInfoHeader.append("序号");
-    for(auto header : validStudentHeader)
+    for(auto header : validStudentHeader())
     {
         studentInfoHeader.append(header);
     }

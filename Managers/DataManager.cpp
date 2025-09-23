@@ -11,16 +11,16 @@ DataManager::DataManager(CoreFrameworkPtr coreFramework)
 
 bool DataManager::createDBConnection(bool shouldDeleteOldDb)
 {
-    QDir().mkpath(CURRENT_PATH_DIR);
+    QDir().mkpath(currentPathDir());
 
-    if (shouldDeleteOldDb && QFile::exists(DATABASE_FULL_PATH)) {
-        QFile::remove(DATABASE_FULL_PATH);
+    if (shouldDeleteOldDb && QFile::exists(databaseFullPath())) {
+        QFile::remove(databaseFullPath());
         LOG_INFO("Old database deleted.");
     }
 
     QSqlDatabase::removeDatabase(QSqlDatabase::defaultConnection);
     mDB = QSqlDatabase::addDatabase("QSQLITE");
-    mDB.setDatabaseName(DATABASE_FULL_PATH);
+    mDB.setDatabaseName(databaseFullPath());
     if (!mDB.open()) {
         LOG_INFO("Failed to connect database.");
         return false;
@@ -164,7 +164,7 @@ bool DataManager::initializeAppSettings()
 
     query.prepare("INSERT OR REPLACE INTO settings (key, value) VALUES (:key, :value)");
 
-    for (const auto& setting : initialAppSettings) {
+    for (const auto& setting : initialAppSettings()) {
         query.bindValue(":key", setting.key);
         query.bindValue(":value", setting.value ? 1 : 0);
         if (!query.exec()) {
@@ -295,19 +295,19 @@ bool DataManager::refreshAllDataFromFile(QString filePath)
 
     if(isTableExist(CLASS_INFOS_TABLE_NAME))
     {
-        LOG_INFO("drop table: " +CLASS_INFOS_TABLE_NAME.toStdString());
+        LOG_INFO(std::string("drop table: ") + CLASS_INFOS_TABLE_NAME);
         dropTable(CLASS_INFOS_TABLE_NAME);
     }
 
     if(isTableExist(TEACHER_INFOS_TABLE_NAME))
     {
-        LOG_INFO("drop table: " +TEACHER_INFOS_TABLE_NAME.toStdString());
+        LOG_INFO(std::string("drop table: ") + TEACHER_INFOS_TABLE_NAME);
         dropTable(TEACHER_INFOS_TABLE_NAME);
     }
 
     if(isTableExist(STUDENT_INFOS_TABLE_NAME))
     {
-        LOG_INFO("drop table: " +STUDENT_INFOS_TABLE_NAME.toStdString());
+        LOG_INFO(std::string("drop table: ") + STUDENT_INFOS_TABLE_NAME);
         dropTable(STUDENT_INFOS_TABLE_NAME);
     }
 
@@ -585,9 +585,9 @@ void DataManager::queryDataFromStudentInfosTable(StudentInfos& infos)
 void DataManager::storeAllTableDataCount()
 {
     QSqlQuery query;
-    for(auto name : allTableNameForDB)
+    for(auto name : allTableNameForDB())
     {
-        std::string tname = name;
+        std::string tname = name.toStdString();
         if(!isTableExist(name))
         {
             LOG_INFO("Table " + tname + " is not exist");
@@ -680,7 +680,7 @@ bool DataManager::hasValidHeaders(Document& doc)
         headers[str] = true;
         col++;
     }
-    for(auto header : validExcelClassHeader)
+    for(auto header : validExcelClassHeader())
     {
         if(!headers[header])
         {
@@ -740,7 +740,7 @@ void DataManager::saveData(ClassInfo& info, QString& headerStr, QString& str)
 {
     if(str.isEmpty() || str == "00:00:00.000")
     {
-        str = nullString;
+        str = nullString();
     }
     if(headerStr == "日期") info.date = str;
     else if(headerStr == "星期") info.weekend = transToChinese(str);
@@ -872,7 +872,7 @@ void DataManager::generateStudentClassInfos()
 
 bool DataManager::isUsefulHeader(QString header)
 {
-    for(auto str : validExcelClassHeader)
+    for(auto str : validExcelClassHeader())
     {
         if(header == str) return true;
     }

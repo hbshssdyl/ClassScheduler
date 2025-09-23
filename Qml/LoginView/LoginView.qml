@@ -1,37 +1,37 @@
-﻿import QtQuick
+import "../JSUtils/ColorUtils.js" as ColorUtils
+import QtQuick
 import QtQuick.Controls
 import QtQuick.Controls.Basic
 import QtQuick.Layouts
 import QtQuick.Window
-import "../JSUtils/ColorUtils.js" as ColorUtils
 
 Rectangle {
     id: root
 
-    color: ColorUtils.getOperateAreaBackgroundColor()
-
     property var rootController
     property string viewName
-
     property var operateMode
     property string authMode: "none" // "login" or "register"
     property string feedbackMessage
     property color feedbackMessageColor: {
-        if(authMode === "success")
+        if (authMode === "success")
             return ColorUtils.getSuccessColor();
-        if(authMode === "failed")
+
+        if (authMode === "failed")
             return ColorUtils.getErrorColor();
+
         return "transparent";
     }
 
+    color: ColorUtils.getOperateAreaBackgroundColor()
     onAuthModeChanged: {
         userEmail.text = "";
         userName.text = "";
         password.text = "";
-        if(authMode === "login" || authMode === "register" || authMode === "none")
+        if (authMode === "login" || authMode === "register" || authMode === "none")
             feedbackMessage = "";
-    }
 
+    }
     onRootControllerChanged: {
         if (rootController) {
             rootController.registerOrLoginResult.connect(function(statusStr) {
@@ -53,21 +53,19 @@ Rectangle {
                 } else if (statusStr === "EmptyInfo") {
                     feedbackMessage = "邮箱、用户名或密码不能为空";
                     authMode = "failed";
-                } else if(statusStr === "UserOrEmailNotFound"){
+                } else if (statusStr === "UserOrEmailNotFound") {
                     feedbackMessage = "邮箱或用户名不存在";
                     authMode = "failed";
-                } else if(statusStr === "PasswordIncorrect"){
+                } else if (statusStr === "PasswordIncorrect") {
                     feedbackMessage = "密码错误";
                     authMode = "failed";
-                } else if(statusStr === "LoginFailed"){
+                } else if (statusStr === "LoginFailed") {
                     feedbackMessage = "登陆失败，请重试";
                     authMode = "failed";
-                }
-                else if(statusStr === "LoginSuccess"){
+                } else if (statusStr === "LoginSuccess") {
                     feedbackMessage = "登录成功";
                     authMode = "success";
-                }
-                else {
+                } else {
                     feedbackMessage = "未知错误，请联系管理员";
                     authMode = "failed";
                 }
@@ -80,11 +78,13 @@ Rectangle {
 
         spacing: 40
         anchors.fill: parent
-        Item{
+
+        Item {
             id: topSpace
 
             Layout.fillHeight: true
         }
+
         Rectangle {
             id: modeSelector
 
@@ -114,7 +114,9 @@ Rectangle {
                         border.color: "#A4A4A4"
                         border.width: 1
                     }
+
                 }
+
                 RoundButton {
                     text: "注册"
                     Layout.fillWidth: true
@@ -128,12 +130,16 @@ Rectangle {
                         border.color: "#A4A4A4"
                         border.width: 1
                     }
+
                 }
+
             }
+
         }
 
         Rectangle {
             id: authView
+
             width: 320
             height: 360
             radius: 16
@@ -159,50 +165,60 @@ Rectangle {
 
                 TextField {
                     id: userEmail
+
                     placeholderText: "请输入邮箱"
                     Layout.fillWidth: true
                     font.pixelSize: 16
                     visible: authMode === "register"
+                    padding: 8
+
                     background: Rectangle {
                         color: "#ffffff"
                         radius: 8
                         border.color: userEmail.text === "" ? "#cccccc" : "#33CC99"
                         border.width: 1
                     }
-                    padding: 8
+
                 }
 
                 TextField {
                     id: userName
+
                     placeholderText: authMode === "register" ? "请输入用户名" : "请输入用户名或邮箱"
                     Layout.fillWidth: true
                     font.pixelSize: 16
+                    padding: 8
+
                     background: Rectangle {
                         color: "#ffffff"
                         radius: 8
                         border.color: userName.text === "" ? "#cccccc" : "#33CC99"
                         border.width: 1
                     }
-                    padding: 8
+
                 }
 
                 TextField {
                     id: password
+
                     placeholderText: "请输入密码"
                     echoMode: TextInput.Password
                     Layout.fillWidth: true
                     font.pixelSize: 16
+                    padding: 8
+
                     background: Rectangle {
                         color: "#ffffff"
                         radius: 8
                         border.color: password.text === "" ? "#cccccc" : "#33CC99"
                         border.width: 1
                     }
-                    padding: 8
+
                 }
 
                 Rectangle {
                     id: roleSelector
+
                     visible: authMode === "register"
                     Layout.fillWidth: true
                     height: 40
@@ -214,6 +230,7 @@ Rectangle {
 
                     ComboBox {
                         id: roleCombo
+
                         anchors.fill: parent
                         model: ["员工", "高级员工", "经理", "一对一助理", "一对一经理", "一对多助理", "一对多经理", "老板"]
                         font.pixelSize: 16
@@ -245,6 +262,7 @@ Rectangle {
                                 border.color: roleSelector.border.color
                                 border.width: roleSelector.border.width
                             }
+
                         }
 
                         delegate: ItemDelegate {
@@ -252,11 +270,14 @@ Rectangle {
                             width: roleCombo.width
                             height: roleCombo.height
                         }
+
                     }
+
                 }
 
                 RoundButton {
                     id: actionButton
+
                     text: authMode === "login" ? "登录" : "注册"
                     font.pixelSize: 18
                     Layout.alignment: Qt.AlignHCenter
@@ -264,6 +285,14 @@ Rectangle {
                     height: 45
                     radius: 10
                     highlighted: true
+                    Keys.onEnterPressed: clicked()
+                    onClicked: {
+                        if (authMode === "login")
+                            rootController.onTryToLogin(userName.text, password.text);
+                        else if (authMode === "register")
+                            rootController.onTryToRegister(userEmail.text, userName.text, password.text, roleCombo.currentText);
+                    }
+
                     background: Rectangle {
                         color: actionButton.hovered ? "#33CCCC" : "#33CC99"
                         anchors.fill: parent
@@ -279,17 +308,10 @@ Rectangle {
                         anchors.centerIn: parent
                     }
 
-                    Keys.onEnterPressed: clicked()
-
-                    onClicked: {
-                        if (authMode === "login") {
-                            rootController.onTryToLogin(userName.text, password.text)
-                        } else if (authMode === "register") {
-                            rootController.onTryToRegister(userEmail.text, userName.text, password.text, roleCombo.currentText)
-                        }
-                    }
                 }
+
             }
+
         }
 
         Rectangle {
@@ -299,15 +321,17 @@ Rectangle {
             height: 360
             Layout.alignment: Qt.AlignCenter
             visible: {
-                if(authMode === "none")
+                if (authMode === "none")
                     return true;
-                if(authMode === "success")
+
+                if (authMode === "success")
                     return true;
-                if(authMode === "failed")
+
+                if (authMode === "failed")
                     return true;
+
                 return false;
             }
-
             color: "white"
             radius: 12
             border.color: "#3399FF"
@@ -318,7 +342,7 @@ Rectangle {
 
                 visible: authMode === "none"
                 anchors.fill: parent
-                source: "qrc:/qt/qml/ClassScheduler/Resource/tianming.jpg"
+                source: "qrc:/ClassScheduler/Resource/tianming.jpg"
             }
 
             Image {
@@ -328,11 +352,13 @@ Rectangle {
                 width: parent.width
                 height: width
                 z: 1
+                source: "qrc:/ClassScheduler/Resource/ok.svg"
+
                 anchors {
                     top: parent.top
                     horizontalCenter: parent.horizontalCenter
                 }
-                source: "qrc:/qt/qml/ClassScheduler/Resource/ok.svg"
+
             }
 
             Image {
@@ -342,11 +368,13 @@ Rectangle {
                 width: parent.width
                 height: width
                 z: 1
+                source: "qrc:/ClassScheduler/Resource/notok.svg"
+
                 anchors {
                     top: parent.top
                     horizontalCenter: parent.horizontalCenter
                 }
-                source: "qrc:/qt/qml/ClassScheduler/Resource/notok.svg"
+
             }
 
             Rectangle {
@@ -360,6 +388,7 @@ Rectangle {
                 border.color: "#3399FF"
                 border.width: 1
                 z: 2
+
                 anchors {
                     bottom: parent.bottom
                     bottomMargin: 10
@@ -372,18 +401,24 @@ Rectangle {
                     anchors.centerIn: parent
                     text: root.feedbackMessage
                     color: "white"
+
                     font {
                         bold: false
                         pixelSize: 12
                     }
+
                 }
+
             }
+
         }
 
-        Item{
+        Item {
             id: bottomSpace
 
             Layout.fillHeight: true
         }
+
     }
+
 }

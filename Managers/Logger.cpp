@@ -1,4 +1,5 @@
 ﻿#include "Logger.h"
+#include "Utils/DataUtils.h"
 #include <filesystem>
 #include <algorithm>
 #include <cstdio>   // for std::rename, std::remove
@@ -43,7 +44,8 @@ void Logger::init(const std::string &filename, LogLevel consoleLevel, LogLevel f
         this->fileLevel = fileLevel;
 
         // 使用 %APPDATA% 作为日志基础路径
-        const char* appDataEnv = std::getenv("APPDATA");
+        std::string pathDir = ClassScheduler::currentPathDir().toStdString();
+        const char* appDataEnv = pathDir.c_str();
         if (!appDataEnv) {
             appDataEnv = std::getenv("LOCALAPPDATA"); // 备用
         }
@@ -52,7 +54,7 @@ void Logger::init(const std::string &filename, LogLevel consoleLevel, LogLevel f
             logPath = filename; // 使用类成员 logPath
         } else {
             fs::path baseDir(appDataEnv);
-            fs::path appDir = baseDir / "MyAppLogs"; // 自定义主目录
+            fs::path appDir = baseDir / "logs"; // 自定义主目录
             fs::path fullDir = appDir / fs::path(filename).parent_path(); // 包括 logs 子目录
             logPath = fullDir / fs::path(filename).filename(); // 完整路径包括文件名
 

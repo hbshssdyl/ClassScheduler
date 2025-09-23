@@ -1,4 +1,4 @@
-﻿import "../BasicComponent"
+import "../BasicComponent"
 import "../JSUtils/ColorUtils.js" as ColorUtils
 import "../JSUtils/MainUtils.js" as MainUtils
 import QtQuick 2.15

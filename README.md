@@ -6,7 +6,7 @@ Qtcreator build 参数：
 Custom process step1:
 ```
 C:\Qt\6.9.1\mingw_64\bin\windeployqt.exe
---compiler-runtime --release --no-translations "%{buildDir}/appClassScheduler.exe"
+--compiler-runtime --release --no-translations --qmldir "%{buildDir}/ClassScheduler/Qml" "%{buildDir}/appClassScheduler.exe"
 %{buildDir}
 ```
 Custom process step2:

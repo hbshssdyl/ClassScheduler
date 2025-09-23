@@ -1,37 +1,83 @@
 ﻿#pragma once
 
-#include <String>
-#include <vector>
 #include <QString>
+#include <vector>
 #include <QTime>
-#include <QtSql>
+#include <QSqlDatabase>
+#include <QSqlQuery>
 #include <map>
+#include <QDir>
 #include <QVariant>
 #include <algorithm>
-#include <iostream>
 #include <nlohmann/json.hpp>
 #include "Managers/Logger.h"
 #include <QStandardPaths>
 
 namespace ClassScheduler
 {
-    static const QString CLASS_INFOS_TABLE_NAME = "classInfos";
-    static const QString TEACHER_INFOS_TABLE_NAME = "teacherInfos";
-    static const QString STUDENT_INFOS_TABLE_NAME = "studentInfos";
-    static const QString APP_TOGGLE_INFOS_TABLE_NAME = "toggleInfos";
-    static const std::string ADMIN_USER_NAME = "Dylandu";
-    static const std::string CURRENT_VERSION = "1.0.1";
+    // ---------- 简单字符串常量（用 constexpr/QLatin1StringView） ----------
+    inline constexpr auto CLASS_INFOS_TABLE_NAME   = "classInfos";
+    inline constexpr auto TEACHER_INFOS_TABLE_NAME = "teacherInfos";
+    inline constexpr auto STUDENT_INFOS_TABLE_NAME = "studentInfos";
+    inline constexpr auto APP_TOGGLE_INFOS_TABLE_NAME = "toggleInfos";
 
-    static const QString CURRENT_PATH_DIR = QStandardPaths::writableLocation(QStandardPaths::DownloadLocation);
-    static const QString DATABASE_NAME = "InfoDatabase.db";
-    static const QString DATABASE_FULL_PATH = CURRENT_PATH_DIR + "/" + DATABASE_NAME;
-    static const std::string INSTALLER_BASIC_NAME = "TianMing";
+    inline constexpr auto ADMIN_USER_NAME   = "Dylandu";
+    inline constexpr auto CURRENT_VERSION   = "v1.0.1";
+    inline constexpr auto DATABASE_NAME     = "database.db";
+    inline constexpr auto LOG_FILE_NAME     = "application.log";
+    inline constexpr auto INSTALLER_BASIC_NAME = "tianming";
 
-    static QString nullString = "无该信息";
-    static std::vector validExcelClassHeader{"日期", "星期", "姓名", "学校", "电话", "年级", "学科", "时间", "老师", "网课or面授", "课时", "金额/小时", "课酬总计", "老师姓名", "老师工资", "已收金额", "付费方式", "收费日期"};
-    static std::vector validTeacherHeader{"老师姓名", "使用过的昵称", "教过的科目及学生", "科目及工资（每小时）", "科目及年级"};
-    static std::vector validStudentHeader{"学生姓名", "就读学校", "手机号", "教过该生的老师", "科目及费用（每小时）"};
-    static std::vector allTableNameForDB{"classInfos", "teacherInfos", "studentInfos"};
+    // ---------- 需要运行时才能确定的值（用函数返回 static） ----------
+    inline const QString& currentPathDir() {
+        static const QString dir =
+            QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation);
+        return dir;
+    }
+
+    inline const QString& databaseFullPath() {
+        QDir dir(currentPathDir() + "/db");
+        if (!dir.exists()) {
+            dir.mkpath(".");  // 创建 db 目录
+        }
+        static const QString path = currentPathDir() + "/db/" + DATABASE_NAME;
+        return path;
+    }
+
+    inline const QString& nullString() {
+        static const QString s = QStringLiteral("无效信息");
+        return s;
+    }
+
+    // ---------- vector 常量，延迟初始化 ----------
+    inline const std::vector<QString>& validExcelClassHeader() {
+        static const std::vector<QString> v = {
+            "日期", "星期", "电话", "年级", "学科", "时间", "老师", "明细or面谈",
+            "课时", "金额/小时", "课时统计", "老师姓名", "老师工资", "已收金额",
+            "存款方式", "收款日期"
+        };
+        return v;
+    }
+
+    inline const std::vector<QString>& validTeacherHeader() {
+        static const std::vector<QString> v = {
+            "教师姓名", "联系电话", "授课学科", "授课年级", "课时费(每小时)", "课时及年级"
+        };
+        return v;
+    }
+
+    inline const std::vector<QString>& validStudentHeader() {
+        static const std::vector<QString> v = {
+            "学生姓名", "联系电话", "就读学校", "就读年级", "所报学科", "课时及费用(每小时)"
+        };
+        return v;
+    }
+
+    inline const std::vector<QString>& allTableNameForDB() {
+        static const std::vector<QString> v = {
+            "classInfos", "teacherInfos", "studentInfos"
+        };
+        return v;
+    }
 
     struct AppVersionInfo{
         bool showUpdate;
@@ -45,7 +91,13 @@ namespace ClassScheduler
         {
             currentVersion = CURRENT_VERSION;
             showUpdate = currentVersion != latestVersion;
-            clientSavePath = CURRENT_PATH_DIR.toStdString() + "/" + INSTALLER_BASIC_NAME + "_v" + latestVersion + ".exe";
+            clientSavePath = currentPathDir().toStdString() + "/installer/" + INSTALLER_BASIC_NAME + "_v" + latestVersion + ".exe";
+
+            QDir dir(currentPathDir() + "/installer");
+            if (!dir.exists()) {
+                dir.mkpath(".");  // 创建 installer 目录
+            }
+
             LOG_INFO("clientSavePath: " + clientSavePath);
         }
 
@@ -372,13 +424,17 @@ namespace ClassScheduler
         QString key;
         bool value;
     };
-    static QVector<Setting> initialAppSettings = {
-        { "showStudentAllClass",      true  },
-        { "showStudentSujectClass",   false },
-        { "showStudentSujectScore",   false },
-        { "showTeacherAllStudent",    true  },
-        { "showTeacherSujectStudent", false }
-    };
+
+    inline const QVector<Setting>& initialAppSettings() {
+        static const QVector<Setting> settings = {
+            { QStringLiteral("showStudentAllClass"),      true  },
+            { QStringLiteral("showStudentSujectClass"),   false },
+            { QStringLiteral("showStudentSujectScore"),   false },
+            { QStringLiteral("showTeacherAllStudent"),    true  },
+            { QStringLiteral("showTeacherSujectStudent"), false }
+        };
+        return settings;
+    }
 
     struct MonthCountInfo {
         QString yearMonth;
@@ -591,25 +647,25 @@ namespace ClassScheduler
         bool isValidInfo()
         {
             int cnt = 0;
-            if(studentName == nullString) return false;
-            if(nullString != teacherName) cnt++;
-            if(nullString != teacherNickName) cnt++;
-            if(nullString != date) cnt++;
-            if(nullString != weekend) cnt++;
-            if(nullString != studentName) cnt++;
-            if(nullString != school) cnt++;
-            if(nullString != studentPhoneNubmer) cnt++;
-            if(nullString != grade) cnt++;
-            if(nullString != suject) cnt++;
-            if(nullString != time) cnt++;
-            if(nullString != learningType) cnt++;
-            if(nullString != courseTime) cnt++;
-            if(nullString != studentFee) cnt++;
-            if(nullString != studentTotalFee) cnt++;
-            if(nullString != teacherFee) cnt++;
-            if(nullString != gotMoney) cnt++;
-            if(nullString != payType) cnt++;
-            if(nullString != payDate) cnt++;
+            if(studentName == nullString()) return false;
+            if(nullString() != teacherName) cnt++;
+            if(nullString() != teacherNickName) cnt++;
+            if(nullString() != date) cnt++;
+            if(nullString() != weekend) cnt++;
+            if(nullString() != studentName) cnt++;
+            if(nullString() != school) cnt++;
+            if(nullString() != studentPhoneNubmer) cnt++;
+            if(nullString() != grade) cnt++;
+            if(nullString() != suject) cnt++;
+            if(nullString() != time) cnt++;
+            if(nullString() != learningType) cnt++;
+            if(nullString() != courseTime) cnt++;
+            if(nullString() != studentFee) cnt++;
+            if(nullString() != studentTotalFee) cnt++;
+            if(nullString() != teacherFee) cnt++;
+            if(nullString() != gotMoney) cnt++;
+            if(nullString() != payType) cnt++;
+            if(nullString() != payDate) cnt++;
             if(cnt < 5) return false;
             return true;
         }

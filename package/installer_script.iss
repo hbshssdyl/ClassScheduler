@@ -2,8 +2,9 @@
 #define MyAppName "天明书院"
 #define MyAppVersion "v1.2.0"
 #define MyAppPublisher "Dylandu"
-#define MyAppURL "https://www.baidu.com"
+#define MyAppURL "https://www.example.com"
 #define MyAppExeName "appClassScheduler.exe" ; 必须与你的CMake目标名一致！
+#define MyAppIconName "app_icon.ico"
 
 ; -- 自动路径计算（无需修改）--
 #define ProjectRoot ExtractFileDir(ExtractFileDir(SourcePath))
@@ -73,76 +74,85 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "chinesesimplified"; MessagesFile: "compiler:Languages\ChineseSimplified.isl"
 
 [Tasks]
-Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
+; 默认勾选桌面图标
+Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"
 
 [Files]
-; 主执行文件
+
+; ----------------------------
+; 主程序
+; ----------------------------
 Source: "{#BuildPath}\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
 
-; 包含所有DLL文件，但不包含可能重复的文件
-Source: "{#BuildPath}\*.dll"; DestDir: "{app}"; Flags: ignoreversion
+; ----------------------------
+; 所有依赖DLL
+; ----------------------------
+Source: "{#BuildPath}\*.dll"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
-; 包含平台插件
-Source: "{#BuildPath}\platforms\*.dll"; DestDir: "{app}\platforms"; Flags: ignoreversion
+; ----------------------------
+; 平台插件（Qt6必需）
+; ----------------------------
+Source: "{#BuildPath}\platforms\*"; DestDir: "{app}\platforms"; Flags: ignoreversion recursesubdirs createallsubdirs
 
-; 选择性包含其他插件目录（如果存在）
+; ----------------------------
+; Qt模块插件（可选，按需添加）
+; ----------------------------
 #if DirExists(BuildPath + "\styles")
-Source: "{#BuildPath}\styles\*.dll"; DestDir: "{app}\styles"; Flags: ignoreversion
+Source: "{#BuildPath}\imageformats\*"; DestDir: "{app}\imageformats"; Flags: ignoreversion recursesubdirs createallsubdirs
 #endif
 
 #if DirExists(BuildPath + "\imageformats")  
-Source: "{#BuildPath}\imageformats\*.dll"; DestDir: "{app}\imageformats"; Flags: ignoreversion
+Source: "{#BuildPath}\styles\*"; DestDir: "{app}\styles"; Flags: ignoreversion recursesubdirs createallsubdirs
 #endif
 
 #if DirExists(BuildPath + "\translations")
-Source: "{#BuildPath}\translations\*.qm"; DestDir: "{app}\translations"; Flags: ignoreversion
+Source: "{#BuildPath}\translations\*"; DestDir: "{app}\translations"; Flags: ignoreversion recursesubdirs createallsubdirs
 #endif
 
-; 许可文件
+; ----------------------------
+; QML模块（关键）
+; ----------------------------
+; 将整个 ClassScheduler 目录（包含 Main.qml, qmldir, *.qmltypes 等）拷贝到 {app}\qml
+Source: "{#BuildPath}\ClassScheduler\*"; DestDir: "{app}\qml\ClassScheduler"; Flags: ignoreversion recursesubdirs createallsubdirs
+; 把 windeployqt 部署好的 qml 文件夹一起打包
+Source: "{#BuildPath}\qml\*"; DestDir: "{app}\qml"; Flags: ignoreversion recursesubdirs
+
+; 程序图标文件
+Source: "{#AssetsDir}\icons\app_icon.ico"; DestDir: "{app}"; Flags: ignoreversion
+
+; ----------------------------
+; License
+; ----------------------------
 Source: "{#LicenseFile}"; DestDir: "{app}"; Flags: ignoreversion; Check: FileExists('{#LicenseFile}')
 
 [Icons]
-Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
-Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
+; 开始菜单
+Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; IconFilename: "{app}\{#MyAppIconName}"
+; 桌面快捷方式（默认勾选）
+Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon; IconFilename: "{app}\{#MyAppIconName}"
+; 卸载
 Name: "{group}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"
 
 [Run]
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
 
 [Code]
-// 安装前检查
+// 安装前检查（简化版，只在出错时提示）
 function InitializeSetup(): Boolean;
-var
-  BuildPath: string;
-  Msg: string;
 begin
-  BuildPath := ExpandConstant('{#BuildPath}');
-  Msg := '构建目录信息:' + #13#10 +
-         '检测到的路径: ' + BuildPath + #13#10 +
-         '项目根目录: ' + ExpandConstant('{#ProjectRoot}') + #13#10#13#10;
-
-  if not DirExists(BuildPath) then
+  if not DirExists(ExpandConstant('{#BuildPath}')) then
   begin
-    Msg := Msg + '❌ 错误：构建目录不存在！' + #13#10 +
-           '请先编译项目并运行windeployqt。';
-    MsgBox(Msg, mbError, MB_OK);
+    MsgBox('❌ 错误：构建目录不存在！请先编译项目并运行 windeployqt。', mbError, MB_OK);
     Result := False;
     Exit;
   end;
 
-  if not FileExists(BuildPath + '\{#MyAppExeName}') then
+  if not FileExists(ExpandConstant('{#BuildPath}\{#MyAppExeName}')) then
   begin
-    Msg := Msg + '❌ 错误：未找到主程序文件！' + #13#10 +
-           '请确认：' + #13#10 +
-           '1. 项目已成功编译' + #13#10 +
-           '2. 已运行windeployqt收集依赖' + #13#10 +
-           '3. MyAppExeName变量设置正确';
-    MsgBox(Msg, mbError, MB_OK);
+    MsgBox('❌ 错误：未找到主程序文件！请确认已编译并收集依赖。', mbError, MB_OK);
     Result := False;
     Exit;
   end;
 
-  Msg := Msg + '✅ 构建目录检测成功！';
-  MsgBox(Msg, mbInformation, MB_OK);
   Result := True;
 end;

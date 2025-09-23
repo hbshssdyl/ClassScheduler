@@ -88,7 +88,7 @@ ResponseResult NetworkManager::approveUserRequest(int userId) {
         std::string url = SERVER_URL + "admin/users/" + std::to_string(userId) + "/approve";
         struct curl_slist* headers = nullptr;
         headers = curl_slist_append(headers, "Content-Type: application/json");
-        headers = curl_slist_append(headers, ("X-Username: " + ADMIN_USER_NAME).c_str());
+        headers = curl_slist_append(headers, (std::string("X-Username: ") + ADMIN_USER_NAME).c_str());
 
         curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "PUT");
         curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
@@ -121,7 +121,7 @@ ResponseResult NetworkManager::rejectUserRequest(int userId) {
         std::string url = SERVER_URL + "admin/users/" + std::to_string(userId) + "/reject";
         struct curl_slist* headers = nullptr;
         headers = curl_slist_append(headers, "Content-Type: application/json");
-        headers = curl_slist_append(headers, ("X-Username: " + ADMIN_USER_NAME).c_str());
+        headers = curl_slist_append(headers, (std::string("X-Username: ") + ADMIN_USER_NAME).c_str());
 
         curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "PUT");
         curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
@@ -152,7 +152,7 @@ ResponseResult NetworkManager::blacklistUserRequest(int userId) {
         std::string url = SERVER_URL + "admin/users/" + std::to_string(userId) + "/blacklist";
         struct curl_slist* headers = nullptr;
         headers = curl_slist_append(headers, "Content-Type: application/json");
-        headers = curl_slist_append(headers, ("X-Username: " + ADMIN_USER_NAME).c_str());
+        headers = curl_slist_append(headers, (std::string("X-Username: ") + ADMIN_USER_NAME).c_str());
 
         curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "PUT");
         curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
@@ -183,7 +183,7 @@ ResponseResult NetworkManager::deleteUserRequest(int userId) {
     if (curl) {
         std::string url = SERVER_URL + "admin/users/" + std::to_string(userId);
         struct curl_slist* headers = nullptr;
-        headers = curl_slist_append(headers, ("X-Username: " + ADMIN_USER_NAME).c_str());
+        headers = curl_slist_append(headers, (std::string("X-Username: ") + ADMIN_USER_NAME).c_str());
 
         curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "DELETE");
         curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
@@ -224,7 +224,7 @@ ResponseResult NetworkManager::addUserRequest(const std::string& username, const
         std::string url = SERVER_URL + "admin/users";
         struct curl_slist* headers = nullptr;
         headers = curl_slist_append(headers, "Content-Type: application/json");
-        headers = curl_slist_append(headers, ("X-Username: " + ADMIN_USER_NAME).c_str());
+        headers = curl_slist_append(headers, (std::string("X-Username: ") + ADMIN_USER_NAME).c_str());
 
         curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
@@ -256,7 +256,7 @@ ResponseResult NetworkManager::getAllUsersRequest() {
     if (curl) {
         std::string url = SERVER_URL + "admin/users";
         struct curl_slist* headers = nullptr;
-        headers = curl_slist_append(headers, ("X-Username: " + ADMIN_USER_NAME).c_str());
+        headers = curl_slist_append(headers, (std::string("X-Username: ") + ADMIN_USER_NAME).c_str());
 
         curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
@@ -467,8 +467,8 @@ ResponseResult NetworkManager::uploadDbFile() {
         curl_mime* form = curl_mime_init(curl);
         curl_mimepart* field = curl_mime_addpart(form);
         curl_mime_name(field, "file");
-        curl_mime_filedata(field, DATABASE_FULL_PATH.toStdString().c_str());
-        curl_mime_filename(field, DATABASE_NAME.toStdString().c_str());
+        curl_mime_filedata(field, databaseFullPath().toStdString().c_str());
+        curl_mime_filename(field, DATABASE_NAME);
 
         curl_easy_setopt(curl, CURLOPT_URL, (SERVER_URL + "upload-db/").c_str());
         curl_easy_setopt(curl, CURLOPT_MIMEPOST, form);
@@ -496,14 +496,14 @@ ResponseResult NetworkManager::downloadDbFile() {
     CURLcode res;
     ResponseResult result;
 
-    FILE* fp = fopen(DATABASE_FULL_PATH.toStdString().c_str(), "wb");
+    FILE* fp = fopen(databaseFullPath().toStdString().c_str(), "wb");
     if (!fp) {
         result.status = ResultStatus::CreateDatabaseFileFailed;
-        result.rawResponse = "无法创建本地文件: " + DATABASE_FULL_PATH.toStdString();
+        result.rawResponse = "无法创建本地文件: " + databaseFullPath().toStdString();
         result.statusStr = result.toString(ResultStatus::CreateDatabaseFileFailed);
         return result;
     }
-    LOG_INFO("test: " +DATABASE_FULL_PATH.toStdString());
+    LOG_INFO("test: " +databaseFullPath().toStdString());
 
     curl = curl_easy_init();
     if (curl) {
@@ -933,6 +933,7 @@ void NetworkManager::downloadInstaller(const std::string& url, const std::string
     FILE* fp = fopen(savePath.c_str(), "wb");
     if(!fp) {
         curl_easy_cleanup(curl);
+        LOG_INFO("Failed to open savePath, savePath: " + savePath);
         return;
     }
 

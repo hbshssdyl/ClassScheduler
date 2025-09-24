@@ -17,6 +17,11 @@ void FeedbackManager::initialize()
     initFeedbackInfos();
 }
 
+void FeedbackManager::refreshDataFromServer()
+{
+    initFeedbackInfos();
+}
+
 void FeedbackManager::initFeedbackInfos()
 {
     mFeedbackInfos = getFeedbacksFromServer();

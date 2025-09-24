@@ -1,4 +1,5 @@
 ﻿import "../JSUtils/ColorUtils.js" as ColorUtils
+import "../BasicComponent"
 import Qt5Compat.GraphicalEffects
 import QtQuick
 import QtQuick.Controls
@@ -45,6 +46,31 @@ Rectangle {
             anchors.fill: parent
             fillMode: Image.PreserveAspectCrop
             source: "qrc:/ClassScheduler/Resource/Banner-mountain.jpg"
+        }
+
+        // 数据更新按钮（使用封装好的 LoadingIconButton）
+        RefreshButton {
+
+            id: dataUpdateBtn
+            iconSource: "qrc:/ClassScheduler/Resource/sync_orange.svg"
+
+            anchors {
+                top: parent.top
+                right: updateIndicator.visible ? updateIndicator.left : parent.right
+                rightMargin: 10
+                topMargin: 10
+            }
+
+            onClicked: {
+                controller.updateAllData()   // 调用数据更新逻辑
+            }
+
+            Connections {
+                target: controller
+                function dataUpdateFinished() {
+                    dataUpdateBtn.finished();     // 恢复按钮
+                }
+            }
         }
 
         // 更新提示图标 - 更美观的设计

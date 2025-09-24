@@ -97,6 +97,17 @@ int main(int argc, char *argv[])
             return -1;
         }
 
+        // 界面已经加载出来，可以获取 Controller 对象
+        QObject *rootObj = engine.rootObjects().first();
+        QObject *controllerObj = rootObj->findChild<QObject*>("controller");
+        if (controllerObj)
+        {
+            // 异步初始化
+            QTimer::singleShot(0, [controllerObj]() {
+                QMetaObject::invokeMethod(controllerObj, "init");
+            });
+        }
+
         LOG_INFO("Entering app.exec()");
         return app.exec();
     }

@@ -73,6 +73,7 @@ qt_add_qml_module(appClassScheduler
     QML_FILES Qml/BasicComponent/DateSelector.qml
     QML_FILES Qml/BasicComponent/MButton.qml
     QML_FILES Qml/BasicComponent/MCheckButton.qml
+    QML_FILES Qml/BasicComponent/RefreshButton.qml
     QML_FILES Qml/SearchTeacherInfo/SearchTeacherInfo.qml
     QML_FILES Qml/SearchTeacherInfo/SearchTeacherInfoDelegate.qml
     QML_FILES Qml/UserInfo/UserInfo.qml
@@ -149,6 +150,7 @@ qt_add_qml_module(appClassScheduler
     RESOURCES Resource/phone.svg
     RESOURCES Resource/close.svg
     RESOURCES Resource/update.svg
+    RESOURCES Resource/sync_orange.svg
 
     RESOURCE_PREFIX "/"
 )

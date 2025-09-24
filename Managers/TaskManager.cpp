@@ -34,6 +34,11 @@ void TaskManager::initialize()
     initTasks();
 }
 
+void TaskManager::refreshDataFromServer()
+{
+    initTasks();
+}
+
 void TaskManager::initTasks()
 {
     mTasks = getTaskFromServer();
@@ -56,7 +61,7 @@ void TaskManager::initDailyTasks()
     bool needNewDailyTasks = true;
     for(auto& task : mTasks)
     {
-        //LOG_INFO(task.publish +" " +data);
+        //LOG_INFO(task.publish + " " + data + " " + task.category);
         if(task.publish == data && task.category == "今日")
         {
             needNewDailyTasks = false;

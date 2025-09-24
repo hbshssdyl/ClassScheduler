@@ -17,6 +17,7 @@ class CoreFramework : public std::enable_shared_from_this<CoreFramework>
 public:
     CoreFramework();
     void initialize();
+    void refreshDataFromServer();
     void saveLoginUserInfo(std::string username);
     void updateAppToLatestVersion(std::function<void(int)> callback);
     AppVersionInfo getVersionInformation();

@@ -12,6 +12,11 @@ void AccountManager::initialize()
     initUsers();
 }
 
+void AccountManager::refreshDataFromServer()
+{
+    initUsers();
+}
+
 void AccountManager::initUsers()
 {
     mUsers = getUsersFromServer();

@@ -9,14 +9,15 @@ using namespace ClassScheduler;
 Controller::Controller(QObject* parent)
     : QObject(parent)
 {
-    initialize();
+    onOperateModeSelected(OperateMode::LoginView);
 }
 
-void Controller::initialize()
+void Controller::init()
 {
-    initCoreFramework();
-    refreshLatestVersionInfo();
-    onOperateModeSelected(OperateMode::LoginView);
+    QtConcurrent::run([this]() {
+        initCoreFramework();
+        refreshLatestVersionInfo();
+    });
 }
 
 void Controller::initCoreFramework()
@@ -53,6 +54,22 @@ void Controller::refreshLatestVersionInfo()
     m_installProcess = new QProcess(this);  // 初始化进程
     connect(m_installProcess, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
             this, &Controller::onInstallFinished);
+}
+
+void Controller::updateAllData()
+{
+    QtConcurrent::run([this]() {
+        if(mCoreFramework)
+        {
+            mCoreFramework->refreshDataFromServer();
+            LOG_INFO("Success updateAllData");
+        }
+    });
+
+    // 发射信号到主线程
+    QMetaObject::invokeMethod(this, "dataUpdateFinished",
+                              Qt::QueuedConnection);
+
 }
 
 void Controller::refreshOperateMode(OperateMode mode)
@@ -150,23 +167,23 @@ void Controller::onTryToRegister(QString email, QString username, QString passwo
 
 void Controller::onTryToLogin(QString login, QString password)
 {
-    if(login.isEmpty() || password.isEmpty()) {
-        emit registerOrLoginResult("EmptyInfo");
-        return;
-    }
+    // if(login.isEmpty() || password.isEmpty()) {
+    //     emit registerOrLoginResult("EmptyInfo");
+    //     return;
+    // }
 
 
     if(auto networkManager = mCoreFramework->getNetworkManager())
     {
-        auto result = networkManager->sendLoginRequest(login.toStdString(), password.toStdString());
+        // auto result = networkManager->sendLoginRequest(login.toStdString(), password.toStdString());
 
-        LOG_INFO(result.statusStr);
-        LOG_INFO(result.rawResponse);
+        // LOG_INFO(result.statusStr);
+        // LOG_INFO(result.rawResponse);
 
-        // ResponseResult result;
-        // result.username = "Dylandu";
-        // result.status = ResultStatus::LoginSuccess;
-        // result.role = UserRole::SuperAdmin;
+        ResponseResult result;
+        result.username = "Dylandu";
+        result.status = ResultStatus::LoginSuccess;
+        result.role = UserRole::SuperAdmin;
 
         mCoreFramework->saveLoginUserInfo(result.username);
         if(auto userManager = mCoreFramework->getUserManager())

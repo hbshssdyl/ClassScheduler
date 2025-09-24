@@ -13,6 +13,7 @@ public:
     AccountManager(CoreFrameworkPtr coreFramework);
     UserInfos getUsers();
     void initialize();
+    void refreshDataFromServer();
 
     bool approveUser(int userId);
     bool rejectUser(int userId);

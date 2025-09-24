@@ -29,6 +29,13 @@ void CoreFramework::initManagers()
     mFeedbackManager->initialize();
 }
 
+void CoreFramework::refreshDataFromServer()
+{
+    mTaskManager->refreshDataFromServer();
+    mAccountManager->refreshDataFromServer();
+    mFeedbackManager->refreshDataFromServer();
+}
+
 void CoreFramework::saveLoginUserInfo(std::string username)
 {
     auto userInfos = mAccountManager->getUsers();

@@ -13,6 +13,7 @@ public:
     TaskManager(CoreFrameworkPtr coreFramework);
     Tasks getTasks();
     void initialize();
+    void refreshDataFromServer();
 
     bool addTask(Task task);
     bool updateTaskFinishStatus(int taskId, std::string commentString);

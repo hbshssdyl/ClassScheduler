@@ -33,7 +33,7 @@ public:
 
 public:
     explicit Controller(QObject* parent = nullptr);
-    void initialize();
+    Q_INVOKABLE void init();
 
     Q_INVOKABLE virtual SearchClassInfoController* getSearchClassInfoController();
     Q_INVOKABLE virtual SearchTeacherInfoController* getSearchTeacherInfoController();
@@ -50,6 +50,7 @@ public slots:
     void onTryToRegister(QString email, QString username, QString password, QString role);
     void onUpdateStarted();
     void installLatestVersion();
+    void updateAllData();
 
 signals:
     void registerOrLoginResult(QString statusStr);
@@ -60,6 +61,7 @@ signals:
     void nameChanged();
     void versionInfoListChanged();
     void downloadValueChanged();
+    void dataUpdateFinished();
 
 private:
     QString toOperateModeString(OperateMode mode);

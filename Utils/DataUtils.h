@@ -22,7 +22,7 @@ namespace ClassScheduler
     inline constexpr auto APP_TOGGLE_INFOS_TABLE_NAME = "toggleInfos";
 
     inline constexpr auto ADMIN_USER_NAME   = "Dylandu";
-    inline constexpr auto CURRENT_VERSION   = "v1.0.1";
+    inline constexpr auto CURRENT_VERSION   = "v1.0.0";
     inline constexpr auto DATABASE_NAME     = "database.db";
     inline constexpr auto LOG_FILE_NAME     = "application.log";
     inline constexpr auto INSTALLER_BASIC_NAME = "tianming";

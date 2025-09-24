@@ -13,6 +13,7 @@ public:
     FeedbackManager(CoreFrameworkPtr coreFramework);
     FeedbackInfos getFeedbackInfos();
     void initialize();
+    void refreshDataFromServer();
 
     bool addFeedback(std::string feedbackType, std::string username, bool isAnonymous, std::string feedbackMessage, std::string dateAndTime);
     bool likeFeedback(int feedbackId);

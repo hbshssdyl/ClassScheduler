@@ -25,7 +25,7 @@ private:
     void initWeeklyTasks();
     void initMonthlyTasks();
     void refreshTaskStatus();
-    Tasks getTaskFromServer();
+    std::pair<Tasks, ResultStatus> getTaskFromServer();
     Task createTask(const TaskTemplate& tmpl, const std::string& publishDate, const std::string& dueDate);
     Tasks generateDailyTasks();
     Tasks generateWeeklyTasks();

@@ -143,7 +143,7 @@ Rectangle {
                                 return false;
                             }
 
-                            if(!shouldFinishButton.checked && modelData.finishStatus === "已审核")
+                            if(!shouldFinishButton.checked && modelData.reviewStatus === "已审核")
                             {
                                 return false;
                             }

@@ -61,15 +61,14 @@ void Controller::updateAllData()
     QtConcurrent::run([this]() {
         if(mCoreFramework)
         {
+            mRefreshFinished = false;
+            emit refreshFinishedChanged();
             mCoreFramework->refreshDataFromServer();
+            mRefreshFinished = true;
+            emit refreshFinishedChanged();
             LOG_INFO("Success updateAllData");
         }
     });
-
-    // 发射信号到主线程
-    QMetaObject::invokeMethod(this, "dataUpdateFinished",
-                              Qt::QueuedConnection);
-
 }
 
 void Controller::refreshOperateMode(OperateMode mode)

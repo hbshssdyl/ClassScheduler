@@ -497,13 +497,14 @@ ResponseResult NetworkManager::downloadDbFile() {
     CURLcode res;
     ResponseResult result;
 
-    FILE* fp = fopen(databaseFullPath().toStdString().c_str(), "wb");
+    FILE* fp = _wfopen((const wchar_t*)databaseFullPath().utf16(), L"wb");
     if (!fp) {
         result.status = ResultStatus::CreateDatabaseFileFailed;
         result.rawResponse = "无法创建本地文件: " + databaseFullPath().toStdString();
         result.statusStr = result.toString(ResultStatus::CreateDatabaseFileFailed);
         return result;
     }
+
     LOG_INFO("test: " +databaseFullPath().toStdString());
 
     curl = curl_easy_init();
@@ -938,6 +939,9 @@ void NetworkManager::downloadInstaller(const std::string& url, const std::string
         return;
     }
 
+    LOG_INFO("savePath: " + savePath);
+    LOG_INFO("set downloadProgressCallback");
+    LOG_INFO("download url: " + url);
     downloadProgressCallback = std::move(callback);
 
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
@@ -948,6 +952,10 @@ void NetworkManager::downloadInstaller(const std::string& url, const std::string
     curl_easy_setopt(curl, CURLOPT_XFERINFODATA, this);
 
     CURLcode res = curl_easy_perform(curl);
+    long http_code = 0;
+    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_code);
+    LOG_INFO("downloadInstaller: curl res: " + std::to_string(res) + ", http_code: " + std::to_string(http_code));
+
     fclose(fp);
     curl_easy_cleanup(curl);
 

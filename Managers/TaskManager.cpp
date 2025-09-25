@@ -41,11 +41,15 @@ void TaskManager::refreshDataFromServer()
 
 void TaskManager::initTasks()
 {
-    mTasks = getTaskFromServer();
-    initDailyTasks();
-    initWeeklyTasks();
-    initMonthlyTasks();
-    refreshTaskStatus();
+    auto [tasks, status] = getTaskFromServer();
+    mTasks = tasks;
+    if(status == ResultStatus::GetOneToOneTasksSuccess)
+    {
+        initDailyTasks();
+        initWeeklyTasks();
+        initMonthlyTasks();
+        refreshTaskStatus();
+    }
 }
 
 Tasks TaskManager::getTasks()
@@ -235,7 +239,7 @@ bool TaskManager::addTask(Task task)
     return false;
 }
 
-Tasks TaskManager::getTaskFromServer()
+std::pair<Tasks, ResultStatus> TaskManager::getTaskFromServer()
 {
     if(auto coreFramework = mCoreFramework.lock())
     {
@@ -244,14 +248,14 @@ Tasks TaskManager::getTaskFromServer()
             auto response = networkManager->getAllOneToOneTasks();
             if(response.status == ResultStatus::GetOneToOneTasksSuccess)
             {
-                return response.oneToOneTasks;
+                return {response.oneToOneTasks, response.status};
             }
             LOG_INFO(response.rawResponse);
-            return {};
+            return {response.oneToOneTasks, response.status};
         }
     }
     LOG_INFO("no coreFramework or no networkManager");
-    return {};
+    return {{}, ResultStatus::UnknownError};
 }
 
 Task TaskManager::createTask(const TaskTemplate& tmpl, const std::string& date, const std::string& dueDate) {

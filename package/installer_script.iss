@@ -1,5 +1,6 @@
 ; -- 应用基本信息（需要修改）--
 #define MyAppName "天明书院"
+#define MyAppInstallerName "TianMingShuYuan"
 #define MyAppVersion "v1.0.1"
 #define MyAppPublisher "Dylandu"
 #define MyAppURL "https://www.example.com"
@@ -62,7 +63,7 @@ AppUpdatesURL={#MyAppURL}
 DefaultDirName={autopf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 OutputDir={#OutputDir}
-OutputBaseFileName={#MyAppName}_Setup_{#MyAppVersion}
+OutputBaseFileName={#MyAppInstallerName}_Setup_{#MyAppVersion}
 Compression=lzma
 SolidCompression=yes
 SetupIconFile={#AppIcon}

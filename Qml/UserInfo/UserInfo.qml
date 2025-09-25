@@ -10,10 +10,22 @@ Rectangle {
 
     property var controller
     property string username: "User"
-    property bool hasUpdate: controller ? controller.versionInfoList["shouldUpdate"] : false // 控制是否显示更新图标
-    property string latestVersion: controller ? controller.versionInfoList["latestVersion"] : "1.0.1" // 最新版本号
-    property string currentVersion: controller ? controller.versionInfoList["currentVersion"] : "1.0.1" // 当前版本号
-    property string releaseNotes: controller ? controller.versionInfoList["changeLog"] : "修复已知问题" // 更新内容
+    property bool hasUpdate: getVersionInfoListValue("shouldUpdate", false)
+    property string latestVersion: getVersionInfoListValue("latestVersion", "1.0.1") // 最新版本号
+    property string currentVersion: getVersionInfoListValue("currentVersion", "1.0.1") // 当前版本号
+    property string releaseNotes: getVersionInfoListValue("changeLog", "修复已知问题") // 更新内容
+
+    function getVersionInfoListValue(key, defaultValue)
+    {
+        if(controller)
+        {
+            if(controller.versionInfoList[key] !== undefined)
+            {
+                return controller.versionInfoList[key];
+            }
+        }
+        return defaultValue;
+    }
 
     // 模拟下载过程
     function simulateDownload() {
@@ -53,6 +65,7 @@ Rectangle {
 
             id: dataUpdateBtn
             iconSource: "qrc:/ClassScheduler/Resource/sync_orange.svg"
+            finished: controller.refreshFinished
 
             anchors {
                 top: parent.top
@@ -62,14 +75,7 @@ Rectangle {
             }
 
             onClicked: {
-                controller.updateAllData()   // 调用数据更新逻辑
-            }
-
-            Connections {
-                target: controller
-                function dataUpdateFinished() {
-                    dataUpdateBtn.finished();     // 恢复按钮
-                }
+                controller.updateAllData();
             }
         }
 

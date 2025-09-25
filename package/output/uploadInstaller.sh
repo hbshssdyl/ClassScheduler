@@ -1,0 +1,1 @@
+scp ./*.exe root@8.153.84.30:/home/project/ClassSchedulerServer/downloads/

@@ -4,13 +4,15 @@ import Qt5Compat.GraphicalEffects
 
 Rectangle {
     id: root
+
     property alias iconSource: icon.source
     property color buttonColor: "white"       // 橙色按钮底色
     property color glowColor: "white"         // 光效颜色，亮橙色
     property int iconSize: 24
     property int busyIndicatorSize: 40
+    property bool finished: false
     signal clicked()
-    signal finished()
+
 
     width: 26
     height: 26
@@ -44,6 +46,9 @@ Rectangle {
         anchors.fill: parent
         cursorShape: Qt.PointingHandCursor
         onClicked: {
+            if(spinner.running)
+                return;
+
             icon.visible = false
             spinner.visible = true
             spinner.running = true
@@ -51,9 +56,11 @@ Rectangle {
         }
     }
 
-    onFinished: {
-        spinner.running = false
-        spinner.visible = false
-        icon.visible = true
+    onFinishedChanged: {
+        if(finished){
+            spinner.running = false
+            spinner.visible = false
+            icon.visible = true
+        }
     }
 }

@@ -25,6 +25,7 @@ public:
     Q_PROPERTY(OperateMode operateMode MEMBER mOperateMode NOTIFY operateModeChanged)
     Q_PROPERTY(bool showActions MEMBER mShowActions NOTIFY operateModeChanged)
     Q_PROPERTY(bool showUserInfo MEMBER mShowUserInfo NOTIFY operateModeChanged)
+    Q_PROPERTY(bool refreshFinished MEMBER mRefreshFinished NOTIFY refreshFinishedChanged)
     Q_PROPERTY(QString name MEMBER mName NOTIFY nameChanged)
     Q_PROPERTY(int downloadValue MEMBER mDownloadValue NOTIFY downloadValueChanged)
     Q_PROPERTY(QVariantList actionItemsList MEMBER mActionItemsList NOTIFY actionItemsListChanged)
@@ -62,6 +63,7 @@ signals:
     void versionInfoListChanged();
     void downloadValueChanged();
     void dataUpdateFinished();
+    void refreshFinishedChanged();
 
 private:
     QString toOperateModeString(OperateMode mode);
@@ -80,8 +82,9 @@ private:
     UserInfo mUserInfo;
 
     QString mName{ "" };
-    bool mShowActions;
-    bool mShowUserInfo;
+    bool mShowActions{ false };
+    bool mShowUserInfo{ false };
+    bool mRefreshFinished{ false };
     int mDownloadValue{ 0 };
     QString mDataCount { "" };
     QVariantList mActionItemsList;

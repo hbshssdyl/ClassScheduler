@@ -25,12 +25,12 @@ namespace ClassScheduler
     inline constexpr auto CURRENT_VERSION   = "v1.0.0";
     inline constexpr auto DATABASE_NAME     = "database.db";
     inline constexpr auto LOG_FILE_NAME     = "application.log";
-    inline constexpr auto INSTALLER_BASIC_NAME = "tianming";
+    inline constexpr auto INSTALLER_BASIC_NAME = "TianMingShuYuan";
 
     // ---------- 需要运行时才能确定的值（用函数返回 static） ----------
     inline const QString& currentPathDir() {
         static const QString dir =
-            QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation);
+            QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation) + "/" + INSTALLER_BASIC_NAME;
         return dir;
     }
 
@@ -89,7 +89,7 @@ namespace ClassScheduler
         {
             currentVersion = CURRENT_VERSION;
             showUpdate = currentVersion != latestVersion;
-            clientSavePath = currentPathDir().toStdString() + "/installer/" + INSTALLER_BASIC_NAME + "_v" + latestVersion + ".exe";
+            clientSavePath = currentPathDir().toStdString() + "/installer/" + INSTALLER_BASIC_NAME + "_" + latestVersion + ".exe";
 
             QDir dir(currentPathDir() + "/installer");
             if (!dir.exists()) {

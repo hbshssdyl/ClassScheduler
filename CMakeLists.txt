@@ -82,6 +82,7 @@ qt_add_qml_module(appClassScheduler
     QML_FILES Qml/FeedbackApp/FeedbackApp.qml
     QML_FILES Qml/FeedbackCompany/FeedbackCompany.qml
     QML_FILES Qml/AccountView/AccountView.qml
+    QML_FILES Qml/StudentGradeView/StudentGradeView.qml
 
     # 源文件
     SOURCES Utils/DataUtils.h

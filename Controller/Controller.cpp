@@ -95,6 +95,7 @@ void Controller::refreshOperateMode(OperateMode mode)
     case OperateMode::FeedbackCompany:
     case OperateMode::AccountView:
     case OperateMode::TeacherEvaluation:
+    case OperateMode::StudentGradeView:
     {
         mShowActions = true;
         mShowUserInfo = true;

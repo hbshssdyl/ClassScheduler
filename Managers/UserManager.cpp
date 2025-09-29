@@ -25,6 +25,7 @@ OperateModes UserManager::getModsByUserRole(UserRole& role)
                     OperateMode::SearchClassInfo,
                     OperateMode::SearchTeacherInfo,
                     OperateMode::SearchStudentInfo,
+                    OperateMode::StudentGradeView,
                     OperateMode::ScheduleClass,
                     OperateMode::TeacherEvaluation,
                     OperateMode::FeedbackApp,
@@ -34,6 +35,7 @@ OperateModes UserManager::getModsByUserRole(UserRole& role)
             return { OperateMode::SearchClassInfo,
                     OperateMode::SearchTeacherInfo,
                     OperateMode::SearchStudentInfo,
+                    OperateMode::StudentGradeView,
                     OperateMode::ScheduleClass,
                     OperateMode::FeedbackApp,
                     OperateMode::FeedbackCompany};
@@ -41,6 +43,7 @@ OperateModes UserManager::getModsByUserRole(UserRole& role)
             return { OperateMode::SearchClassInfo,
                     OperateMode::SearchTeacherInfo,
                     OperateMode::SearchStudentInfo,
+                    OperateMode::StudentGradeView,
                     OperateMode::ScheduleClass,
                     OperateMode::FeedbackApp,
                     OperateMode::FeedbackCompany};
@@ -56,6 +59,7 @@ OperateModes UserManager::getModsByUserRole(UserRole& role)
                     OperateMode::SearchClassInfo,
                     OperateMode::SearchTeacherInfo,
                     OperateMode::SearchStudentInfo,
+                    OperateMode::StudentGradeView,
                     OperateMode::ScheduleClass,
                     OperateMode::FeedbackApp,
                     OperateMode::FeedbackCompany};
@@ -64,16 +68,19 @@ OperateModes UserManager::getModsByUserRole(UserRole& role)
                     OperateMode::SearchClassInfo,
                     OperateMode::SearchTeacherInfo,
                     OperateMode::SearchStudentInfo,
+                    OperateMode::StudentGradeView,
                     OperateMode::ScheduleClass,
                     OperateMode::FeedbackApp,
                     OperateMode::FeedbackCompany};
         case UserRole::OneToMultiAssistant:
             return { OperateMode::TaskAssistantView,
+                    OperateMode::StudentGradeView,
                     OperateMode::ScheduleClass,
                     OperateMode::FeedbackApp,
                     OperateMode::FeedbackCompany};
         case UserRole::OneToMultiManager:
             return { OperateMode::TaskManagerView,
+                    OperateMode::StudentGradeView,
                     OperateMode::ScheduleClass,
                     OperateMode::FeedbackApp,
                     OperateMode::FeedbackCompany};

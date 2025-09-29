@@ -119,6 +119,7 @@ namespace ClassScheduler
         SearchClassInfo,
         SearchTeacherInfo,
         SearchStudentInfo,
+        StudentGradeView,
         ScheduleClass,
         TaskAssistantView,
         TaskManagerView,
@@ -1077,6 +1078,24 @@ namespace ClassScheduler
         }
     };
     using StudentInfos = std::vector<StudentInfo>;
+
+    struct Grade {
+        std::string suject;
+        int score;
+        std::string date;
+        std::string type;
+    };
+    using Grades = std::vector<Grade>;
+
+    struct StudentGradeInfo {
+        int id;
+        std::string name;
+        std::string school;
+        std::string phoneNumber;
+        std::string year;
+        std::string teachers;
+        Grades grades;
+    };
 
     struct ScheduleClassInputInfo
     {

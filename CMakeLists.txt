@@ -109,6 +109,8 @@ qt_add_qml_module(appClassScheduler
     SOURCES Controller/FeedbackController.cpp
     SOURCES Controller/AccountViewController.h
     SOURCES Controller/AccountViewController.cpp
+    SOURCES Controller/StudentGradeController.h
+    SOURCES Controller/StudentGradeController.cpp
 
     SOURCES Managers/CoreFramework.h
     SOURCES Managers/CoreFramework.cpp
@@ -124,6 +126,8 @@ qt_add_qml_module(appClassScheduler
     SOURCES Managers/FeedbackManager.cpp
     SOURCES Managers/AccountManager.h
     SOURCES Managers/AccountManager.cpp
+    SOURCES Managers/StudentGradeManager.h
+    SOURCES Managers/StudentGradeManager.cpp
     SOURCES Managers/Logger.cpp
     SOURCES Managers/Logger.h
 
@@ -152,6 +156,7 @@ qt_add_qml_module(appClassScheduler
     RESOURCES Resource/close.svg
     RESOURCES Resource/update.svg
     RESOURCES Resource/sync_orange.svg
+    RESOURCES Resource/grade.svg
 
     RESOURCE_PREFIX "/"
 )

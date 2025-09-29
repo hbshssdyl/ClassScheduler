@@ -21,6 +21,8 @@ QString toOperateModeString(OperateMode mode)
         return "教师信息";
     case OperateMode::SearchStudentInfo:
         return "学生信息";
+    case OperateMode::StudentGradeView:
+        return "学生成绩";
     case OperateMode::ScheduleClass:
         return "排课";
     case OperateMode::TeacherEvaluation:
@@ -55,6 +57,8 @@ QString getIconNameByOperateMode(OperateMode mode)
         return "study.svg";
     case OperateMode::SearchStudentInfo:
         return "user.svg";
+    case OperateMode::StudentGradeView:
+        return "grade.svg";
     case OperateMode::ScheduleClass:
         return "tag.svg";
     case OperateMode::TeacherEvaluation:
@@ -145,6 +149,8 @@ QString CUtils::toString(OperateMode mode)
         return "SearchTeacherInfo";
     case OperateMode::SearchStudentInfo:
         return "SearchStudentInfo";
+    case OperateMode::StudentGradeView:
+        return "StudentGradeView";
     case OperateMode::ScheduleClass:
         return "ScheduleClass";
     case OperateMode::TaskAssistantView:

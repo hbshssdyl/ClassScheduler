@@ -44,6 +44,14 @@ public:
     ResponseResult getLatestVersion();
     void downloadInstaller(const std::string& url, const std::string& savePath, std::function<void(int)> callback);
 
+    //For student grade
+    ResponseResult createStudentInfo(const StudentGradeInfo& student);
+    ResponseResult getAllStudentGrades();
+    ResponseResult createStudentGrade(const Grade& grade, int studentId);
+    ResponseResult updateGrade(const Grade& grade);
+    ResponseResult deleteGrade(int gradeId);
+
+
 private:
     std::weak_ptr<CoreFramework> mCoreFramework;
 };

@@ -11,6 +11,7 @@ using NetworkManagerPtr = std::shared_ptr<class NetworkManager>;
 using TaskManagerPtr = std::shared_ptr<class TaskManager>;
 using AccountManagerPtr = std::shared_ptr<class AccountManager>;
 using FeedbackManagerPtr = std::shared_ptr<class FeedbackManager>;
+using StudentGradeManagerPtr = std::shared_ptr<class StudentGradeManager>;
 
 class CoreFramework : public std::enable_shared_from_this<CoreFramework>
 {
@@ -28,6 +29,7 @@ public:
     TaskManagerPtr getTaskManager();
     AccountManagerPtr getAccountManager();
     FeedbackManagerPtr getFeedbackManager();
+    StudentGradeManagerPtr getStudentGradeManager();
 
 private:
     void initAppData();
@@ -44,6 +46,7 @@ private:
     TaskManagerPtr mTaskManager;
     AccountManagerPtr mAccountManager;
     FeedbackManagerPtr mFeedbackManager;
+    StudentGradeManagerPtr mStudentGradeManager;
 };
 
 #endif // COREFRAMEWORK_H

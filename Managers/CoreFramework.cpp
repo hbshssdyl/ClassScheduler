@@ -5,6 +5,7 @@
 #include "TaskManager.h"
 #include "AccountManager.h"
 #include "FeedbackManager.h"
+#include "StudentGradeManager.h"
 
 CoreFramework::CoreFramework() {}
 
@@ -23,10 +24,12 @@ void CoreFramework::initManagers()
     mTaskManager = std::make_shared<TaskManager>(shared_from_this());
     mAccountManager = std::make_shared<AccountManager>(shared_from_this());
     mFeedbackManager = std::make_shared<FeedbackManager>(shared_from_this());
+    mStudentGradeManager = std::make_shared<StudentGradeManager>(shared_from_this());
 
     mTaskManager->initialize();
     mAccountManager->initialize();
     mFeedbackManager->initialize();
+    mStudentGradeManager->initialize();
 }
 
 void CoreFramework::refreshDataFromServer()
@@ -138,3 +141,9 @@ FeedbackManagerPtr CoreFramework::getFeedbackManager()
 {
     return mFeedbackManager;
 }
+
+StudentGradeManagerPtr CoreFramework::getStudentGradeManager()
+{
+    return mStudentGradeManager;
+}
+

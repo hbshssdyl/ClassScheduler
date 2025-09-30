@@ -18,7 +18,7 @@ public:
 
 public:
     explicit StudentGradeController(CoreFrameworkPtr coreFramework, QObject* parent = nullptr);
-    void refreshStudentGradeList();
+    void refreshStudentGradeInfos();
 
 signals:
     void studentGradeListChanged();
@@ -32,8 +32,7 @@ private:
 
 private:
     QVariantList mStudentGradeList;
-    StudentInfos mStudentInfosFromDB;
-    AppSettings mAppSettings;
+    StudentGradeInfos mStudentGradeInfos;
     std::weak_ptr<CoreFramework> mCoreFramework;
 };
 

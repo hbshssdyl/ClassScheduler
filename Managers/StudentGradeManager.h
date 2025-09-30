@@ -7,27 +7,26 @@ using namespace ClassScheduler;
 
 using CoreFrameworkPtr = std::shared_ptr<class CoreFramework>;
 
-class FeedbackManager
+class StudentGradeManager
 {
 public:
-    FeedbackManager(CoreFrameworkPtr coreFramework);
-    FeedbackInfos getFeedbackInfos();
+    StudentGradeManager(CoreFrameworkPtr coreFramework);
+    StudentGradeInfos getStudentGradeInfos();
     void initialize();
     void refreshDataFromServer();
 
-    bool addFeedback(std::string feedbackType, std::string username, bool isAnonymous, std::string feedbackMessage, std::string dateAndTime);
-    bool likeFeedback(int feedbackId);
-    bool approveFeedback(int feedbackId);
-    bool rejectFeedback(int feedbackId);
-    bool deleteFeedback(int feedbackId);
+    bool addStudentInfo(const StudentGradeInfo& studentInfo);
+    bool addStudentGrade(const Grade& grade, int studentId);
+    bool updateGrade(const Grade& grade);
+    bool deleteGrade(int gradeId);
 
 private:
-    void initFeedbackInfos();
-    FeedbackInfos getFeedbacksFromServer();
+    void initStudentGradeInfos();
+    StudentGradeInfos getStudentGradeInfosFromServer();
 
 private:
     std::weak_ptr<CoreFramework> mCoreFramework;
-    FeedbackInfos mFeedbackInfos;
+    StudentGradeInfos mStudentGradeInfos;
 };
 
 #endif // FEEDBACKMANAGER_H

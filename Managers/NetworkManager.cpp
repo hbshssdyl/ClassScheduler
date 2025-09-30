@@ -7,8 +7,8 @@
 
 using json = nlohmann::json;
 
-//static const std::string SERVER_URL = "http://127.0.0.1:8888/";
-static const std::string SERVER_URL = "http://8.153.84.30:8888/";
+static const std::string SERVER_URL = "http://127.0.0.1:8888/";
+//static const std::string SERVER_URL = "http://8.153.84.30:8888/";
 
 NetworkManager::NetworkManager(CoreFrameworkPtr coreFramework)
     : mCoreFramework(coreFramework)
@@ -960,5 +960,157 @@ void NetworkManager::downloadInstaller(const std::string& url, const std::string
     curl_easy_cleanup(curl);
 
     return;
+}
+
+// 添加学生
+ResponseResult NetworkManager::createStudentInfo(const StudentGradeInfo& student) {
+    CURL* curl = curl_easy_init();
+    std::string responseStr;
+    ResponseResult result;
+    if (!curl) { result.updateToCurlError(); return result; }
+
+    json payload = {
+        {"name", student.name},
+        {"school", student.school},
+        {"phoneNumber", student.phoneNumber},
+        {"year", student.year},
+        {"teachers", student.teachers}
+    };
+
+    std::string jsonData = payload.dump();
+    struct curl_slist* headers = nullptr;
+    headers = curl_slist_append(headers, "Content-Type: application/json");
+
+    curl_easy_setopt(curl, CURLOPT_URL, (SERVER_URL + "students/add").c_str());
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, jsonData.c_str());
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeCallback);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &responseStr);
+
+    CURLcode res = curl_easy_perform(curl);
+    if (res != CURLE_OK) result.rawResponse = curl_easy_strerror(res);
+    else                 result.refreshResult(responseStr);
+
+    curl_slist_free_all(headers);
+    curl_easy_cleanup(curl);
+    return result;
+}
+
+// 获取所有学生及成绩
+ResponseResult NetworkManager::getAllStudentGrades() {
+    ResponseResult result;
+    CURL* curl = curl_easy_init();
+    if (!curl) { result.updateToCurlError(); return result; }
+
+    std::string responseStr;
+    curl_easy_setopt(curl, CURLOPT_URL, (SERVER_URL + "students/all").c_str());
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeCallback);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &responseStr);
+
+    CURLcode res = curl_easy_perform(curl);
+    if (res != CURLE_OK) result.rawResponse = curl_easy_strerror(res);
+    else                 result.refreshResult(responseStr);
+
+    curl_easy_cleanup(curl);
+    return result;
+}
+
+// 添加成绩
+ResponseResult NetworkManager::createStudentGrade(const Grade& grade, int studentId) {
+    CURL* curl = curl_easy_init();
+    std::string responseStr;
+    ResponseResult result;
+    if (!curl) { result.updateToCurlError(); return result; }
+
+    json payload = {
+        {"student_id", studentId},
+        {"subject", grade.subject},
+        {"score", grade.score},
+        {"date", grade.date},
+        {"type", grade.type},
+        {"operatorName", grade.operatorName}
+    };
+
+    std::string jsonData = payload.dump();
+    struct curl_slist* headers = nullptr;
+    headers = curl_slist_append(headers, "Content-Type: application/json");
+
+    curl_easy_setopt(curl, CURLOPT_URL, (SERVER_URL + "grades/add").c_str());
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, jsonData.c_str());
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeCallback);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &responseStr);
+
+    CURLcode res = curl_easy_perform(curl);
+    if (res != CURLE_OK) result.rawResponse = curl_easy_strerror(res);
+    else                 result.refreshResult(responseStr);
+
+    curl_slist_free_all(headers);
+    curl_easy_cleanup(curl);
+    return result;
+}
+
+// 修改成绩
+ResponseResult NetworkManager::updateGrade(const Grade& grade) {
+    CURL* curl = curl_easy_init();
+    std::string responseStr;
+    ResponseResult result;
+    if (!curl) { result.updateToCurlError(); return result; }
+
+    json payload = {
+        {"id", grade.id},
+        {"subject", grade.subject},
+        {"score", grade.score},
+        {"date", grade.date},
+        {"type", grade.type},
+        {"operatorName", grade.operatorName}
+    };
+
+    std::string jsonData = payload.dump();
+    struct curl_slist* headers = nullptr;
+    headers = curl_slist_append(headers, "Content-Type: application/json");
+
+    curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "PUT");
+    curl_easy_setopt(curl, CURLOPT_URL, (SERVER_URL + "grades/update").c_str());
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, jsonData.c_str());
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeCallback);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &responseStr);
+
+    CURLcode res = curl_easy_perform(curl);
+    if (res != CURLE_OK) result.rawResponse = curl_easy_strerror(res);
+    else                 result.refreshResult(responseStr);
+
+    curl_slist_free_all(headers);
+    curl_easy_cleanup(curl);
+    return result;
+}
+
+// 删除成绩
+ResponseResult NetworkManager::deleteGrade(int gradeId) {
+    CURL* curl = curl_easy_init();
+    std::string responseStr;
+    ResponseResult result;
+    if (!curl) { result.updateToCurlError(); return result; }
+
+    json payload = { {"id", gradeId} };
+    std::string jsonData = payload.dump();
+    struct curl_slist* headers = nullptr;
+    headers = curl_slist_append(headers, "Content-Type: application/json");
+
+    curl_easy_setopt(curl, CURLOPT_URL, (SERVER_URL + "grades/delete").c_str());
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, jsonData.c_str());
+    curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "POST");
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeCallback);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &responseStr);
+
+    CURLcode res = curl_easy_perform(curl);
+    if (res != CURLE_OK) result.rawResponse = curl_easy_strerror(res);
+    else                 result.refreshResult(responseStr);
+
+    curl_slist_free_all(headers);
+    curl_easy_cleanup(curl);
+    return result;
 }
 

@@ -193,6 +193,18 @@ namespace ClassScheduler
         LikeFeedbackSuccess,
         LikeFeedbackFailed,
 
+        //StudentGradeInfos
+        CreateStudentInfoSuccess,
+        CreateStudentInfoFailed,
+        GetAllStudentGradeInfosSuccess,
+        GetAllStudentGradeInfosFailed,
+        CreateStudentGradeSuccess,
+        CreateStudentGradeFailed,
+        UpdateStudentGradeSuccess,
+        UpdateStudentGradeFailed,
+        DeleteStudentGradeSuccess,
+        DeleteStudentGradeFailed,
+
         //Other
         CurlNotOK,
         UnknownError
@@ -1080,15 +1092,17 @@ namespace ClassScheduler
     using StudentInfos = std::vector<StudentInfo>;
 
     struct Grade {
-        std::string suject;
+        int id; // 成绩 ID（数据库主键）
+        std::string subject;
         int score;
         std::string date;
         std::string type;
+        std::string operatorName;
     };
     using Grades = std::vector<Grade>;
 
     struct StudentGradeInfo {
-        int id;
+        int id; // 学生 ID
         std::string name;
         std::string school;
         std::string phoneNumber;
@@ -1096,6 +1110,7 @@ namespace ClassScheduler
         std::string teachers;
         Grades grades;
     };
+    using StudentGradeInfos = std::vector<StudentGradeInfo>;
 
     struct ScheduleClassInputInfo
     {
@@ -1385,6 +1400,9 @@ namespace ClassScheduler
         //FeedbackInfos
         FeedbackInfos feedbackInfos;
 
+        //StudentGradeInfos
+        StudentGradeInfos studentGradeInfos;
+
         ResponseResult()
         {
             rawResponse = "ResponseResult: init rawResponse";
@@ -1552,6 +1570,94 @@ namespace ClassScheduler
             if (response.find(toString(ResultStatus::LikeFeedbackFailed), Qt::CaseSensitive) != std::string::npos) {
                 status = ResultStatus::LikeFeedbackFailed;
                 statusStr = toString(ResultStatus::LikeFeedbackFailed);
+                return;
+            }
+
+            // StudentGradeInfos
+            if (response.find(toString(ResultStatus::GetAllStudentGradeInfosSuccess), Qt::CaseSensitive) != std::string::npos) {
+                status = ResultStatus::GetAllStudentGradeInfosSuccess;
+                statusStr = toString(ResultStatus::GetAllStudentGradeInfosSuccess);
+
+                nlohmann::json studentArray = nlohmann::json::parse(response);
+
+                for (const auto& item : studentArray["students"]) {
+                    StudentGradeInfo student;
+                    student.id = item.at("id").get<int>();
+                    student.name = item.at("name").get<std::string>();
+                    student.school = item.value("school", "");
+                    student.phoneNumber = item.value("phoneNumber", "");
+                    student.year = item.value("year", "");
+                    student.teachers = item.value("teachers", "");
+
+                    // 解析成绩数组
+                    for (const auto& g : item["grades"]) {
+                        Grade grade;
+                        grade.id = g.at("id").get<int>();
+                        grade.subject = g.at("subject").get<std::string>();
+                        grade.score = g.at("score").get<int>();
+                        grade.date = g.value("date", "");
+                        grade.type = g.value("type", "");
+                        grade.operatorName = g.value("operatorName", "");
+                        student.grades.push_back(grade);
+                    }
+
+                    studentGradeInfos.push_back(student);
+                }
+
+                return;
+            }
+
+            if (response.find(toString(ResultStatus::GetAllStudentGradeInfosFailed), Qt::CaseSensitive) != std::string::npos) {
+                status = ResultStatus::GetAllStudentGradeInfosFailed;
+                statusStr = toString(ResultStatus::GetAllStudentGradeInfosFailed);
+                return;
+            }
+
+            if (response.find(toString(ResultStatus::CreateStudentInfoSuccess), Qt::CaseSensitive) != std::string::npos) {
+                status = ResultStatus::CreateStudentInfoSuccess;
+                statusStr = toString(ResultStatus::CreateStudentInfoSuccess);
+                return;
+            }
+
+            if (response.find(toString(ResultStatus::CreateStudentInfoFailed), Qt::CaseSensitive) != std::string::npos) {
+                status = ResultStatus::CreateStudentInfoFailed;
+                statusStr = toString(ResultStatus::CreateStudentInfoFailed);
+                return;
+            }
+
+            if (response.find(toString(ResultStatus::CreateStudentGradeSuccess), Qt::CaseSensitive) != std::string::npos) {
+                status = ResultStatus::CreateStudentGradeSuccess;
+                statusStr = toString(ResultStatus::CreateStudentGradeSuccess);
+                return;
+            }
+
+            if (response.find(toString(ResultStatus::CreateStudentGradeFailed), Qt::CaseSensitive) != std::string::npos) {
+                status = ResultStatus::CreateStudentGradeFailed;
+                statusStr = toString(ResultStatus::CreateStudentGradeFailed);
+                return;
+            }
+
+            if (response.find(toString(ResultStatus::UpdateStudentGradeSuccess), Qt::CaseSensitive) != std::string::npos) {
+                status = ResultStatus::UpdateStudentGradeSuccess;
+                statusStr = toString(ResultStatus::UpdateStudentGradeSuccess);
+                return;
+            }
+
+            if (response.find(toString(ResultStatus::UpdateStudentGradeFailed), Qt::CaseSensitive) != std::string::npos) {
+                status = ResultStatus::UpdateStudentGradeFailed;
+                statusStr = toString(ResultStatus::UpdateStudentGradeFailed);
+                return;
+            }
+
+            if (response.find(toString(ResultStatus::DeleteStudentGradeSuccess), Qt::CaseSensitive) != std::string::npos) {
+                status = ResultStatus::DeleteStudentGradeSuccess;
+                statusStr = toString(ResultStatus::DeleteStudentGradeSuccess);
+                return;
+            }
+
+            if (response.find(toString(ResultStatus::DeleteStudentGradeFailed), Qt::CaseSensitive) != std::string::npos) {
+                status = ResultStatus::DeleteStudentGradeFailed;
+                statusStr = toString(ResultStatus::DeleteStudentGradeFailed);
                 return;
             }
 
@@ -1923,6 +2029,28 @@ namespace ClassScheduler
                     return "LikeFeedbackSuccess";
                 case ClassScheduler::ResultStatus::LikeFeedbackFailed:
                     return "LikeFeedbackFailed";
+
+                // StudentGradeInfos
+                case ClassScheduler::ResultStatus::CreateStudentInfoSuccess:
+                    return "CreateStudentInfoSuccess";
+                case ClassScheduler::ResultStatus::CreateStudentInfoFailed:
+                    return "CreateStudentInfoFailed";
+                case ClassScheduler::ResultStatus::GetAllStudentGradeInfosSuccess:
+                    return "GetAllStudentGradeInfosSuccess";
+                case ClassScheduler::ResultStatus::GetAllStudentGradeInfosFailed:
+                    return "GetAllStudentGradeInfosFailed";
+                case ClassScheduler::ResultStatus::CreateStudentGradeSuccess:
+                    return "CreateStudentGradeSuccess";
+                case ClassScheduler::ResultStatus::CreateStudentGradeFailed:
+                    return "CreateStudentGradeFailed";
+                case ClassScheduler::ResultStatus::UpdateStudentGradeSuccess:
+                    return "UpdateStudentGradeSuccess";
+                case ClassScheduler::ResultStatus::UpdateStudentGradeFailed:
+                    return "UpdateStudentGradeFailed";
+                case ClassScheduler::ResultStatus::DeleteStudentGradeSuccess:
+                    return "DeleteStudentGradeSuccess";
+                case ClassScheduler::ResultStatus::DeleteStudentGradeFailed:
+                    return "DeleteStudentGradeFailed";
 
                 // Other
                 case ResultStatus::CurlNotOK:

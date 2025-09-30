@@ -1,37 +1,37 @@
 ﻿#include <QCoreApplication>
 #include <iostream>
 
-#include "SearchStudentInfoController.h"
+#include "StudentGradeController.h"
 #include "Utils/ControllerUtils.h"
-#include "Managers/DataManager.h"
+#include "Managers/StudentGradeManager.h"
 
 using namespace ClassScheduler;
 
-SearchStudentInfoController::SearchStudentInfoController(CoreFrameworkPtr coreFramework, QObject* parent)
+StudentGradeController::StudentGradeController(CoreFrameworkPtr coreFramework, QObject* parent)
     : mCoreFramework(coreFramework)
     , QObject(parent)
 {
     initialize();
 }
 
-void SearchStudentInfoController::initialize()
+void StudentGradeController::initialize()
 {
-    refreshSearchStudentInfo();
+    refreshStudentGradeInfos();
 }
 
-void SearchStudentInfoController::refreshSearchStudentInfo()
+void StudentGradeController::refreshStudentGradeInfos()
 {
     auto coreFramework = mCoreFramework.lock();
-    auto dataManager = coreFramework->getDataManager();
-    if(!dataManager)
+    auto studentGradeManager = coreFramework->getStudentGradeManager();
+    if(!studentGradeManager)
     {
         return;
     }
 
-    if(mStudentInfosFromDB.size() == 0)
+    if(mStudentGradeInfos.size() == 0)
     {
-        mStudentInfosFromDB = dataManager->getStudentInfosFromDB();
-        mAppSettings = dataManager->getAppSettingsFromDB();
+        mStudentGradeInfos = studentGradeManager->getStudentInfosFromDB();
+        mAppSettings = studentGradeManager->getAppSettingsFromDB();
     }
 
     if(mStudentInfosFromDB.size() == 0)
@@ -42,7 +42,7 @@ void SearchStudentInfoController::refreshSearchStudentInfo()
     updateStudentInfosList(mStudentInfosFromDB);
 }
 
-void SearchStudentInfoController::updateStudentInfosList(StudentInfos& studentInfos)
+void StudentGradeController::updateStudentInfosList(StudentInfos& studentInfos)
 {
     QVariantMap newStudentInfoMap;
     CUtils::updateStudentInfoList(newStudentInfoMap, studentInfos);
@@ -54,7 +54,7 @@ void SearchStudentInfoController::updateStudentInfosList(StudentInfos& studentIn
     }
 }
 
-void SearchStudentInfoController::onSearchTriggered(QString searchString)
+void StudentGradeController::onSearchTriggered(QString searchString)
 {
     StudentInfos infos;
     searchString = searchString.simplified();
